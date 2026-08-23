@@ -18,7 +18,7 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: "PremierView — season comparison",
+  title: "Better Than The Last One",
   description: "Your club's Premier League season so far, against the same point last season.",
 };
 
