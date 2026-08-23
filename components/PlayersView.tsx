@@ -6,13 +6,6 @@ import { short, textOn } from "@/lib/format";
 import { goalsChart, playersView } from "@/lib/view";
 import type { PlayedTeamPage } from "@/lib/types";
 
-const LABEL: React.CSSProperties = {
-  fontSize: 11,
-  letterSpacing: "1.2px",
-  textTransform: "uppercase",
-  color: "#8b857c",
-};
-
 type Row = ReturnType<typeof playersView>["scorers"][number];
 
 function RankedList({
@@ -42,7 +35,7 @@ function RankedList({
           alignItems: "baseline",
         }}
       >
-        <div style={LABEL}>{title}</div>
+        <div className="eyebrow">{title}</div>
         <div style={{ fontSize: 10.5, color: "#b9b2a6" }}>this season · last</div>
       </div>
 
@@ -56,7 +49,7 @@ function RankedList({
             animation: `rise .5s cubic-bezier(.2,.7,.3,1) ${p.delay.toFixed(2)}s both`,
           }}
         >
-          <div className="num" style={{ width: 26, fontSize: 11, color: "#b9b2a6" }}>
+          <div className="num fig-rank" style={{ width: 26, color: "#b9b2a6" }}>
             {p.rank}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
@@ -69,19 +62,12 @@ function RankedList({
               }}
             >
               <span
-                style={{
-                  fontWeight: 700,
-                  fontSize: 13.5,
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                }}
+                className="player-name"
+                style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
               >
                 {p.name}
               </span>
-              <span className="num" style={{ fontSize: 15 }}>
-                {p.value}
-              </span>
+              <span className="num fig-player">{p.value}</span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 5 }}>
               <div
@@ -155,18 +141,13 @@ export default function PlayersView({
       </div>
 
       <div className="a-top">
-        <div style={{ ...LABEL, animation: "rise .5s ease-out .16s both", marginBottom: 6 }}>
+        <div className="eyebrow" style={{ animation: "rise .5s ease-out .16s both", marginBottom: 6 }}>
           {vm.topScorerLabel}
         </div>
         <div style={{ display: "flex", alignItems: "baseline", gap: 14, flexWrap: "wrap" }}>
           <div
-            style={{
-              animation: "bigin .7s cubic-bezier(.2,.8,.25,1) .22s both",
-              fontWeight: 800,
-              fontSize: 46,
-              lineHeight: 1,
-              letterSpacing: "-1.5px",
-            }}
+            className="fig-name"
+            style={{ animation: "bigin .7s cubic-bezier(.2,.8,.25,1) .22s both", fontWeight: 800 }}
           >
             {vm.topScorerName}
           </div>
@@ -180,21 +161,14 @@ export default function PlayersView({
               color: accentFg,
               borderRadius: 99,
               padding: "5px 10px",
-              fontSize: 12,
               fontWeight: 700,
             }}
+            className="pill-delta"
           >
             {vm.topScorerGoals}
           </div>
         </div>
-        <div
-          style={{
-            animation: "rise .5s ease-out .54s both",
-            fontSize: 12,
-            color: "#8b857c",
-            marginTop: 8,
-          }}
-        >
+        <div className="sub-note" style={{ animation: "rise .5s ease-out .54s both", marginTop: 8 }}>
           {vm.topScorerNote}
         </div>
       </div>
@@ -203,30 +177,15 @@ export default function PlayersView({
         {vm.summary.map((c) => (
           <div
             key={c.label}
-            style={{
-              background: "#fff",
-              borderRadius: 16,
-              padding: 14,
-              animation: `rise .55s cubic-bezier(.2,.7,.3,1) ${c.delay.toFixed(2)}s both`,
-            }}
+            className="card"
+            style={{ animation: `rise .55s cubic-bezier(.2,.7,.3,1) ${c.delay.toFixed(2)}s both` }}
           >
-            <div
-              style={{
-                fontSize: 10.5,
-                letterSpacing: "1px",
-                textTransform: "uppercase",
-                color: "#8b857c",
-              }}
-            >
-              {c.label}
-            </div>
+            <div className="card-label">{c.label}</div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 4 }}>
-              <span className="num" style={{ fontSize: 30 }}>
-                {c.value}
-              </span>
-              <span style={{ fontSize: 12, color: "#8b857c" }}>{c.unit}</span>
+              <span className="num fig-stat">{c.value}</span>
+              <span className="sub-note">{c.unit}</span>
             </div>
-            <div style={{ fontSize: 11, color: "#8b857c", marginTop: 6 }}>{c.prev}</div>
+            <div className="prev-note" style={{ marginTop: 6 }}>{c.prev}</div>
           </div>
         ))}
       </div>

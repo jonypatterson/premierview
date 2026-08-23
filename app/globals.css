@@ -12,6 +12,8 @@ a:hover { color: #c8102e; }
    it becomes a centred card on the canvas and the screens re-flow onto two
    columns. */
 
+:root { --chart-h: 160px; }
+
 .frame-outer { display: flex; justify-content: center; }
 
 .frame {
@@ -23,9 +25,10 @@ a:hover { color: #c8102e; }
 }
 
 @media (min-width: 1000px) {
-  .frame-outer { padding: 40px 20px; }
+  :root { --chart-h: 280px; }
+  .frame-outer { padding: 36px 28px; }
   .frame {
-    max-width: 1100px;
+    max-width: 1500px;
     min-height: 0;
     border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 24px;
@@ -53,6 +56,7 @@ a:hover { color: #c8102e; }
     grid-template-columns: 1fr 1fr;
     gap: 36px 52px;
     padding: 48px 60px 140px;
+    box-sizing: border-box;
     align-content: start;
   }
   .screen-season {
@@ -128,14 +132,17 @@ a:hover { color: #c8102e; }
 
 .chart-block { margin-top: 14px; }
 
+.chart-block { display: flex; flex-direction: column; }
+.chart-row { display: flex; gap: 8px; }
+
 .chart-plot {
   flex: 1;
   position: relative;
-  height: 160px;
+  height: var(--chart-h);
   align-self: flex-start;
 }
 
-.chart-svg { width: 100%; height: 160px; display: block; overflow: visible; }
+.chart-svg { width: 100%; height: 100%; display: block; overflow: visible; }
 
 .chart-marker {
   position: absolute;
@@ -160,11 +167,15 @@ a:hover { color: #c8102e; }
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 160px;
+  height: var(--chart-h);
   font-size: 9.5px;
   color: #b9b2a6;
   text-align: right;
   padding: 4px 0;
+}
+
+@media (min-width: 1000px) {
+  .chart-ylabels { font-size: 11px; }
 }
 
 .club-row { transition: background 0.18s ease; }
@@ -216,3 +227,50 @@ a:hover { color: #c8102e; }
     transition-duration: 0.001ms !important;
   }
 }
+
+/* ---- Type scale --------------------------------------------------------
+   Phone sizes are the base; the wide layout has room, so the figures get
+   considerably bigger rather than floating in space. */
+
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #8b857c;
+}
+.card-label {
+  font-size: 10.5px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #8b857c;
+}
+.card { background: #fff; border-radius: 16px; padding: 14px; }
+
+.fig-position { font-size: 76px; line-height: 0.9; letter-spacing: -2px; }
+.fig-suffix { font-size: 26px; letter-spacing: 0; }
+.fig-stat { font-size: 30px; }
+.fig-name { font-size: 46px; line-height: 1; letter-spacing: -1.5px; }
+.fig-player { font-size: 15px; }
+.fig-rank { font-size: 11px; }
+.pill-delta { font-size: 12px; }
+.sub-note { font-size: 12px; color: #8b857c; }
+.prev-note { font-size: 11px; color: #8b857c; }
+
+@media (min-width: 1000px) {
+  .eyebrow { font-size: 12.5px; letter-spacing: 1.6px; }
+  .card-label { font-size: 12px; letter-spacing: 1.4px; }
+  .card { border-radius: 20px; padding: 22px 24px 20px; }
+
+  .fig-position { font-size: 148px; letter-spacing: -5px; }
+  .fig-suffix { font-size: 48px; }
+  .fig-stat { font-size: 62px; }
+  .fig-name { font-size: 78px; letter-spacing: -3px; }
+  .fig-player { font-size: 22px; }
+  .fig-rank { font-size: 13px; }
+  .pill-delta { font-size: 16px; padding: 7px 14px; }
+  .sub-note { font-size: 15px; }
+  .prev-note { font-size: 13px; }
+}
+
+.player-name { font-weight: 700; font-size: 13.5px; }
+@media (min-width: 1000px) { .player-name { font-size: 17px; } }

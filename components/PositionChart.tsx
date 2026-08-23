@@ -33,10 +33,11 @@ export default function PositionChart({ chart, accent, thisSeason, lastSeason }:
       .map((p) => p.split(",").map(Number) as [number, number]);
 
     const measure = () => {
-      const sx = el.clientWidth / 320; // height is 160 in both spaces, so sy = 1
+      const sx = el.clientWidth / 320;
+      const sy = el.clientHeight / 160;
       let total = 0;
       for (let i = 1; i < pts.length; i++) {
-        total += Math.hypot((pts[i][0] - pts[i - 1][0]) * sx, pts[i][1] - pts[i - 1][1]);
+        total += Math.hypot((pts[i][0] - pts[i - 1][0]) * sx, (pts[i][1] - pts[i - 1][1]) * sy);
       }
       setLen(Math.ceil(total) + 1);
     };
@@ -60,14 +61,7 @@ export default function PositionChart({ chart, accent, thisSeason, lastSeason }:
           flexWrap: "wrap",
         }}
       >
-        <div
-          style={{
-            fontSize: 11,
-            letterSpacing: "1.2px",
-            textTransform: "uppercase",
-            color: "#8b857c",
-          }}
-        >
+        <div className="eyebrow">
           Position by matchweek
         </div>
         <div style={{ display: "flex", gap: 12, fontSize: 10.5, color: "#8b857c" }}>
@@ -89,7 +83,9 @@ export default function PositionChart({ chart, accent, thisSeason, lastSeason }:
         </div>
       </div>
 
-      <div style={{ animation: "rise .6s ease-out 1.5s both", display: "flex", gap: 8 }}>
+      <div style={{ animation: "rise .6s ease-out 1.5s both", display: "flex" }}
+        className="chart-row"
+      >
         <div className="chart-ylabels">
           <span>1</span>
           <span>5</span>

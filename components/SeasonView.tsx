@@ -6,20 +6,6 @@ import { short, textOn } from "@/lib/format";
 import { seasonView } from "@/lib/view";
 import type { CompareMode, PlayedTeamPage } from "@/lib/types";
 
-const LABEL: React.CSSProperties = {
-  fontSize: 11,
-  letterSpacing: "1.2px",
-  textTransform: "uppercase",
-  color: "#8b857c",
-};
-
-const CARD_LABEL: React.CSSProperties = {
-  fontSize: 10.5,
-  letterSpacing: "1px",
-  textTransform: "uppercase",
-  color: "#8b857c",
-};
-
 type Props = {
   data: PlayedTeamPage;
   accent: string;
@@ -48,29 +34,21 @@ export default function SeasonView({ data, accent, mode, onOpenPicker }: Props) 
 
       <div className="a-pos">
         <div
-          style={{
-            ...LABEL,
-            animation: "rise .5s cubic-bezier(.2,.7,.3,1) .18s both",
-            marginBottom: 6,
-          }}
+          className="eyebrow"
+          style={{ animation: "rise .5s cubic-bezier(.2,.7,.3,1) .18s both", marginBottom: 6 }}
         >
           League position · MW {vm.matchweek}
         </div>
         <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
           <div
-            className="num"
-            style={{
-              animation: "bigin .7s cubic-bezier(.2,.8,.25,1) .24s both",
-              fontSize: 76,
-              lineHeight: 0.9,
-              letterSpacing: "-2px",
-            }}
+            className="num fig-position"
+            style={{ animation: "bigin .7s cubic-bezier(.2,.8,.25,1) .24s both" }}
           >
             {vm.position}
-            <span style={{ fontSize: 26, letterSpacing: 0 }}>{vm.positionSuffix}</span>
+            <span className="fig-suffix">{vm.positionSuffix}</span>
           </div>
           <div
-            className="num"
+            className="num pill-delta"
             style={{
               animation: "pop .5s cubic-bezier(.3,1.4,.4,1) .5s both",
               display: "flex",
@@ -78,7 +56,6 @@ export default function SeasonView({ data, accent, mode, onOpenPicker }: Props) 
               gap: 5,
               borderRadius: 99,
               padding: "5px 10px",
-              fontSize: 12,
               background: vm.deltaBg,
               color: vm.deltaFg,
             }}
@@ -86,20 +63,13 @@ export default function SeasonView({ data, accent, mode, onOpenPicker }: Props) 
             {vm.deltaLabel}
           </div>
         </div>
-        <div
-          style={{
-            animation: "rise .5s ease-out .58s both",
-            fontSize: 12,
-            color: "#8b857c",
-            marginTop: 8,
-          }}
-        >
+        <div className="sub-note" style={{ animation: "rise .5s ease-out .58s both", marginTop: 8 }}>
           {vm.comparisonNote}
         </div>
       </div>
 
       <div className="a-form" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        <div style={{ ...LABEL, animation: "rise .5s ease-out .6s both" }}>Form this season</div>
+        <div className="eyebrow" style={{ animation: "rise .5s ease-out .6s both" }}>Form this season</div>
         <div style={{ display: "flex", gap: 10 }}>
           {vm.form.map((d, i) => (
             <div
@@ -130,18 +100,14 @@ export default function SeasonView({ data, accent, mode, onOpenPicker }: Props) 
         {vm.record.map((s) => (
           <div
             key={s.label}
-            style={{
-              background: "#fff",
-              borderRadius: 16,
-              padding: "14px 14px 12px",
-              animation: `rise .55s cubic-bezier(.2,.7,.3,1) ${s.delay.toFixed(2)}s both`,
-            }}
+            className="card"
+            style={{ animation: `rise .55s cubic-bezier(.2,.7,.3,1) ${s.delay.toFixed(2)}s both` }}
           >
-            <div style={CARD_LABEL}>{s.label}</div>
-            <div className="num" style={{ fontSize: 30, marginTop: 4 }}>
+            <div className="card-label">{s.label}</div>
+            <div className="num fig-stat" style={{ marginTop: 4 }}>
               {s.value}
             </div>
-            <div style={{ fontSize: 11, color: "#8b857c", marginTop: 2 }}>{s.prev}</div>
+            <div className="prev-note" style={{ marginTop: 2 }}>{s.prev}</div>
           </div>
         ))}
       </div>
@@ -150,19 +116,13 @@ export default function SeasonView({ data, accent, mode, onOpenPicker }: Props) 
         {vm.goals.map((g) => (
           <div
             key={g.label}
-            style={{
-              background: "#fff",
-              borderRadius: 16,
-              padding: 14,
-              animation: `rise .55s cubic-bezier(.2,.7,.3,1) ${g.delay.toFixed(2)}s both`,
-            }}
+            className="card"
+            style={{ animation: `rise .55s cubic-bezier(.2,.7,.3,1) ${g.delay.toFixed(2)}s both` }}
           >
-            <div style={CARD_LABEL}>{g.label}</div>
+            <div className="card-label">{g.label}</div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 4 }}>
-              <span className="num" style={{ fontSize: 30 }}>
-                {g.total}
-              </span>
-              <span style={{ fontSize: 12, color: "#8b857c" }}>{g.perGame}</span>
+              <span className="num fig-stat">{g.total}</span>
+              <span className="sub-note">{g.perGame}</span>
             </div>
             <div
               style={{
@@ -184,7 +144,7 @@ export default function SeasonView({ data, accent, mode, onOpenPicker }: Props) 
                 }}
               />
             </div>
-            <div style={{ fontSize: 11, color: "#8b857c", marginTop: 6 }}>{g.prev}</div>
+            <div className="prev-note" style={{ marginTop: 6 }}>{g.prev}</div>
           </div>
         ))}
       </div>

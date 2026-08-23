@@ -21,14 +21,7 @@ export default function GoalsChart({ vm }: { vm: GoalsChartVM }) {
           flexWrap: "wrap",
         }}
       >
-        <div
-          style={{
-            fontSize: 11,
-            letterSpacing: "1.2px",
-            textTransform: "uppercase",
-            color: "#8b857c",
-          }}
-        >
+        <div className="eyebrow">
           Goals by matchweek
         </div>
         <div style={{ display: "flex", gap: 12, fontSize: 10.5, color: "#8b857c" }}>
@@ -43,7 +36,9 @@ export default function GoalsChart({ vm }: { vm: GoalsChartVM }) {
         </div>
       </div>
 
-      <div style={{ animation: "rise .6s ease-out 2s both", display: "flex", gap: 8 }}>
+      <div style={{ animation: "rise .6s ease-out 2s both", display: "flex" }}
+        className="chart-row"
+      >
         <div className="chart-ylabels">
           {vm.labels.map((l) => (
             <span key={l}>{l}</span>
