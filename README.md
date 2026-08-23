@@ -1,25 +1,67 @@
-# CODING AGENTS: READ THIS FIRST
+# PremierView
 
-This is a **handoff bundle** from Claude Design (claude.ai/design).
+Your Premier League club's season so far, against the same point last season —
+league position, form, record, goals, a position-by-matchweek chart, and a
+goalscorers/assists page.
 
-A user mocked up designs in HTML/CSS/JS using an AI design tool, then exported this bundle so a coding agent can implement the designs for real.
+Next.js App Router on Vercel, reading a Supabase/Postgres database that a
+scheduled job keeps current. The app never calls a football API at request time.
 
-## What you should do — IMPORTANT
+## Running it
 
-**Read the chat transcripts first.** There are 1 chat transcript(s) in `chats/`. The transcripts show the full back-and-forth between the user and the design assistant — they tell you **what the user actually wants** and **where they landed** after iterating. Don't skip them. The final HTML files are the output, but the chat is where the intent lives.
+```bash
+npm install
+cp .env.example .env.local     # add NEXT_PUBLIC_SUPABASE_ANON_KEY
+npm run dev
+```
 
-**Read `project/Season Comparison.dc.html` in full.** The user had this file open when they triggered the handoff, so it's almost certainly the primary design they want built. Read it top to bottom — don't skim. Then **follow its imports**: open every file it pulls in (shared components, CSS, scripts) so you understand how the pieces fit together before you start implementing.
+Both env vars are required — `lib/queries.ts` throws at import without them.
 
-**If anything is ambiguous, ask the user to confirm before you start implementing.** It's much cheaper to clarify scope up front than to build the wrong thing.
+## Shape
 
-## About the design files
+```
+app/page.tsx        landing — saved club → /TLA, otherwise the picker
+app/[tla]/page.tsx  one route per club, ISR 60s, prerendered for all 20
+components/         the design, split by screen
+lib/queries.ts      the two RPCs: team_page(code), club_list()
+lib/view.ts         every derived number, label, bar width and chart point
+lib/config.ts       COMPARE_MODE — same-matchweek or final-table
+```
 
-The design medium is **HTML/CSS/JS** — these are prototypes, not production code. Your job is to **recreate them pixel-perfectly** in whatever technology makes sense for the target codebase (React, Vue, native, whatever fits). Match the visual output; don't copy the prototype's internal structure unless it happens to fit.
+**Why it's fast.** `revalidate = 60` means Vercel serves cached HTML for a minute
+at a time, so the common case never reaches Postgres. Data arrives with the
+HTML; the skeleton only ever appears on a client-side club switch. The hourly
+sync is what makes the page current, the cache is what makes it instant.
 
-**Don't render these files in a browser or take screenshots unless the user asks you to.** Everything you need — dimensions, colors, layout rules — is spelled out in the source. Read the HTML and CSS directly; a screenshot won't tell you anything they don't.
+**Club memory.** The chosen club is written to `localStorage` and the route is
+the source of truth — `/` redirects to it on later visits. Visiting `/ARS`
+directly also sets it.
 
-## Bundle contents
+**Comparison basis.** `COMPARE_MODE` switches the whole page between
+"same matchweek last season" (the fair comparison, and the default) and "last
+season's final table". The note, the delta pill and every *last season* figure
+move together.
 
-- `README.md` — this file
-- `chats/` — conversation transcripts (read these!)
-- `project/` — the `Premier League Season Comparison` project files (HTML prototypes, assets, components)
+**Club colour.** The accent — position pill, form dots, goals bar, chart line and
+marker, active tab icon — comes from `clubs.colour`. Anything sitting on that
+colour takes a computed foreground, so light clubs (Leeds, Hull, City, Coventry,
+Villa) get near-black text rather than unreadable white.
+
+## Type
+
+Rubik throughout, with figures set in Roboto 700 — a little narrower and quieter
+than Rubik's 800.
+
+## Backend
+
+Documented in [`design/project/ARCHITECTURE.md`](design/project/ARCHITECTURE.md):
+schema, the `sync-season` Edge Function, the hourly pg_cron job, and the two
+gotchas worth remembering (generated columns can't be written to; the table must
+only rank clubs from that season).
+
+## Design source
+
+`design/` holds the Claude Design handoff this was built from — the
+`.dc.html` prototype, its chat transcript, and the architecture notes. It isn't
+part of the build (excluded in `tsconfig.json`); it's there as the reference for
+what the screens are meant to look like.
