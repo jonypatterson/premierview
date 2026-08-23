@@ -19,7 +19,7 @@ function Lockup() {
   return (
     <div
       style={{
-        animation: "rise .5s cubic-bezier(.2,.7,.3,1) .05s both",
+        animation: "rise .35s cubic-bezier(.2,.7,.3,1) .025s both",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -92,7 +92,7 @@ export default function ClubPicker({ clubs, seasonLabel, current, onKeep }: Prop
     >
       <Lockup />
 
-      <div style={{ animation: "rise .5s cubic-bezier(.2,.7,.3,1) .12s both", textAlign: "center" }}>
+      <div style={{ animation: "rise .35s cubic-bezier(.2,.7,.3,1) .06s both", textAlign: "center" }}>
         <div
           style={{
             fontSize: 11,
@@ -141,7 +141,7 @@ export default function ClubPicker({ clubs, seasonLabel, current, onKeep }: Prop
               className={`club-tile${isCurrent ? " club-tile-current" : ""}`}
               onClick={() => pick(c.code)}
               aria-current={isCurrent}
-              style={{ animation: `pop .45s cubic-bezier(.3,1.4,.4,1) ${(0.2 + i * 0.028).toFixed(3)}s both` }}
+              style={{ animation: `pop .315s cubic-bezier(.3,1.4,.4,1) ${(0.1 + i * 0.014).toFixed(3)}s both` }}
             >
               <div
                 style={{

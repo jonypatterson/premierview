@@ -5,7 +5,7 @@ const shimmer = (delay = 0, dark = false): CSSProperties => ({
     ? "linear-gradient(90deg,#EFEBE4 25%,#F7F4EF 50%,#EFEBE4 75%)"
     : "linear-gradient(90deg,#E9E4DB 25%,#F2EEE7 50%,#E9E4DB 75%)",
   backgroundSize: "320px 100%",
-  animation: `shimmer 1.4s linear ${delay}s infinite`,
+  animation: `shimmer .98s linear ${delay}s infinite`,
 });
 
 /** Shown on client-side club switches; first paint arrives with data. */

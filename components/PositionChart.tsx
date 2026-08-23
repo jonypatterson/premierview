@@ -52,7 +52,7 @@ export default function PositionChart({ chart, accent, thisSeason, lastSeason }:
     <div className="chart-block a-chart">
       <div
         style={{
-          animation: "rise .5s ease-out 1.4s both",
+          animation: "rise .35s ease-out .7s both",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "baseline",
@@ -83,7 +83,7 @@ export default function PositionChart({ chart, accent, thisSeason, lastSeason }:
         </div>
       </div>
 
-      <div style={{ animation: "rise .6s ease-out 1.5s both", display: "flex" }}
+      <div style={{ animation: "rise .42s ease-out .75s both", display: "flex" }}
         className="chart-row"
       >
         <div className="chart-ylabels">
@@ -122,7 +122,7 @@ export default function PositionChart({ chart, accent, thisSeason, lastSeason }:
               strokeDasharray="4 4"
               strokeLinejoin="round"
               vectorEffect="non-scaling-stroke"
-              style={{ opacity: 0, animation: "rise .8s ease-out 1.5s both" }}
+              style={{ opacity: 0, animation: "rise .56s ease-out .75s both" }}
               points={chart.lastLine}
             />
             <polyline
@@ -135,7 +135,7 @@ export default function PositionChart({ chart, accent, thisSeason, lastSeason }:
               style={
                 len > 0
                   ? ({
-                      animation: "draw .7s ease-out 1.8s both",
+                      animation: "draw .49s ease-out .9s both",
                       "--len": len,
                       strokeDasharray: len,
                     } as React.CSSProperties)
@@ -153,7 +153,7 @@ export default function PositionChart({ chart, accent, thisSeason, lastSeason }:
               left: chart.markerLeft,
               top: chart.markerTop,
               background: accent,
-              animation: "pop .45s cubic-bezier(.3,1.5,.45,1) 2.45s both",
+              animation: "pop .315s cubic-bezier(.3,1.5,.45,1) 1.225s both",
             }}
           />
           <div
@@ -162,7 +162,7 @@ export default function PositionChart({ chart, accent, thisSeason, lastSeason }:
               left: chart.markerLeft,
               top: chart.markerTop,
               background: accent,
-              animation: "ping 1.6s ease-out 2.7s infinite",
+              animation: "ping 1.12s ease-out 1.35s infinite",
             }}
           />
         </div>
@@ -170,6 +170,7 @@ export default function PositionChart({ chart, accent, thisSeason, lastSeason }:
 
       <div
         style={{
+          animation: "rise .42s ease-out .775s both",
           display: "flex",
           justifyContent: "space-between",
           fontSize: 9.5,

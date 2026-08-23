@@ -149,14 +149,14 @@ export function seasonView(d: PlayedTeamPage, mode: CompareMode, accent: string)
         bg: r === "W" ? accent : r === "L" ? "#191613" : r === "D" ? "#E4DFD6" : "#F0ECE5",
         fg: r === "W" ? textOn(accent) : r === "D" ? "#8b857c" : "#fff",
         border: filled ? "0" : "1.5px dashed #d9d3c9",
-        delay: 0.66 + i * 0.07,
+        delay: 0.165 + i * 0.035,
       };
     }),
 
     record: [
-      { label: "Wins", value: s.won, prev: `${aligned ? s.prev_won_same_mw : s.prev_final_won} ${prevTag}`, delay: 1.0 },
-      { label: "Draws", value: s.drawn, prev: `${aligned ? s.prev_drawn_same_mw : s.prev_final_drawn} ${prevTag}`, delay: 1.08 },
-      { label: "Losses", value: s.lost, prev: `${aligned ? s.prev_lost_same_mw : s.prev_final_lost} ${prevTag}`, delay: 1.16 },
+      { label: "Wins", value: s.won, prev: `${aligned ? s.prev_won_same_mw : s.prev_final_won} ${prevTag}`, delay: 0.5 },
+      { label: "Draws", value: s.drawn, prev: `${aligned ? s.prev_drawn_same_mw : s.prev_final_drawn} ${prevTag}`, delay: 0.54 },
+      { label: "Losses", value: s.lost, prev: `${aligned ? s.prev_lost_same_mw : s.prev_final_lost} ${prevTag}`, delay: 0.58 },
     ],
 
     // Bars are normalised against 3 goals/game.
@@ -168,7 +168,7 @@ export function seasonView(d: PlayedTeamPage, mode: CompareMode, accent: string)
         pct: `${Math.min(100, Math.round(((s.goals_for / (games || 1)) / 3) * 100))}%`,
         color: accent,
         prev: `${per(pgf, prevGames)} / game ${prevTag}`,
-        delay: 1.24,
+        delay: 0.62,
       },
       {
         label: "Goals conceded",
@@ -177,7 +177,7 @@ export function seasonView(d: PlayedTeamPage, mode: CompareMode, accent: string)
         pct: `${Math.min(100, Math.round(((s.goals_against / (games || 1)) / 3) * 100))}%`,
         color: "#191613",
         prev: `${per(pga, prevGames)} / game ${prevTag}`,
-        delay: 1.32,
+        delay: 0.66,
       },
     ],
 
@@ -204,16 +204,16 @@ export function playersView(d: PlayedTeamPage, accent: string) {
       .sort((a, b) => (b[key] ?? 0) - (a[key] ?? 0) || (b[prevKey] ?? 0) - (a[prevKey] ?? 0))
       .slice(0, 5);
     const top = Math.max(1, ...rows.map((p) => p[key] ?? 0));
-    const bd = isGoals ? 1.0 : 1.62;
-    const rd = isGoals ? 0.86 : 1.48;
+    const bd = isGoals ? 0.5 : 0.81;
+    const rd = isGoals ? 0.43 : 0.74;
     return rows.map((p, i) => ({
       rank: i + 1,
       name: p.player_name,
       value: (p[key] ?? 0) > 0 ? String(p[key]) : "—",
       pct: `${Math.round(((p[key] ?? 0) / top) * 100)}%`,
       prev: `${p[prevKey] ?? 0} last`,
-      delay: rd + i * 0.07,
-      barDelay: bd + i * 0.07,
+      delay: rd + i * 0.035,
+      barDelay: bd + i * 0.035,
     }));
   };
 
@@ -256,14 +256,14 @@ export function playersView(d: PlayedTeamPage, accent: string) {
         value: scored ? String(d.players.filter((p) => (p.goals ?? 0) > 0).length) : "—",
         unit: scored ? `of ${s.goals_for} goals` : "no goals yet",
         prev: `${d.players.filter((p) => (p.prev_goals ?? 0) > 0).length} across ${short(d.seasons.previous)}`,
-        delay: 0.62,
+        delay: 0.31,
       },
       {
         label: "Assisted goals",
         value: scored ? String(assists) : "—",
         unit: scored ? `${assistedShare}%` : "no goals yet",
         prev: `${short(d.seasons.previous)} squad total`,
-        delay: 0.7,
+        delay: 0.35,
       },
     ],
     scorers,

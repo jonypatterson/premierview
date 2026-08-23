@@ -73,7 +73,7 @@ export default function ProblemState({
     >
       <div
         style={{
-          animation: "pop .5s cubic-bezier(.3,1.4,.4,1) both",
+          animation: "pop .35s cubic-bezier(.3,1.4,.4,1) both",
           width: 56,
           height: 56,
           borderRadius: "50%",
@@ -100,7 +100,7 @@ export default function ProblemState({
         </svg>
       </div>
 
-      <div style={{ animation: "rise .5s ease-out .1s both" }}>
+      <div style={{ animation: "rise .35s ease-out .05s both" }}>
         <div style={{ fontWeight: 700, fontSize: 17 }}>{title}</div>
         <div
           style={{
@@ -116,14 +116,14 @@ export default function ProblemState({
         </div>
       </div>
 
-      <div style={{ animation: "rise .5s ease-out .18s both", fontSize: 11, color: "#b9b2a6" }}>
+      <div style={{ animation: "rise .35s ease-out .09s both", fontSize: 11, color: "#b9b2a6" }}>
         Last successful sync {synced ?? "unknown"}
       </div>
 
       {/* Two ways out — this screen is never a dead end. */}
       <div
         style={{
-          animation: "rise .5s ease-out .24s both",
+          animation: "rise .35s ease-out .12s both",
           display: "flex",
           gap: 8,
           flexWrap: "wrap",

@@ -29,7 +29,7 @@ function RankedList({
     <div className={area} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       <div
         style={{
-          animation: `rise .5s ease-out ${headingDelay}s both`,
+          animation: `rise .35s ease-out ${headingDelay}s both`,
           display: "flex",
           justifyContent: "space-between",
           alignItems: "baseline",
@@ -46,7 +46,7 @@ function RankedList({
             display: "flex",
             alignItems: "center",
             gap: 12,
-            animation: `rise .5s cubic-bezier(.2,.7,.3,1) ${p.delay.toFixed(2)}s both`,
+            animation: `rise .35s cubic-bezier(.2,.7,.3,1) ${p.delay.toFixed(2)}s both`,
           }}
         >
           <div className="num fig-rank" style={{ width: 26, color: "#b9b2a6" }}>
@@ -85,7 +85,7 @@ function RankedList({
                     background: barColor,
                     borderRadius: 3,
                     transformOrigin: "left",
-                    animation: `grow .7s cubic-bezier(.2,.8,.25,1) ${p.barDelay.toFixed(2)}s both`,
+                    animation: `grow .49s cubic-bezier(.2,.8,.25,1) ${p.barDelay.toFixed(2)}s both`,
                     width: p.pct,
                   }}
                 />
@@ -141,19 +141,19 @@ export default function PlayersView({
       </div>
 
       <div className="a-top">
-        <div className="eyebrow" style={{ animation: "rise .5s ease-out .16s both", marginBottom: 6 }}>
+        <div className="eyebrow" style={{ animation: "rise .35s ease-out .08s both", marginBottom: 6 }}>
           {vm.topScorerLabel}
         </div>
         <div style={{ display: "flex", alignItems: "baseline", gap: 14, flexWrap: "wrap" }}>
           <div
             className="fig-name"
-            style={{ animation: "bigin .7s cubic-bezier(.2,.8,.25,1) .22s both", fontWeight: 800 }}
+            style={{ animation: "bigin .49s cubic-bezier(.2,.8,.25,1) .11s both", fontWeight: 800 }}
           >
             {vm.topScorerName}
           </div>
           <div
             style={{
-              animation: "pop .5s cubic-bezier(.3,1.4,.4,1) .46s both",
+              animation: "pop .35s cubic-bezier(.3,1.4,.4,1) .23s both",
               display: "flex",
               alignItems: "center",
               gap: 5,
@@ -168,7 +168,7 @@ export default function PlayersView({
             {vm.topScorerGoals}
           </div>
         </div>
-        <div className="sub-note" style={{ animation: "rise .5s ease-out .54s both", marginTop: 8 }}>
+        <div className="sub-note" style={{ animation: "rise .35s ease-out .27s both", marginTop: 8 }}>
           {vm.topScorerNote}
         </div>
       </div>
@@ -178,7 +178,7 @@ export default function PlayersView({
           <div
             key={c.label}
             className="card"
-            style={{ animation: `rise .55s cubic-bezier(.2,.7,.3,1) ${c.delay.toFixed(2)}s both` }}
+            style={{ animation: `rise .385s cubic-bezier(.2,.7,.3,1) ${c.delay.toFixed(2)}s both` }}
           >
             <div className="card-label">{c.label}</div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 4 }}>

@@ -35,14 +35,14 @@ export default function SeasonView({ data, accent, mode, onOpenPicker }: Props) 
       <div className="a-pos">
         <div
           className="eyebrow"
-          style={{ animation: "rise .5s cubic-bezier(.2,.7,.3,1) .18s both", marginBottom: 6 }}
+          style={{ animation: "rise .35s cubic-bezier(.2,.7,.3,1) .09s both", marginBottom: 6 }}
         >
           League position · MW {vm.matchweek}
         </div>
         <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
           <div
             className="num fig-position"
-            style={{ animation: "bigin .7s cubic-bezier(.2,.8,.25,1) .24s both" }}
+            style={{ animation: "bigin .49s cubic-bezier(.2,.8,.25,1) .12s both" }}
           >
             {vm.position}
             <span className="fig-suffix">{vm.positionSuffix}</span>
@@ -50,7 +50,7 @@ export default function SeasonView({ data, accent, mode, onOpenPicker }: Props) 
           <div
             className="num pill-delta"
             style={{
-              animation: "pop .5s cubic-bezier(.3,1.4,.4,1) .5s both",
+              animation: "pop .35s cubic-bezier(.3,1.4,.4,1) .25s both",
               display: "flex",
               alignItems: "center",
               gap: 5,
@@ -63,13 +63,13 @@ export default function SeasonView({ data, accent, mode, onOpenPicker }: Props) 
             {vm.deltaLabel}
           </div>
         </div>
-        <div className="sub-note" style={{ animation: "rise .5s ease-out .58s both", marginTop: 8 }}>
+        <div className="sub-note" style={{ animation: "rise .35s ease-out .29s both", marginTop: 8 }}>
           {vm.comparisonNote}
         </div>
       </div>
 
       <div className="a-form" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        <div className="eyebrow" style={{ animation: "rise .5s ease-out .6s both" }}>Form this season</div>
+        <div className="eyebrow" style={{ animation: "rise .35s ease-out .3s both" }}>Form this season</div>
         <div style={{ display: "flex", gap: 10 }}>
           {vm.form.map((d, i) => (
             <div
@@ -83,7 +83,7 @@ export default function SeasonView({ data, accent, mode, onOpenPicker }: Props) 
                 justifyContent: "center",
                 fontWeight: 800,
                 fontSize: 15,
-                animation: `pop .45s cubic-bezier(.3,1.5,.45,1) ${d.delay.toFixed(2)}s both`,
+                animation: `pop .315s cubic-bezier(.3,1.5,.45,1) ${d.delay.toFixed(2)}s both`,
                 background: d.bg,
                 color: d.fg,
                 border: d.border,
@@ -101,7 +101,7 @@ export default function SeasonView({ data, accent, mode, onOpenPicker }: Props) 
           <div
             key={s.label}
             className="card"
-            style={{ animation: `rise .55s cubic-bezier(.2,.7,.3,1) ${s.delay.toFixed(2)}s both` }}
+            style={{ animation: `rise .385s cubic-bezier(.2,.7,.3,1) ${s.delay.toFixed(2)}s both` }}
           >
             <div className="card-label">{s.label}</div>
             <div className="num fig-stat" style={{ marginTop: 4 }}>
@@ -117,7 +117,7 @@ export default function SeasonView({ data, accent, mode, onOpenPicker }: Props) 
           <div
             key={g.label}
             className="card"
-            style={{ animation: `rise .55s cubic-bezier(.2,.7,.3,1) ${g.delay.toFixed(2)}s both` }}
+            style={{ animation: `rise .385s cubic-bezier(.2,.7,.3,1) ${g.delay.toFixed(2)}s both` }}
           >
             <div className="card-label">{g.label}</div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 4 }}>
@@ -138,7 +138,7 @@ export default function SeasonView({ data, accent, mode, onOpenPicker }: Props) 
                   height: "100%",
                   borderRadius: 3,
                   transformOrigin: "left",
-                  animation: "grow .8s cubic-bezier(.2,.8,.25,1) 1.24s both",
+                  animation: "grow .56s cubic-bezier(.2,.8,.25,1) .62s both",
                   width: g.pct,
                   background: g.color,
                 }}

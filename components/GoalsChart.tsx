@@ -12,7 +12,7 @@ export default function GoalsChart({ vm }: { vm: GoalsChartVM }) {
     <div className="chart-block a-gchart">
       <div
         style={{
-          animation: "rise .5s ease-out 1.9s both",
+          animation: "rise .35s ease-out .95s both",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "baseline",
@@ -36,7 +36,7 @@ export default function GoalsChart({ vm }: { vm: GoalsChartVM }) {
         </div>
       </div>
 
-      <div style={{ animation: "rise .6s ease-out 2s both", display: "flex" }}
+      <div style={{ animation: "rise .42s ease-out 1s both", display: "flex" }}
         className="chart-row"
       >
         <div className="chart-ylabels">
@@ -73,7 +73,7 @@ export default function GoalsChart({ vm }: { vm: GoalsChartVM }) {
               strokeDasharray="4 4"
               strokeLinejoin="round"
               vectorEffect="non-scaling-stroke"
-              style={{ opacity: 0, animation: "rise .8s ease-out 2s both" }}
+              style={{ opacity: 0, animation: "rise .56s ease-out 1s both" }}
               points={vm.lastLine}
             />
             <polyline
@@ -83,7 +83,7 @@ export default function GoalsChart({ vm }: { vm: GoalsChartVM }) {
               strokeLinecap="round"
               strokeLinejoin="round"
               vectorEffect="non-scaling-stroke"
-              style={{ opacity: 0, animation: "rise .7s ease-out 2.2s both" }}
+              style={{ opacity: 0, animation: "rise .49s ease-out 1.1s both" }}
               points={vm.thisLine}
             />
           </svg>
@@ -96,7 +96,7 @@ export default function GoalsChart({ vm }: { vm: GoalsChartVM }) {
                   left: vm.markerLeft,
                   top: vm.markerTop,
                   background: vm.accent,
-                  animation: "pop .45s cubic-bezier(.3,1.5,.45,1) 2.6s both",
+                  animation: "pop .315s cubic-bezier(.3,1.5,.45,1) 1.3s both",
                 }}
               />
               <div
@@ -105,7 +105,7 @@ export default function GoalsChart({ vm }: { vm: GoalsChartVM }) {
                   left: vm.markerLeft,
                   top: vm.markerTop,
                   background: vm.accent,
-                  animation: "ping 1.6s ease-out 2.85s infinite",
+                  animation: "ping 1.12s ease-out 1.425s infinite",
                 }}
               />
             </>
@@ -115,6 +115,7 @@ export default function GoalsChart({ vm }: { vm: GoalsChartVM }) {
 
       <div
         style={{
+          animation: "rise .42s ease-out 1.025s both",
           display: "flex",
           justifyContent: "space-between",
           fontSize: 9.5,

@@ -23,7 +23,7 @@ export default function Header({
   return (
     <div
       style={{
-        animation: "rise .5s cubic-bezier(.2,.7,.3,1) .05s both",
+        animation: "rise .35s cubic-bezier(.2,.7,.3,1) .025s both",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
