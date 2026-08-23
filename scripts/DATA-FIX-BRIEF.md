@@ -1,87 +1,114 @@
-# Brief: fix last season's truncated player figures (PremierView)
+# Brief: last season's player figures read as 0
 
-Paste this to the Claude Design session that still has the Supabase connector.
+**Status: resolved by the owner.** Kept for the diagnostic queries and for the
+one outstanding item at the bottom. Nothing here needs doing.
+
+Neither theory below was ever verified — the session that wrote this had no
+database access at the time.
 
 ---
 
-## The bug
+## The symptom
 
 On the Players page, players who scored last season show **0 last**. Kai Havertz
-scored 2 in 2025/26 and the app credits him with none. It is not one player —
-it is everyone below a cutoff.
+scored 2 in 2025/26 and the app credits him with none. The current season looks
+right; it is the previous-season figures that are wrong.
 
-## The cause
+## Theory A — the scorers feed is capped
 
-Last season's per-player goals were ingested from football-data's
-`/v4/competitions/PL/scorers` endpoint. That endpoint returns only the league's
-leading scorers, and the request was capped well below the number of players who
-actually score in a season (~300). Everyone below the cap kept `goals = 0` for
-2025/26, and the app renders that 0 as fact.
+Last season's per-player goals come from football-data's
+`/v4/competitions/PL/scorers`, which returns only the league's leading scorers.
+If the request's `limit` is below the ~300 players who score in a season,
+everyone underneath keeps `goals = 0`.
 
-The current season is unaffected: it comes from the FPL API, which returns every
-player.
+Supporting: a `team_page('MUN')` payload returned only **6** Man United players,
+the lowest on 4 goals.
 
-Supporting evidence, from a `team_page('MUN')` payload: only **6** Man United
-players came back, the lowest on **4** goals. That is a top-N list, not a squad.
+Against: Bournemouth's page shows scorers on 2, 3, 5 and 6 goals — below the
+cutoff that theory implies. So it does not fit every club, and may be wrong or
+only part of the story.
+
+## Theory B — the same player exists as two rows
+
+FPL and football-data spell players differently and the sync matches them by
+normalised name. Where that match fails, one player can end up as two rows —
+one holding this season's figures, the other last season's — and the page shows
+whichever it finds, with the other season reading 0.
+
+Supporting: Bournemouth's **assists list** shows "Francisco Evanilson de Lima
+Barbosa" at #1 (1 this season, 0 last) and "Evanilson" at #5 (—, 2 last) — two
+entries in the same list. (A player legitimately appears in both the goals and
+the assists list; this is two rows within one list, which is different.)
+
+Not verified: it may be two genuinely different players, or a display quirk.
+Check before acting on it.
 
 ## Please do this
 
-**1. Confirm it.** `scripts/diagnose-player-data.sql` in the repo has the
-queries. The tell is the league-wide floor:
+**1. Establish which, if either, is true.**
 
 ```sql
+-- A: is the 2025/26 scorer list cut off? A floor above 1 goal says yes.
 select count(*) as scorer_rows, min(goals) as fewest_goals
 from player_season_stats p join seasons s on s.id = p.season_id
 where s.label = '2025/26' and p.goals > 0;
+
+-- B: players whose name collapses to the same surname within a club
+select club_id, lower(regexp_replace(name, '.* ', '')) as surname,
+       count(*), array_agg(id), array_agg(name)
+from players group by 1, 2 having count(*) > 1 order by 3 desc;
+
+-- B: players carrying figures in only one of the two seasons
+select pl.id, pl.name, count(distinct s.label) as seasons_present
+from players pl
+join player_season_stats p on p.player_id = pl.id
+join seasons s on s.id = p.season_id
+group by 1, 2 having count(distinct s.label) = 1;
+
+-- the specific case
+select pl.id, pl.name, s.label, p.goals, p.assists
+from players pl
+join player_season_stats p on p.player_id = pl.id
+join seasons s on s.id = p.season_id
+where pl.name ilike '%havertz%' or pl.name ilike '%evanilson%';
 ```
 
-A floor of 3 or 4 rather than 1 confirms truncation. Also check
-`select * from players where name ilike '%havertz%'` joined to his stat row.
+Report what these return before making changes.
 
-**2. Fix the ingestion.** Read the deployed `sync-season` Edge Function
-(`get_edge_function`). Find the scorers fetch and raise its limit —
-`?season=2025&limit=500`. Check whether the limit is applied per season or only
-to the current one; last season is the one that matters here. Redeploy.
+**2. Read the sync.** `get_edge_function` on `sync-season`. Find where
+football-data scorers are fetched (note the `limit`) and where FPL players are
+matched to football-data players. Establish what happens when a match fails.
 
 > The function's source exists **only** in Supabase — it was written through the
-> connector and never landed in the repo. Please also paste the final source
-> back into the repo at `supabase/functions/sync-season/index.ts` so it stops
-> being unversioned. That is the reason this brief exists.
+> connector and never landed in the repo. Please paste the final source back to
+> `supabase/functions/sync-season/index.ts` so it stops being unversioned. That
+> is why this handoff is needed at all.
 
-**3. Backfill 2025/26** by invoking the function for that season, the same way
-the original backfill was run.
+**3. Fix whichever the queries implicate.**
+- If A: raise the scorers `limit` to 500 and re-run the 2025/26 backfill.
+- If B: match on a stable key — `players.fpl_id` already exists — rather than a
+  display name; merge duplicate rows onto one `player_id`; add a unique
+  constraint so it cannot recur.
+- If both, do B first: merging after a re-ingest is harder than before it.
 
-**4. Verify, in this order:**
-- `fewest_goals` for 2025/26 is now 1, and `scorer_rows` is in the hundreds.
-- Havertz reads 2.
-- `team_page('MUN')` returns far more than 6 players.
-- `team_page('ARS')->'players'` contains Havertz with `prev_goals = 2`.
+**4. Verify.** Havertz reads 2 for 2025/26; `team_page('MUN')` returns a
+realistic squad rather than 6 players; no club lists the same player twice in
+one list; the "players who scored / last season" figure is in the teens for a
+typical club.
 
-**5. Watch for two things.**
-- **Name matching.** FPL and football-data spell players differently; matching is
-  by normalised name, so some will miss. Report any unmatched names rather than
-  silently dropping them — `players.fpl_id` exists for manual correction.
-- **Rate limits.** The free tier is 10 requests/minute. A larger `limit` is still
-  one request, so this does not add load.
+**5. If the queries support neither theory, say so** and report what you found
+rather than applying a fix that doesn't match the evidence.
 
-**6. If `limit=500` is refused or still comes back truncated**, say so rather
-than working around it — that changes the fix to a different source (FPL
-`element-summary` per player for history, or a paid feed) and is worth a
-decision rather than a workaround.
+## No app changes needed
 
-## Fallback if you would rather not touch the function
-
-`scripts/repair-player-season.mjs` in the repo repairs the stored rows directly
-via PostgREST — it introspects the schema, refetches the complete list, and
-updates in place, with `--dry`. It needs `SUPABASE_URL`,
-`SUPABASE_SERVICE_ROLE_KEY` and `FD_API_KEY`. It has **never been run** — it was
-written without access to the database, so expect one correction on first use.
-It fixes stored data only; the hourly sync would keep re-truncating until the
-function itself is fixed.
+The Players page renders whatever `team_page` returns and needs no change once
+the rows are right. `scripts/repair-player-season.mjs` was written for Theory A
+and has never been run — **do not run it before step 1**; if B is the real cause
+it would write into duplicated rows and make things worse.
 
 ## Also outstanding
 
 The football-data API key was exposed in the design chat transcript before being
-redacted from this repo. It has not been rotated. New key →
+redacted from this repo, and has not been rotated. New key →
 `insert into app_config (key, value) values ('football_data_api_key', 'NEW_KEY')
 on conflict (key) do update set value = excluded.value;`

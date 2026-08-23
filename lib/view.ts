@@ -227,7 +227,6 @@ export function playersView(d: PlayedTeamPage, accent: string) {
     .sort((a, b) => (b.prev_goals ?? 0) - (a.prev_goals ?? 0))
     .find((p) => (p.prev_goals ?? 0) > 0);
   const assists = d.players.reduce((n, p) => n + (p.assists ?? 0), 0);
-  const assistedShare = s.goals_for ? Math.round((assists / s.goals_for) * 100) : 0;
 
   // Counts over the whole squad — not `scorers`, which is capped at five.
   const scoredCount = d.players.filter((p) => (p.goals ?? 0) > 0).length;
@@ -255,22 +254,22 @@ export function playersView(d: PlayedTeamPage, accent: string) {
   return {
     ...head,
     accent,
-    // Each card reads as one sentence: a count, what it counts, and the same
-    // figure for last season. "3 of 3 goals" read as a ratio of goals rather
-    // than a number of players, which is the wrong noun.
+    // Same shape as the Wins / Draws / Losses cards: a plain label, a number,
+    // and the same number for last season. No ratios, no second unit — the
+    // earlier "1 of 1 goals" and "100%" were arithmetic, not information.
     summary: [
       {
-        label: "Different scorers",
+        label: "Players who scored",
         value: scored ? String(scoredCount) : "—",
-        unit: scored ? (scoredCount === 1 ? "player" : "players") : "no goals yet",
-        prev: `${prevScorers} in ${short(d.seasons.previous)}`,
+        unit: "",
+        prev: `${prevScorers} last season`,
         delay: 0.31,
       },
       {
-        label: "Assisted goals",
-        value: scored ? String(assists) : "—",
-        unit: scored ? `${assistedShare}% of goals` : "no goals yet",
-        prev: `${prevAssists} in ${short(d.seasons.previous)}`,
+        label: "Assists",
+        value: assists > 0 ? String(assists) : "—",
+        unit: "",
+        prev: `${prevAssists} last season`,
         delay: 0.35,
       },
     ],
