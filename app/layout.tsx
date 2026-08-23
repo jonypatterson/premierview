@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Roboto, Rubik } from "next/font/google";
 import "./globals.css";
+import { DESCRIPTION, OG_IMAGE, SITE, SITE_URL } from "@/lib/site";
 
 const rubik = Rubik({
   subsets: ["latin"],
@@ -18,8 +19,23 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: "Better Than The Last One",
-  description: "Your club's Premier League season so far, against the same point last season.",
+  // Makes the preview image's relative path absolute, which link previews need.
+  metadataBase: new URL(SITE_URL),
+  title: { default: SITE, template: `%s · ${SITE}` },
+  description: DESCRIPTION,
+  applicationName: SITE,
+  openGraph: {
+    type: "website",
+    siteName: SITE,
+    title: SITE,
+    description: DESCRIPTION,
+    url: SITE_URL,
+    locale: "en_GB",
+    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: SITE }],
+  },
+  // Card type only: X and the rest fall back to the og: tags, so the per-club
+  // title doesn't have to be repeated in two vocabularies.
+  twitter: { card: "summary_large_image" },
 };
 
 export const viewport: Viewport = {
