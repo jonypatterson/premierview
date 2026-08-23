@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300..900&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#EBE8E2;font-family:Rubik,system-ui,sans-serif}
+a{color:#1a1a1a}a:hover{color:#C8102E}
+.dv-card{max-width:100%;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:24px;box-shadow:0 2px 12px rgba(0,0,0,.07);overflow:hidden}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{opacity:0;transform:scale(.72)}60%{transform:scale(1.06)}100%{opacity:1;transform:scale(1)}}
+@keyframes bigin{from{opacity:0;transform:translateY(18px) scale(.9)}to{opacity:1;transform:none}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes draw{from{stroke-dashoffset:var(--len)}to{stroke-dashoffset:0}}
+@keyframes ping{0%{transform:scale(.4);opacity:.55}70%{transform:scale(2.1);opacity:0}100%{transform:scale(2.1);opacity:0}}
+@keyframes shimmer{from{background-position:-320px 0}to{background-position:320px 0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</helmet>
+<section data-screen-label="Man Utd season comparison" style="display:flex;justify-content:center;padding:40px 20px">
+<div class="dv-card" style="width:390px;background:#F6F3EE;color:#191613">
+<div style="position:relative;min-height:940px">
+
+<sc-if value="{{ isPicker }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:22px;padding:34px 24px 34px;min-height:940px;box-sizing:border-box">
+  <div style="animation:rise .5s cubic-bezier(.2,.7,.3,1) .05s both">
+    <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#8b857c">Premier League &middot; {{ seasonLabel }}</div>
+    <div style="font-weight:800;font-size:34px;line-height:1.05;letter-spacing:-1px;margin-top:10px;text-wrap:pretty">Pick your club</div>
+    <div style="font-size:13px;color:#8b857c;margin-top:8px;line-height:1.5;max-width:270px;text-wrap:pretty">We&rsquo;ll remember it and open straight to their season from now on.</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <sc-for list="{{ clubs }}" as="c" hint-placeholder-count="20">
+      <button type="button" onClick="{{ c.pick }}" style="display:flex;align-items:center;gap:12px;width:100%;padding:9px 12px;border:0;border-radius:14px;cursor:pointer;font-family:Rubik,sans-serif;text-align:left;transition:background .18s ease;animation:rise .45s cubic-bezier(.2,.7,.3,1) {{ c.delay }}s both;background:{{ c.rowBg }}" style-hover="background:#fff">
+        <div style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:10.5px;letter-spacing:.3px;flex:none;color:{{ c.fg }};background:{{ c.color }}">{{ c.tla }}</div>
+        <div style="flex:1;min-width:0;font-weight:600;font-size:14px;color:#191613;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.name }}</div>
+        <div style="font-size:11px;color:#b9b2a6;flex:none">{{ c.hint }}</div>
+      </button>
+    </sc-for>
+  </div>
+  <sc-if value="{{ hasSaved }}" hint-placeholder-val="{{ false }}">
+    <button type="button" onClick="{{ closePicker }}" style="align-self:flex-start;border:0;background:none;padding:0;cursor:pointer;font-family:Rubik,sans-serif;font-size:12.5px;font-weight:700;color:#8b857c">Keep {{ teamName }}</button>
+  </sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ isLoading }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:28px;padding:28px 24px 96px">
+  <div style="display:flex;align-items:center;justify-content:space-between">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(90deg,#E9E4DB 25%,#F2EEE7 50%,#E9E4DB 75%);background-size:320px 100%;animation:shimmer 1.4s linear infinite"></div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="width:132px;height:13px;border-radius:4px;background:linear-gradient(90deg,#E9E4DB 25%,#F2EEE7 50%,#E9E4DB 75%);background-size:320px 100%;animation:shimmer 1.4s linear infinite"></div>
+        <div style="width:78px;height:9px;border-radius:4px;background:linear-gradient(90deg,#E9E4DB 25%,#F2EEE7 50%,#E9E4DB 75%);background-size:320px 100%;animation:shimmer 1.4s linear .1s infinite"></div>
+      </div>
+    </div>
+    <div style="width:88px;height:26px;border-radius:99px;background:linear-gradient(90deg,#E9E4DB 25%,#F2EEE7 50%,#E9E4DB 75%);background-size:320px 100%;animation:shimmer 1.4s linear infinite"></div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <div style="width:120px;height:10px;border-radius:4px;background:linear-gradient(90deg,#E9E4DB 25%,#F2EEE7 50%,#E9E4DB 75%);background-size:320px 100%;animation:shimmer 1.4s linear infinite"></div>
+    <div style="width:150px;height:60px;border-radius:10px;background:linear-gradient(90deg,#E9E4DB 25%,#F2EEE7 50%,#E9E4DB 75%);background-size:320px 100%;animation:shimmer 1.4s linear .08s infinite"></div>
+    <div style="width:164px;height:10px;border-radius:4px;background:linear-gradient(90deg,#E9E4DB 25%,#F2EEE7 50%,#E9E4DB 75%);background-size:320px 100%;animation:shimmer 1.4s linear .16s infinite"></div>
+  </div>
+  <div style="display:flex;gap:10px">
+    <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(90deg,#E9E4DB 25%,#F2EEE7 50%,#E9E4DB 75%);background-size:320px 100%;animation:shimmer 1.4s linear infinite"></div>
+    <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(90deg,#E9E4DB 25%,#F2EEE7 50%,#E9E4DB 75%);background-size:320px 100%;animation:shimmer 1.4s linear .07s infinite"></div>
+    <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(90deg,#E9E4DB 25%,#F2EEE7 50%,#E9E4DB 75%);background-size:320px 100%;animation:shimmer 1.4s linear .14s infinite"></div>
+    <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(90deg,#E9E4DB 25%,#F2EEE7 50%,#E9E4DB 75%);background-size:320px 100%;animation:shimmer 1.4s linear .21s infinite"></div>
+    <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(90deg,#E9E4DB 25%,#F2EEE7 50%,#E9E4DB 75%);background-size:320px 100%;animation:shimmer 1.4s linear .28s infinite"></div>
+    <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(90deg,#E9E4DB 25%,#F2EEE7 50%,#E9E4DB 75%);background-size:320px 100%;animation:shimmer 1.4s linear .35s infinite"></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+    <div style="height:86px;border-radius:16px;background:linear-gradient(90deg,#EFEBE4 25%,#F7F4EF 50%,#EFEBE4 75%);background-size:320px 100%;animation:shimmer 1.4s linear infinite"></div>
+    <div style="height:86px;border-radius:16px;background:linear-gradient(90deg,#EFEBE4 25%,#F7F4EF 50%,#EFEBE4 75%);background-size:320px 100%;animation:shimmer 1.4s linear .08s infinite"></div>
+    <div style="height:86px;border-radius:16px;background:linear-gradient(90deg,#EFEBE4 25%,#F7F4EF 50%,#EFEBE4 75%);background-size:320px 100%;animation:shimmer 1.4s linear .16s infinite"></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <div style="height:116px;border-radius:16px;background:linear-gradient(90deg,#EFEBE4 25%,#F7F4EF 50%,#EFEBE4 75%);background-size:320px 100%;animation:shimmer 1.4s linear infinite"></div>
+    <div style="height:116px;border-radius:16px;background:linear-gradient(90deg,#EFEBE4 25%,#F7F4EF 50%,#EFEBE4 75%);background-size:320px 100%;animation:shimmer 1.4s linear .08s infinite"></div>
+  </div>
+  <div style="height:186px;border-radius:16px;background:linear-gradient(90deg,#EFEBE4 25%,#F7F4EF 50%,#EFEBE4 75%);background-size:320px 100%;animation:shimmer 1.4s linear infinite"></div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isProblem }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:16px;padding:120px 40px;min-height:940px;box-sizing:border-box">
+  <div style="animation:pop .5s cubic-bezier(.3,1.4,.4,1) both;width:56px;height:56px;border-radius:50%;background:#EFEBE3;display:flex;align-items:center;justify-content:center;color:#b9b2a6">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v4.5"></path><path d="M12 16.2h.01"></path></svg>
+  </div>
+  <div style="animation:rise .5s ease-out .1s both">
+    <div style="font-weight:700;font-size:17px">{{ problemTitle }}</div>
+    <div style="font-size:13px;color:#8b857c;margin-top:8px;line-height:1.5;max-width:250px;text-wrap:pretty">{{ problemBody }}</div>
+  </div>
+  <div style="animation:rise .5s ease-out .18s both;font-size:11px;color:#b9b2a6">Last successful sync {{ lastSync }}</div>
+  <button type="button" onClick="{{ retry }}" style="animation:rise .5s ease-out .24s both;border:0;cursor:pointer;font-family:Rubik,sans-serif;font-size:12.5px;font-weight:700;color:#fff;background:#191613;border-radius:99px;padding:11px 22px;margin-top:4px">Try again</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ showSeason }}" hint-placeholder-val="{{ true }}"><div style="display:flex;flex-direction:column;gap:28px;padding:28px 24px 96px">
+  <div style="animation:rise .5s cubic-bezier(.2,.7,.3,1) .05s both;display:flex;align-items:center;justify-content:space-between">
+    <button type="button" onClick="{{ openPicker }}" style="display:flex;align-items:center;gap:10px;border:0;background:none;padding:0;cursor:pointer;font-family:Rubik,sans-serif;color:inherit;text-align:left">
+      <div style="width:38px;height:38px;border-radius:50%;background:{{ accent }};color:{{ accentFg }};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;letter-spacing:.5px">{{ tla }}</div>
+      <div><div style="font-weight:700;font-size:15px;line-height:1.1">{{ teamName }}</div><div style="display:flex;align-items:center;gap:3px;font-size:11px;color:#8b857c;margin-top:2px">Premier League<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><polyline points="6 9 12 15 18 9"></polyline></svg></div></div>
+    </button>
+    <div style="font-size:10.5px;font-weight:600;letter-spacing:.4px;padding:6px 10px;border:1px solid #d9d3c9;border-radius:99px;color:#6f695f">{{ seasonLabel }}</div>
+  </div>
+  <div>
+    <div style="animation:rise .5s cubic-bezier(.2,.7,.3,1) .18s both;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#8b857c;margin-bottom:6px">League position · MW {{ matchweek }}</div>
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <div style="animation:bigin .7s cubic-bezier(.2,.8,.25,1) .24s both;font-weight:800;font-size:76px;line-height:.9;letter-spacing:-2px">{{ position }}<span style="font-size:26px;font-weight:700;letter-spacing:0">{{ positionSuffix }}</span></div>
+      <div style="animation:pop .5s cubic-bezier(.3,1.4,.4,1) .5s both;display:flex;align-items:center;gap:5px;border-radius:99px;padding:5px 10px;font-size:12px;font-weight:700;background:{{ deltaBg }};color:{{ deltaFg }}">{{ deltaLabel }}</div>
+    </div>
+    <div style="animation:rise .5s ease-out .58s both;font-size:12px;color:#8b857c;margin-top:8px">{{ comparisonNote }}</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="animation:rise .5s ease-out .6s both;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#8b857c">Form this season</div>
+    <div style="display:flex;gap:10px">
+      <sc-for list="{{ form }}" as="d" hint-placeholder-count="6">
+        <div style="width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;animation:pop .45s cubic-bezier(.3,1.5,.45,1) {{ d.delay }}s both;background:{{ d.bg }};color:{{ d.fg }};border:{{ d.border }}">{{ d.letter }}</div>
+      </sc-for>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+    <sc-for list="{{ record }}" as="s" hint-placeholder-count="3">
+      <div style="background:#fff;border-radius:16px;padding:14px 14px 12px;animation:rise .55s cubic-bezier(.2,.7,.3,1) {{ s.delay }}s both">
+        <div style="font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:#8b857c">{{ s.label }}</div>
+        <div style="font-weight:800;font-size:30px;margin-top:4px">{{ s.value }}</div>
+        <div style="font-size:11px;color:#8b857c;margin-top:2px">{{ s.prev }}</div>
+      </div>
+    </sc-for>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <sc-for list="{{ goals }}" as="g" hint-placeholder-count="2">
+      <div style="background:#fff;border-radius:16px;padding:14px;animation:rise .55s cubic-bezier(.2,.7,.3,1) {{ g.delay }}s both">
+        <div style="font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:#8b857c">{{ g.label }}</div>
+        <div style="display:flex;align-items:baseline;gap:8px;margin-top:4px"><span style="font-weight:800;font-size:30px">{{ g.total }}</span><span style="font-size:12px;color:#8b857c">{{ g.perGame }}</span></div>
+        <div style="height:6px;border-radius:3px;background:#EFEBE3;margin-top:10px;overflow:hidden"><div style="height:100%;border-radius:3px;transform-origin:left;animation:grow .8s cubic-bezier(.2,.8,.25,1) 1.24s both;width:{{ g.pct }};background:{{ g.color }}"></div></div>
+        <div style="font-size:11px;color:#8b857c;margin-top:6px">{{ g.prev }}</div>
+      </div>
+    </sc-for>
+  </div>
+  <div>
+    <div style="animation:rise .5s ease-out 1.4s both;display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px">
+      <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#8b857c">Position by matchweek</div>
+      <div style="display:flex;gap:12px;font-size:10.5px;color:#8b857c"><span style="display:flex;align-items:center;gap:5px"><span style="background:{{ accent }};width:{{ legendW }};height:{{ legendH }};border-radius:{{ legendR }}"></span>{{ thisSeasonShort }}</span><span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:0;border-top:2px dashed #b9b2a6"></span>{{ lastSeasonShort }}</span></div>
+    </div>
+    <div style="animation:rise .6s ease-out 1.5s both;display:flex;gap:8px">
+      <div style="display:flex;flex-direction:column;justify-content:space-between;height:160px;font-size:9.5px;color:#b9b2a6;text-align:right;padding:4px 0"><span>1</span><span>5</span><span>10</span><span>15</span><span>20</span></div>
+      <svg viewBox="0 0 320 160" style="flex:1;height:160px;overflow:visible">
+        <line x1="0" y1="10" x2="320" y2="10" stroke="#E7E2D9" stroke-width="1"></line>
+        <line x1="0" y1="39.5" x2="320" y2="39.5" stroke="#E7E2D9" stroke-width="1"></line>
+        <line x1="0" y1="76.3" x2="320" y2="76.3" stroke="#E7E2D9" stroke-width="1"></line>
+        <line x1="0" y1="113.2" x2="320" y2="113.2" stroke="#E7E2D9" stroke-width="1"></line>
+        <line x1="0" y1="150" x2="320" y2="150" stroke="#E7E2D9" stroke-width="1"></line>
+        <polyline fill="none" stroke="#b9b2a6" stroke-width="2" stroke-dasharray="4 4" stroke-linejoin="round" style="opacity:0;animation:rise .8s ease-out 1.5s both" points="{{ lastLine }}"></polyline>
+        <polyline fill="none" stroke="{{ accent }}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="animation:draw .7s ease-out 1.8s both;--len:{{ thisLineLen }};stroke-dasharray:{{ thisLineLen }}" points="{{ thisLine }}"></polyline>
+        <circle r="4.5" fill="{{ accent }}" style="animation:pop .45s cubic-bezier(.3,1.5,.45,1) 2.45s both;transform-origin:{{ markerOrigin }}" cx="{{ markerX }}" cy="{{ markerY }}"></circle>
+        <circle r="8" fill="{{ accent }}" opacity="0.2" style="animation:ping 1.6s ease-out 2.7s infinite;transform-origin:{{ markerOrigin }}" cx="{{ markerX }}" cy="{{ markerY }}"></circle>
+      </svg>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:9.5px;color:#b9b2a6;margin-top:6px;padding-left:20px"><span>MW 1</span><span>MW 10</span><span>MW 19</span><span>MW 29</span><span>MW 38</span></div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ showPlayers }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:28px;padding:28px 24px 96px">
+  <div style="animation:rise .5s cubic-bezier(.2,.7,.3,1) .05s both;display:flex;align-items:center;justify-content:space-between">
+    <button type="button" onClick="{{ openPicker }}" style="display:flex;align-items:center;gap:10px;border:0;background:none;padding:0;cursor:pointer;font-family:Rubik,sans-serif;color:inherit;text-align:left">
+      <div style="width:38px;height:38px;border-radius:50%;background:{{ accent }};color:{{ accentFg }};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;letter-spacing:.5px">{{ tla }}</div>
+      <div><div style="font-weight:700;font-size:15px;line-height:1.1">{{ teamName }}</div><div style="display:flex;align-items:center;gap:3px;font-size:11px;color:#8b857c;margin-top:2px">Players<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><polyline points="6 9 12 15 18 9"></polyline></svg></div></div>
+    </button>
+    <div style="font-size:10.5px;font-weight:600;letter-spacing:.4px;padding:6px 10px;border:1px solid #d9d3c9;border-radius:99px;color:#6f695f">{{ seasonLabel }}</div>
+  </div>
+  <div>
+    <div style="animation:rise .5s ease-out .16s both;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#8b857c;margin-bottom:6px">{{ topScorerLabel }}</div>
+    <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap">
+      <div style="animation:bigin .7s cubic-bezier(.2,.8,.25,1) .22s both;font-weight:800;font-size:46px;line-height:1;letter-spacing:-1.5px">{{ topScorerName }}</div>
+      <div style="animation:pop .5s cubic-bezier(.3,1.4,.4,1) .46s both;display:flex;align-items:center;gap:5px;background:{{ accent }};color:{{ accentFg }};border-radius:99px;padding:5px 10px;font-size:12px;font-weight:700">{{ topScorerGoals }}</div>
+    </div>
+    <div style="animation:rise .5s ease-out .54s both;font-size:12px;color:#8b857c;margin-top:8px">{{ topScorerNote }}</div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <sc-for list="{{ playerSummary }}" as="c" hint-placeholder-count="2">
+      <div style="background:#fff;border-radius:16px;padding:14px;animation:rise .55s cubic-bezier(.2,.7,.3,1) {{ c.delay }}s both">
+        <div style="font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:#8b857c">{{ c.label }}</div>
+        <div style="display:flex;align-items:baseline;gap:8px;margin-top:4px"><span style="font-weight:800;font-size:30px">{{ c.value }}</span><span style="font-size:12px;color:#8b857c">{{ c.unit }}</span></div>
+        <div style="font-size:11px;color:#8b857c;margin-top:6px">{{ c.prev }}</div>
+      </div>
+    </sc-for>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="animation:rise .5s ease-out .8s both;display:flex;justify-content:space-between;align-items:baseline">
+      <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#8b857c">Goalscorers</div>
+      <div style="font-size:10.5px;color:#b9b2a6">this season · last</div>
+    </div>
+    <sc-for list="{{ scorers }}" as="p" hint-placeholder-count="5">
+      <div style="display:flex;align-items:center;gap:12px;animation:rise .5s cubic-bezier(.2,.7,.3,1) {{ p.delay }}s both">
+        <div style="width:26px;font-size:11px;color:#b9b2a6;font-weight:700">{{ p.rank }}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><span style="font-weight:700;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.name }}</span><span style="font-weight:800;font-size:15px">{{ p.value }}</span></div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:5px">
+            <div style="flex:1;height:6px;border-radius:3px;background:#EFEBE3;overflow:hidden"><div style="height:100%;background:{{ accent }};border-radius:3px;transform-origin:left;animation:grow .7s cubic-bezier(.2,.8,.25,1) {{ p.barDelay }}s both;width:{{ p.pct }}"></div></div>
+            <span style="font-size:10.5px;color:#8b857c;white-space:nowrap;width:56px;text-align:right">{{ p.prev }}</span>
+          </div>
+        </div>
+      </div>
+    </sc-for>
+    <sc-if value="{{ noScorers }}" hint-placeholder-val="{{ false }}">
+      <div style="font-size:12.5px;color:#8b857c;padding:6px 0 2px">No goals yet this season. Last season&rsquo;s scorers appear here once the first goes in.</div>
+    </sc-if>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="animation:rise .5s ease-out 1.42s both;display:flex;justify-content:space-between;align-items:baseline">
+      <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#8b857c">Assists</div>
+      <div style="font-size:10.5px;color:#b9b2a6">this season · last</div>
+    </div>
+    <sc-for list="{{ assisters }}" as="p" hint-placeholder-count="5">
+      <div style="display:flex;align-items:center;gap:12px;animation:rise .5s cubic-bezier(.2,.7,.3,1) {{ p.delay }}s both">
+        <div style="width:26px;font-size:11px;color:#b9b2a6;font-weight:700">{{ p.rank }}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><span style="font-weight:700;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.name }}</span><span style="font-weight:800;font-size:15px">{{ p.value }}</span></div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:5px">
+            <div style="flex:1;height:6px;border-radius:3px;background:#EFEBE3;overflow:hidden"><div style="height:100%;background:#191613;border-radius:3px;transform-origin:left;animation:grow .7s cubic-bezier(.2,.8,.25,1) {{ p.barDelay }}s both;width:{{ p.pct }}"></div></div>
+            <span style="font-size:10.5px;color:#8b857c;white-space:nowrap;width:56px;text-align:right">{{ p.prev }}</span>
+          </div>
+        </div>
+      </div>
+    </sc-for>
+    <sc-if value="{{ noAssisters }}" hint-placeholder-val="{{ false }}">
+      <div style="font-size:12.5px;color:#8b857c;padding:6px 0 2px">No assists recorded yet this season.</div>
+    </sc-if>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ showTabs }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;left:0;right:0;bottom:20px;display:flex;justify-content:center;pointer-events:none">
+  <div style="display:flex;gap:4px;padding:5px;background:#191613;border-radius:99px;box-shadow:0 8px 24px rgba(25,22,19,.28);pointer-events:auto">
+    <button type="button" aria-label="Change club" onClick="{{ openPicker }}" style="border:0;cursor:pointer;width:42px;height:42px;display:flex;align-items:center;justify-content:center;border-radius:99px;background:transparent;color:rgba(255,255,255,.62);transition:background .22s ease,color .22s ease" style-hover="background:rgba(255,255,255,.12);color:#fff">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5h16"></path><path d="M4 12h16"></path><path d="M4 18.5h16"></path><circle cx="9" cy="5.5" r="2.2" fill="#191613"></circle><circle cx="15" cy="12" r="2.2" fill="#191613"></circle><circle cx="8" cy="18.5" r="2.2" fill="#191613"></circle></svg>
+    </button>
+    <button type="button" aria-label="Season" onClick="{{ goSeason }}" style="border:0;cursor:pointer;width:42px;height:42px;display:flex;align-items:center;justify-content:center;border-radius:99px;transition:background .22s ease,color .22s ease;background:{{ tabSeasonBg }};color:{{ tabSeasonFg }}">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="15 7 21 7 21 13"></polyline></svg>
+    </button>
+    <button type="button" aria-label="Players" onClick="{{ goPlayers }}" style="border:0;cursor:pointer;width:42px;height:42px;display:flex;align-items:center;justify-content:center;border-radius:99px;transition:background .22s ease,color .22s ease;background:{{ tabPlayersBg }};color:{{ tabPlayersFg }}">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.4"></circle><path d="M3.2 19.5c0-3.1 2.6-5.2 5.8-5.2s5.8 2.1 5.8 5.2"></path><path d="M16.4 5.2a3 3 0 0 1 0 5.8"></path><path d="M18 14.6c2 .6 3.4 2.2 3.4 4.4"></path></svg>
+    </button>
+  </div>
+</div>
+</sc-if>
+
+</div>
+</div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: { &quot;width&quot;: 470, &quot;height&quot;: 1030 },
+  &quot;supabaseUrl&quot;: { &quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;https://bgijzlomphztrxobsgiq.supabase.co&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Data source&quot; },
+  &quot;supabaseAnonKey&quot;: { &quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;REDACTED-SUPABASE-ANON-KEY&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Data source&quot; },
+  &quot;teamTla&quot;: { &quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;MUN&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Data source&quot; },
+  &quot;compareMode&quot;: { &quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;same-matchweek&quot;, &quot;final-table&quot;], &quot;default&quot;: &quot;same-matchweek&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Comparison&quot; },
+  &quot;forceState&quot;: { &quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;auto&quot;, &quot;loading&quot;, &quot;empty&quot;, &quot;error&quot;], &quot;default&quot;: &quot;auto&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Preview state&quot; },
+  &quot;demoDelayMs&quot;: { &quot;editor&quot;: &quot;int&quot;, &quot;default&quot;: 700, &quot;min&quot;: 0, &quot;max&quot;: 4000, &quot;step&quot;: 100, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Preview state&quot; }
+}">
+// Reads the shapes returned by supabase/queries.sql:
+//   season_comparison (one row)  ->  summary
+//   team_position_series()       ->  series
+//   team_player_comparison()     ->  players
+// With no supabaseUrl configured it renders SAMPLE, so the design stands alone.
+
+const SAMPLE = {
+  team: { name: "Manchester United", tla: "MU" },
+  summary: {
+    matchweek: 3, position: 2, won: 2, drawn: 1, lost: 0,
+    goals_for: 7, goals_against: 2,
+    prev_position_same_mw: 9, prev_won_same_mw: 1, prev_drawn_same_mw: 1,
+    prev_lost_same_mw: 1, prev_gf_same_mw: 4, prev_ga_same_mw: 4,
+    prev_final_position: 6, prev_final_won: 18, prev_final_drawn: 9,
+    prev_final_lost: 11, prev_final_gf: 58, prev_final_ga: 47
+  },
+  form: ["W", "D", "W"],
+  series: {
+    "2026-27": [8, 4, 2],
+    "2025-26": [12,12,10,10,11,9,10,11,9,8,7,7,8,9,9,9,8,8,7,8,7,8,6,6,6,6,6,6,7,7,7,8,8,8,5,6,6,6]
+  },
+  players: [
+    { player_name: "Bryan Mbeumo",     goals: 3, assists: 0, prev_goals: 14, prev_assists: 7 },
+    { player_name: "Matheus Cunha",    goals: 2, assists: 1, prev_goals: 9,  prev_assists: 5 },
+    { player_name: "Benjamin \u0160e\u0161ko", goals: 1, assists: 0, prev_goals: 7, prev_assists: 1 },
+    { player_name: "Bruno Fernandes",  goals: 1, assists: 3, prev_goals: 11, prev_assists: 12 },
+    { player_name: "Amad Diallo",      goals: 0, assists: 2, prev_goals: 5,  prev_assists: 6 },
+    { player_name: "Patrick Dorgu",    goals: 0, assists: 1, prev_goals: 1,  prev_assists: 4 },
+    { player_name: "Leny Yoro",        goals: 0, assists: 0, prev_goals: 2,  prev_assists: 0 }
+  ],
+  lastSync: "12 minutes ago",
+  seasons: { current: "2026-27", previous: "2025-26" }
+};
+
+// Fallback list, replaced at runtime by club_list() from the database so
+// promotions and relegations need no code change.
+const CLUBS = [
+  { tla: "ARS", name: "Arsenal", color: "#EF0107" },
+  { tla: "AVL", name: "Aston Villa", color: "#95BFE5" },
+  { tla: "BOU", name: "Bournemouth", color: "#DA291C" },
+  { tla: "BRE", name: "Brentford", color: "#E30613" },
+  { tla: "BHA", name: "Brighton Hove", color: "#0057B8" },
+  { tla: "CHE", name: "Chelsea", color: "#034694" },
+  { tla: "COV", name: "Coventry City", color: "#78D0F3" },
+  { tla: "CRY", name: "Crystal Palace", color: "#1B458F" },
+  { tla: "EVE", name: "Everton", color: "#003399" },
+  { tla: "FUL", name: "Fulham", color: "#CC0000" },
+  { tla: "HUL", name: "Hull City", color: "#F5971D" },
+  { tla: "IPS", name: "Ipswich Town", color: "#005EA5" },
+  { tla: "LEE", name: "Leeds United", color: "#FFCD00" },
+  { tla: "LIV", name: "Liverpool", color: "#C8102E" },
+  { tla: "MCI", name: "Man City", color: "#6CABDD" },
+  { tla: "MUN", name: "Man United", color: "#DA291C" },
+  { tla: "NEW", name: "Newcastle", color: "#241F20" },
+  { tla: "NOT", name: "Nottingham", color: "#DD0000" },
+  { tla: "SUN", name: "Sunderland", color: "#EB172B" },
+  { tla: "TOT", name: "Tottenham", color: "#132257" }
+];
+
+// readable badge text on light club colours
+const textOn = (hex) => {
+  const h = (hex || "#000").replace("#", "");
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) || 0);
+  return (r * 0.299 + g * 0.587 + b * 0.114) > 165 ? "#191613" : "#fff";
+};
+const STORAGE_KEY = "plc.team";
+
+// Live PremierView backend. The anon key is public by design — every table is
+// read-only through RLS, and writes only happen inside the sync function.
+const SUPABASE_URL = "https://bgijzlomphztrxobsgiq.supabase.co";
+const SUPABASE_ANON_KEY = "REDACTED-SUPABASE-ANON-KEY";
+
+const ord = (n) => {
+  const s = ["th", "st", "nd", "rd"], v = n % 100;
+  return s[(v - 20) % 10] || s[v] || s[0];
+};
+const per = (total, games) => games ? (total / games).toFixed(1) : "0.0";
+const short = (s) => s ? s.slice(2).replace("-", "/") : "";
+
+class Component extends DCLogic {
+  state = { tab: "season", status: "loading", data: null, error: null,
+            picker: false, club: null, clubs: CLUBS };
+
+  componentDidMount() {
+    let saved = null;
+    try { saved = window.localStorage.getItem(STORAGE_KEY); } catch (e) {}
+    const club = (this.state.clubs ?? CLUBS).find((c) => c.tla === saved);
+    if (club) { this.setState({ club }, () => this.load()); }
+    else { this.setState({ picker: true, status: "ok" }); }
+    this.loadClubs(saved);
+  }
+
+  // Live club list: promotions and relegations need no code change.
+  async loadClubs(saved) {
+    const url = this.props.supabaseUrl || SUPABASE_URL;
+    const key = this.props.supabaseAnonKey || SUPABASE_ANON_KEY;
+    if (!url || !key) return;
+    try {
+      const res = await fetch(`${url}/rest/v1/rpc/club_list`, {
+        method: "POST",
+        headers: {
+          apikey: key, Authorization: `Bearer ${key}`,
+          "Content-Type": "application/json"
+        },
+        body: "{}"
+      });
+      if (!res.ok) return;
+      const rows = await res.json();
+      if (!Array.isArray(rows) || !rows.length) return;
+      const clubs = rows.map((r) => ({
+        tla: r.code,
+        name: r.short_name || r.name,
+        color: r.colour || "#191613"
+      }));
+      this.setState((s) => ({
+        clubs,
+        club: s.club ? clubs.find((c) => c.tla === s.club.tla) ?? s.club : s.club
+      }));
+    } catch (e) { /* keep the fallback list */ }
+  }
+
+  pick(club) {
+    try { window.localStorage.setItem(STORAGE_KEY, club.tla); } catch (e) {}
+    this.setState({ club, picker: false, tab: "season", data: null }, () => this.load());
+  }
+
+  async load() {
+    const url = this.props.supabaseUrl || SUPABASE_URL;
+    const key = this.props.supabaseAnonKey || SUPABASE_ANON_KEY;
+    const tla = this.state.club?.tla || this.props.teamTla || "MUN";
+
+    if (url && key) {
+      this.setState({ status: "loading", error: null });
+      try {
+        const res = await fetch(`${url}/rest/v1/rpc/team_page`, {
+          method: "POST",
+          headers: {
+            apikey: key,
+            Authorization: `Bearer ${key}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ p_code: tla })
+        });
+        if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
+        const d = await res.json();
+        if (!d || !d.summary) { this.setState({ status: "empty", data: null }); return; }
+
+        const series = {};
+        for (const [label, arr] of Object.entries(d.series ?? {})) {
+          series[label] = arr;
+        }
+        this.setState({
+          status: "ok",
+          data: {
+            team: { name: d.team.short_name || d.team.name, tla: d.team.tla },
+            summary: d.summary,
+            form: d.form ?? [],
+            series,
+            players: d.players ?? [],
+            seasons: d.seasons,
+            lastSync: d.lastSync
+              ? new Date(d.lastSync).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
+              : "unknown"
+          }
+        });
+      } catch (e) {
+        this.setState({ status: "error", error: String(e.message ?? e) });
+      }
+      return;
+    }
+
+    // No backend configured: show the skeleton briefly, then sample data.
+    if (!url || !key) {
+      this.setState({ status: "loading" });
+      await new Promise((r) => setTimeout(r, this.props.demoDelayMs ?? 700));
+      const club = this.state.club;
+      this.setState({
+        status: "ok",
+        data: club
+          ? { ...SAMPLE, team: { name: club.name, tla: club.tla } }
+          : SAMPLE
+      });
+      return;
+    }
+
+    this.setState({ status: "loading", error: null });
+    const rest = `${url.replace(/\/$/, "")}/rest/v1`;
+    const headers = { apikey: key, Authorization: `Bearer ${key}` };
+    const get = async (path, body) => {
+      const res = await fetch(`${rest}${path}`, {
+        method: body ? "POST" : "GET",
+        headers: body ? { ...headers, "Content-Type": "application/json" } : headers,
+        body: body ? JSON.stringify(body) : undefined
+      });
+      if (!res.ok) throw new Error(`${res.status} ${path}`);
+      return res.json();
+    };
+
+    try {
+      const rows = await get(`/season_comparison?tla=eq.${tla}&limit=1`);
+      const summary = rows[0];
+      if (!summary) { this.setState({ status: "empty", data: null }); return; }
+
+      const [series, players, form, sync] = await Promise.all([
+        get("/rpc/team_position_series", { p_team_id: summary.team_id }),
+        get("/rpc/team_player_comparison", { p_team_id: summary.team_id }),
+        get(`/matches?season=eq.${summary.season ?? ""}&status=eq.FINISHED` +
+            `&or=(home_team_id.eq.${summary.team_id},away_team_id.eq.${summary.team_id})` +
+            "&select=matchweek,home_team_id,home_goals,away_goals&order=matchweek.desc&limit=6"),
+        get("/sync_log?ok=eq.true&order=id.desc&limit=1&select=finished_at")
+      ]);
+
+      const bySeason = {};
+      for (const r of series) {
+        (bySeason[r.season] ??= [])[r.matchweek - 1] = r.position;
+      }
+      const seasonKeys = Object.keys(bySeason).sort();
+
+      this.setState({
+        status: "ok",
+        data: {
+          team: { name: summary.team_name, tla: summary.tla },
+          summary,
+          form: form.slice().reverse().map((m) => {
+            const home = m.home_team_id === summary.team_id;
+            const us = home ? m.home_goals : m.away_goals;
+            const them = home ? m.away_goals : m.home_goals;
+            return us > them ? "W" : us < them ? "L" : "D";
+          }).slice(-6),
+          series: bySeason,
+          players,
+          lastSync: sync[0]?.finished_at
+            ? new Date(sync[0].finished_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
+            : "unknown",
+          seasons: {
+            current: seasonKeys[seasonKeys.length - 1],
+            previous: seasonKeys[0]
+          }
+        }
+      });
+    } catch (e) {
+      this.setState({ status: "error", error: String(e.message ?? e) });
+    }
+  }
+
+  // x is inset from the axes so a single early-season point sits inside the plot
+  // rather than straddling the y-axis.
+  xy(p, i) {
+    return [8 + (i / 37) * 304, 10 + (p - 1) / 19 * 140];
+  }
+
+  // Real polyline length, so the draw animation reveals exactly the whole line.
+  lineLength(positions) {
+    const pts = positions
+      .map((p, i) => p == null ? null : this.xy(p, i))
+      .filter(Boolean);
+    let len = 0;
+    for (let i = 1; i < pts.length; i++) {
+      len += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+    }
+    return Math.ceil(len) + 1;
+  }
+
+  points(positions) {
+    return positions
+      .map((p, i) => {
+        if (p == null) return null;
+        const [x, y] = this.xy(p, i);
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      })
+      .filter(Boolean).join(" ");
+  }
+
+  renderVals() {
+    const t = this.state.tab;
+    const st = this.props.forceState && this.props.forceState !== "auto"
+      ? this.props.forceState
+      : this.state.status;
+    const picking = this.state.picker;
+    const ok = st === "ok" && !picking;
+    const d = this.state.data;
+    const accent = this.state.club?.color ?? "#DA291C";
+
+    const base = {
+      accent,
+      accentFg: textOn(accent),
+      isPicker: picking,
+      isLoading: !picking && st === "loading",
+      isProblem: !picking && (st === "error" || st === "empty"),
+      showSeason: ok && t === "season",
+      showPlayers: ok && t === "players",
+      showTabs: ok,
+      openPicker: () => this.setState({ picker: true }),
+      closePicker: () => this.setState({ picker: false }),
+      hasSaved: !!this.state.club,
+      seasonLabel: "26/27 vs 25/26",
+      teamName: this.state.club?.name ?? "",
+      clubs: (this.state.clubs ?? CLUBS).map((c, i) => ({
+        ...c,
+        fg: textOn(c.color),
+        hint: this.state.club?.tla === c.tla ? "current" : "",
+        rowBg: this.state.club?.tla === c.tla ? "#fff" : "transparent",
+        delay: (0.14 + i * 0.022).toFixed(3),
+        pick: () => this.pick(c)
+      })),
+      goSeason: () => this.setState({ tab: "season" }),
+      goPlayers: () => this.setState({ tab: "players" }),
+      retry: () => this.load(),
+      tabSeasonBg: t === "season" ? accent : "transparent",
+      tabSeasonFg: t === "season" ? textOn(accent) : "rgba(255,255,255,.62)",
+      tabPlayersBg: t === "players" ? accent : "transparent",
+      tabPlayersFg: t === "players" ? textOn(accent) : "rgba(255,255,255,.62)",
+      problemTitle: st === "empty" ? "No data for this team yet" : "Couldn't load the season",
+      problemBody: st === "empty"
+        ? "The hourly sync hasn't written any standings for this team. It may be a newly promoted side."
+        : (this.state.error ?? "The database didn't respond. Your data is cached, so this is usually brief."),
+      lastSync: (d ?? SAMPLE).lastSync
+    };
+
+    if (!ok || !d) return base;
+
+    const s = d.summary;
+    const games = s.won + s.drawn + s.lost;
+    const alignedMode = (this.props.compareMode ?? "same-matchweek") === "same-matchweek";
+    const prevPos = alignedMode ? s.prev_position_same_mw : s.prev_final_position;
+    const delta = prevPos != null ? prevPos - s.position : null;
+    const prevGames = alignedMode
+      ? (s.prev_won_same_mw ?? 0) + (s.prev_drawn_same_mw ?? 0) + (s.prev_lost_same_mw ?? 0)
+      : 38;
+    const pgf = alignedMode ? s.prev_gf_same_mw : s.prev_final_gf;
+    const pga = alignedMode ? s.prev_ga_same_mw : s.prev_final_ga;
+    const prevTag = alignedMode ? "last season" : `in ${short(d.seasons.previous)}`;
+
+    const cur = d.series[d.seasons.current] ?? [];
+    const last = d.series[d.seasons.previous] ?? [];
+    const lastIdx = cur.reduce((a, p, i) => p != null ? i : a, 0);
+    const played = cur.filter((p) => p != null).length;
+    const [mx, my] = this.xy(cur[lastIdx] ?? 1, lastIdx);
+    const markerX = mx.toFixed(1);
+    const markerY = my.toFixed(1);
+
+    const rank = (key, prevKey, color) => {
+      const rows = d.players
+        .filter((p) => (p[key] ?? 0) > 0 || (p[prevKey] ?? 0) > 0)
+        .sort((a, b) => (b[key] ?? 0) - (a[key] ?? 0) || (b[prevKey] ?? 0) - (a[prevKey] ?? 0))
+        .slice(0, 5);
+      const top = Math.max(1, ...rows.map((p) => p[key] ?? 0));
+      const bd = color === "#DA291C" ? 1.0 : 1.62;
+      const rd = color === "#DA291C" ? 0.86 : 1.48;
+      return rows.map((p, i) => ({
+        rank: i + 1,
+        name: p.player_name,
+        value: (p[key] ?? 0) > 0 ? p[key] : "\u2014",
+        pct: `${Math.round(((p[key] ?? 0) / top) * 100)}%`,
+        prev: `${p[prevKey] ?? 0} last`,
+        delay: (rd + i * 0.07).toFixed(2),
+        barDelay: (bd + i * 0.07).toFixed(2)
+      }));
+    };
+
+    const scorers = rank("goals", "prev_goals", "#DA291C");
+    const assisters = rank("assists", "prev_assists", "#191613");
+    const topScorer = d.players.slice().sort((a, b) => (b.goals ?? 0) - (a.goals ?? 0))[0];
+    const scored = (topScorer?.goals ?? 0) > 0;
+    const prevTopScorer = d.players.slice()
+      .sort((a, b) => (b.prev_goals ?? 0) - (a.prev_goals ?? 0))
+      .find((p) => (p.prev_goals ?? 0) > 0);
+    const assistedShare = s.goals_for
+      ? Math.round((d.players.reduce((n, p) => n + (p.assists ?? 0), 0) / s.goals_for) * 100)
+      : 0;
+
+    return {
+      ...base,
+      teamName: d.team.name,
+      tla: d.team.tla,
+      seasonLabel: `${short(d.seasons.current)} vs ${short(d.seasons.previous)}`,
+      thisSeasonShort: short(d.seasons.current),
+      lastSeasonShort: short(d.seasons.previous),
+      matchweek: s.matchweek,
+      position: s.position,
+      positionSuffix: ord(s.position),
+      deltaLabel: delta == null ? "\u2014"
+        : delta > 0 ? `\u25B2 ${delta}`
+        : delta < 0 ? `\u25BC ${Math.abs(delta)}` : "level",
+      deltaBg: delta == null || delta === 0 ? "#E4DFD6" : delta > 0 ? accent : "#191613",
+      deltaFg: delta == null || delta === 0 ? "#8b857c"
+        : delta > 0 ? textOn(accent) : "#fff",
+      comparisonNote: alignedMode
+        ? `${prevPos ? prevPos + ord(prevPos) : "Unplaced"} at this stage last season`
+        : `Finished ${prevPos}${ord(prevPos)} last season`,
+
+      form: Array.from({ length: 6 }, (_, i) => {
+        const r = d.form[i];
+        const filled = r === "W" || r === "L" || r === "D";
+        return {
+          letter: filled ? r : "",
+          bg: r === "W" ? accent : r === "L" ? "#191613" : r === "D" ? "#E4DFD6" : "#F0ECE5",
+          fg: r === "W" ? textOn(accent) : r === "D" ? "#8b857c" : "#fff",
+          border: filled ? "0" : "1.5px dashed #d9d3c9",
+          delay: (0.66 + i * 0.07).toFixed(2)
+        };
+      }),
+
+      record: [
+        { label: "Wins",   value: s.won,   prev: `${alignedMode ? s.prev_won_same_mw : s.prev_final_won} ${prevTag}`,   delay: "1.00" },
+        { label: "Draws",  value: s.drawn, prev: `${alignedMode ? s.prev_drawn_same_mw : s.prev_final_drawn} ${prevTag}`, delay: "1.08" },
+        { label: "Losses", value: s.lost,  prev: `${alignedMode ? s.prev_lost_same_mw : s.prev_final_lost} ${prevTag}`,  delay: "1.16" }
+      ],
+
+      goals: [
+        {
+          label: "Goals scored", total: s.goals_for, perGame: `${per(s.goals_for, games)} / game`,
+          pct: `${Math.min(100, Math.round((s.goals_for / games) / 3 * 100))}%`,
+          color: accent, prev: `${per(pgf, prevGames)} / game ${prevTag}`, delay: "1.24"
+        },
+        {
+          label: "Goals conceded", total: s.goals_against, perGame: `${per(s.goals_against, games)} / game`,
+          pct: `${Math.min(100, Math.round((s.goals_against / games) / 3 * 100))}%`,
+          color: "#191613", prev: `${per(pga, prevGames)} / game ${prevTag}`, delay: "1.32"
+        }
+      ],
+
+      lastLine: this.points(last),
+      thisLine: this.points(cur),
+      thisLineLen: this.lineLength(cur),
+      markerX, markerY,
+      markerOrigin: `${markerX}px ${markerY}px`,
+
+      // legend swatch becomes a dot while there's only one data point
+      legendW: played > 1 ? "14px" : "7px",
+      legendH: played > 1 ? "3px" : "7px",
+      legendR: played > 1 ? "2px" : "50%",
+
+      ...(scored
+        ? {
+            topScorerLabel: `Top scorer · MW ${s.matchweek}`,
+            topScorerName: topScorer.player_name.split(" ").slice(-1)[0],
+            topScorerGoals: `${topScorer.goals} ${topScorer.goals === 1 ? "goal" : "goals"}`,
+            topScorerNote: `${topScorer.prev_goals ?? 0} in ${short(d.seasons.previous)}`
+          }
+        : {
+            topScorerLabel: `Goalscorers · MW ${s.matchweek}`,
+            topScorerName: "None yet",
+            topScorerGoals: `0 goals in ${s.matchweek} ${s.matchweek === 1 ? "game" : "games"}`,
+            topScorerNote: prevTopScorer
+              ? `${prevTopScorer.player_name} led the scoring in ${short(d.seasons.previous)} with ${prevTopScorer.prev_goals}`
+              : `No goals in ${short(d.seasons.previous)} either`
+          }),
+
+      playerSummary: [
+        {
+          label: "Scorers used",
+          value: scored ? d.players.filter((p) => (p.goals ?? 0) > 0).length : "\u2014",
+          unit: scored ? `of ${s.goals_for} goals` : "no goals yet",
+          prev: `${d.players.filter((p) => (p.prev_goals ?? 0) > 0).length} across ${short(d.seasons.previous)}`,
+          delay: "0.62"
+        },
+        {
+          label: "Assisted goals",
+          value: scored ? d.players.reduce((n, p) => n + (p.assists ?? 0), 0) : "\u2014",
+          unit: scored ? `${assistedShare}%` : "no goals yet",
+          prev: `${short(d.seasons.previous)} squad total`, delay: "0.70"
+        }
+      ],
+      scorers, assisters,
+      noScorers: scorers.length === 0,
+      noAssisters: assisters.length === 0
+    };
+  }
+}
+</script>
+</body>
+</html>
