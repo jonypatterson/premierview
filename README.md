@@ -11,11 +11,14 @@ scheduled job keeps current. The app never calls a football API at request time.
 
 ```bash
 npm install
-cp .env.example .env.local     # add NEXT_PUBLIC_SUPABASE_ANON_KEY
 npm run dev
 ```
 
-Both env vars are required — `lib/queries.ts` throws at import without them.
+No configuration needed: `lib/queries.ts` falls back to the PremierView project's
+URL and anon key. That key is public by design — every table is read-only through
+RLS and writes only happen inside the sync Edge Function. To point the app at a
+different Supabase instance, set `NEXT_PUBLIC_SUPABASE_URL` and
+`NEXT_PUBLIC_SUPABASE_ANON_KEY` (see `.env.example`); they take precedence.
 
 ## Shape
 

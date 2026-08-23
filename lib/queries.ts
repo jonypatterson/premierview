@@ -4,14 +4,17 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Club, TeamPage } from "./types";
 
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+// The PremierView defaults, so a fresh clone or deploy works with no setup.
+// The anon key is public by design: every table is read-only through RLS and
+// writes only happen inside the sync Edge Function. Set the env vars to point
+// this at a different instance — they take precedence.
+const DEFAULT_URL = "https://bgijzlomphztrxobsgiq.supabase.co";
+const DEFAULT_ANON_KEY =
+  "REDACTED-SUPABASE-ANON-KEY";
 
-if (!url || !anonKey) {
-  throw new Error(
-    "Missing NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY — see .env.example",
-  );
-}
+// `||` not `??` — an empty env var must fall back too.
+const url = process.env.NEXT_PUBLIC_SUPABASE_URL || DEFAULT_URL;
+const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || DEFAULT_ANON_KEY;
 
 const db = createClient(url, anonKey, { auth: { persistSession: false } });
 
