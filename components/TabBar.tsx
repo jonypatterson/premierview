@@ -34,11 +34,15 @@ export default function TabBar({ tab, accent, onSeason, onPlayers, onPicker }: P
 
   return (
     <div
+      // Fixed, not absolute: on a long page an absolute bar sits at the foot of
+      // the content and you have to scroll to find it. The screens reserve
+      // bottom padding so nothing hides behind it.
       style={{
-        position: "absolute",
+        position: "fixed",
         left: 0,
         right: 0,
         bottom: 20,
+        zIndex: 50,
         display: "flex",
         justifyContent: "center",
         pointerEvents: "none",

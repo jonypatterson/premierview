@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="PremierView">
+  <rect width="64" height="64" rx="14" fill="#191613"/>
+  <!-- The season line climbing, ending on the marker dot the charts use. -->
+  <polyline points="12,46 24,34 33,41 49,20" fill="none" stroke="#DA291C" stroke-width="7"
+            stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="49" cy="20" r="6.5" fill="#F6F3EE"/>
+</svg>
