@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
-import { STORAGE_KEY, textOn } from "@/lib/format";
+import { DEFAULT_ACCENT, STORAGE_KEY, textOn } from "@/lib/format";
+import { FALLBACK_CLUBS } from "@/lib/clubs";
 import type { Club } from "@/lib/types";
 
 type Props = {
@@ -13,6 +14,53 @@ type Props = {
   onKeep?: () => void;
 };
 
+/** The mark: a league position, the move it represents, and what it's counting. */
+function Lockup() {
+  return (
+    <div
+      style={{
+        animation: "rise .5s cubic-bezier(.2,.7,.3,1) .05s both",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 10,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ fontWeight: 800, fontSize: 64, lineHeight: 1, letterSpacing: "-2.5px" }}>
+          2nd
+        </div>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 5,
+            background: DEFAULT_ACCENT,
+            color: textOn(DEFAULT_ACCENT),
+            borderRadius: 99,
+            padding: "5px 10px",
+            fontSize: 12,
+            fontWeight: 700,
+          }}
+        >
+          ▲ 4
+        </div>
+      </div>
+      <div
+        style={{
+          fontSize: 12,
+          fontWeight: 600,
+          letterSpacing: "5px",
+          color: "#8b857c",
+          textTransform: "uppercase",
+        }}
+      >
+        Matchday
+      </div>
+    </div>
+  );
+}
+
 /**
  * First run and club switching. The choice is written to localStorage so every
  * later visit to / opens straight on that club's season.
@@ -20,6 +68,7 @@ type Props = {
 export default function ClubPicker({ clubs, seasonLabel, current, onKeep }: Props) {
   const router = useRouter();
   const [, startTransition] = useTransition();
+  const list = clubs.length ? clubs : FALLBACK_CLUBS;
 
   const pick = (code: string) => {
     try {
@@ -32,16 +81,18 @@ export default function ClubPicker({ clubs, seasonLabel, current, onKeep }: Prop
 
   return (
     <div
+      className="col-narrow"
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: 22,
-        padding: "34px 24px",
-        minHeight: 940,
+        gap: 36,
+        padding: "56px 24px 40px",
         boxSizing: "border-box",
       }}
     >
-      <div style={{ animation: "rise .5s cubic-bezier(.2,.7,.3,1) .05s both" }}>
+      <Lockup />
+
+      <div style={{ animation: "rise .5s cubic-bezier(.2,.7,.3,1) .12s both", textAlign: "center" }}>
         <div
           style={{
             fontSize: 11,
@@ -50,7 +101,7 @@ export default function ClubPicker({ clubs, seasonLabel, current, onKeep }: Prop
             color: "#8b857c",
           }}
         >
-          Premier League · {seasonLabel}
+          Premier League{seasonLabel ? ` · ${seasonLabel}` : ""}
         </div>
         <div
           style={{
@@ -70,7 +121,8 @@ export default function ClubPicker({ clubs, seasonLabel, current, onKeep }: Prop
             color: "#8b857c",
             marginTop: 8,
             lineHeight: 1.5,
-            maxWidth: 270,
+            maxWidth: 300,
+            margin: "8px auto 0",
             textWrap: "pretty",
           }}
         >
@@ -78,41 +130,29 @@ export default function ClubPicker({ clubs, seasonLabel, current, onKeep }: Prop
         </div>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-        {clubs.map((c, i) => {
+      <div className="picker-grid">
+        {list.map((c, i) => {
           const isCurrent = current?.tla === c.code;
           const colour = c.colour || "#191613";
           return (
             <button
               key={c.code}
               type="button"
-              className="club-row"
+              className={`club-tile${isCurrent ? " club-tile-current" : ""}`}
               onClick={() => pick(c.code)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 12,
-                width: "100%",
-                padding: "9px 12px",
-                border: 0,
-                borderRadius: 14,
-                cursor: "pointer",
-                fontFamily: "inherit",
-                textAlign: "left",
-                animation: `rise .45s cubic-bezier(.2,.7,.3,1) ${(0.14 + i * 0.022).toFixed(3)}s both`,
-                background: isCurrent ? "#fff" : "transparent",
-              }}
+              aria-current={isCurrent}
+              style={{ animation: `pop .45s cubic-bezier(.3,1.4,.4,1) ${(0.2 + i * 0.028).toFixed(3)}s both` }}
             >
               <div
                 style={{
-                  width: 30,
-                  height: 30,
+                  width: 36,
+                  height: 36,
                   borderRadius: "50%",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   fontWeight: 800,
-                  fontSize: 10.5,
+                  fontSize: 11,
                   letterSpacing: ".3px",
                   flex: "none",
                   color: textOn(colour),
@@ -121,23 +161,7 @@ export default function ClubPicker({ clubs, seasonLabel, current, onKeep }: Prop
               >
                 {c.code}
               </div>
-              <div
-                style={{
-                  flex: 1,
-                  minWidth: 0,
-                  fontWeight: 600,
-                  fontSize: 14,
-                  color: "#191613",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                }}
-              >
-                {c.short_name || c.name}
-              </div>
-              <div style={{ fontSize: 11, color: "#b9b2a6", flex: "none" }}>
-                {isCurrent ? "current" : ""}
-              </div>
+              <div className="club-tile-name">{c.short_name || c.name}</div>
             </button>
           );
         })}
@@ -148,7 +172,7 @@ export default function ClubPicker({ clubs, seasonLabel, current, onKeep }: Prop
           type="button"
           onClick={onKeep}
           style={{
-            alignSelf: "flex-start",
+            alignSelf: "center",
             border: 0,
             background: "none",
             padding: 0,

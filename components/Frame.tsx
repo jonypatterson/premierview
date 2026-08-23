@@ -1,12 +1,13 @@
 import type { ReactNode } from "react";
 
-/** The 390px phone card everything renders inside. */
+/**
+ * Below 1000px there is no card — the app is the viewport. At 1000px and up
+ * it becomes a centred card on the canvas. See .frame in globals.css.
+ */
 export default function Frame({ children }: { children: ReactNode }) {
   return (
-    <section style={{ display: "flex", justifyContent: "center", padding: "40px 20px" }}>
-      <div className="dv-card" style={{ width: 390, background: "#F6F3EE", color: "#191613" }}>
-        <div style={{ position: "relative", minHeight: 940 }}>{children}</div>
-      </div>
-    </section>
+    <div className="frame-outer">
+      <div className="frame">{children}</div>
+    </div>
   );
 }

@@ -1,9 +1,10 @@
 "use client";
 
+import GoalsChart from "./GoalsChart";
 import Header from "./Header";
 import { short, textOn } from "@/lib/format";
-import { playersView } from "@/lib/view";
-import type { TeamPage } from "@/lib/types";
+import { goalsChart, playersView } from "@/lib/view";
+import type { PlayedTeamPage } from "@/lib/types";
 
 const LABEL: React.CSSProperties = {
   fontSize: 11,
@@ -21,6 +22,7 @@ function RankedList({
   headingDelay,
   title,
   emptyNote,
+  area,
 }: {
   rows: Row[];
   barColor: string;
@@ -28,9 +30,10 @@ function RankedList({
   headingDelay: string;
   title: string;
   emptyNote: string;
+  area: string;
 }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+    <div className={area} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       <div
         style={{
           animation: `rise .5s ease-out ${headingDelay}s both`,
@@ -129,26 +132,29 @@ export default function PlayersView({
   accent,
   onOpenPicker,
 }: {
-  data: TeamPage;
+  data: PlayedTeamPage;
   accent: string;
   onOpenPicker: () => void;
 }) {
   const vm = playersView(data, accent);
+  const gvm = goalsChart(data, accent);
   const accentFg = textOn(accent);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 28, padding: "28px 24px 96px" }}>
-      <Header
-        tla={data.team.tla}
-        teamName={data.team.short_name || data.team.name}
-        subtitle="Players"
-        seasonLabel={`${short(data.seasons.current)} vs ${short(data.seasons.previous)}`}
-        accent={accent}
-        accentFg={accentFg}
-        onOpenPicker={onOpenPicker}
-      />
+    <div className="screen screen-players">
+      <div className="a-hdr">
+        <Header
+          tla={data.team.tla}
+          teamName={data.team.short_name || data.team.name}
+          subtitle="Players"
+          seasonLabel={`${short(data.seasons.current)} vs ${short(data.seasons.previous)}`}
+          accent={accent}
+          accentFg={accentFg}
+          onOpenPicker={onOpenPicker}
+        />
+      </div>
 
-      <div>
+      <div className="a-top">
         <div style={{ ...LABEL, animation: "rise .5s ease-out .16s both", marginBottom: 6 }}>
           {vm.topScorerLabel}
         </div>
@@ -193,7 +199,7 @@ export default function PlayersView({
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+      <div className="a-sum" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
         {vm.summary.map((c) => (
           <div
             key={c.label}
@@ -232,6 +238,7 @@ export default function PlayersView({
         empty={vm.noScorers}
         headingDelay="0.8"
         emptyNote="No goals yet this season. Last season’s scorers appear here once the first goes in."
+        area="a-scorers"
       />
 
       <RankedList
@@ -241,7 +248,10 @@ export default function PlayersView({
         empty={vm.noAssisters}
         headingDelay="1.42"
         emptyNote="No assists recorded yet this season."
+        area="a-assists"
       />
+
+      {gvm ? <GoalsChart vm={gvm} /> : null}
     </div>
   );
 }

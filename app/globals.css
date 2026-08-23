@@ -7,12 +7,110 @@ body {
 a { color: #1a1a1a; }
 a:hover { color: #c8102e; }
 
-.dv-card {
-  max-width: 100%;
+/* ---- Frame -------------------------------------------------------------
+   Below 1000px there is no card: the app is the viewport. At 1000px and up
+   it becomes a centred card on the canvas and the screens re-flow onto two
+   columns. */
+
+.frame-outer { display: flex; justify-content: center; }
+
+.frame {
+  position: relative;
+  width: 100%;
+  min-height: 100dvh;
+  background: #f6f3ee;
+  color: #191613;
+}
+
+@media (min-width: 1000px) {
+  .frame-outer { padding: 40px 20px; }
+  .frame {
+    max-width: 1100px;
+    min-height: 0;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 24px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+  }
+}
+
+/* Picker, skeleton and problem screens stay readable on a wide phone. */
+.col-narrow { width: 100%; max-width: 520px; margin: 0 auto; }
+@media (min-width: 1000px) { .col-narrow { max-width: none; } }
+
+/* ---- Screens ----------------------------------------------------------- */
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 28px 24px 96px;
+}
+
+@media (min-width: 1000px) {
+  .screen {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 36px 52px;
+    padding: 48px 60px 140px;
+    align-content: start;
+  }
+  .screen-season {
+    grid-template-areas: "hdr hdr" "pos rec" "form goals" "chart chart";
+  }
+  .screen-players {
+    grid-template-areas: "hdr hdr" "top sum" "scorers assists" "gchart gchart";
+  }
+  .a-hdr { grid-area: hdr; }
+  .a-pos { grid-area: pos; }
+  .a-rec { grid-area: rec; }
+  .a-form { grid-area: form; }
+  .a-goals { grid-area: goals; }
+  .a-chart { grid-area: chart; }
+  .a-top { grid-area: top; }
+  .a-sum { grid-area: sum; }
+  .a-scorers { grid-area: scorers; }
+  .a-assists { grid-area: assists; }
+  .a-gchart { grid-area: gchart; }
+}
+
+/* ---- Club picker ------------------------------------------------------- */
+
+.picker-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+@media (min-width: 1000px) {
+  .picker-grid { grid-template-columns: repeat(5, 1fr); }
+}
+
+.club-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 6px 12px;
   background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 24px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+  border: 0;
+  border-radius: 14px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: box-shadow 0.18s ease, transform 0.18s ease;
+}
+.club-tile:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08); }
+.club-tile-current { box-shadow: inset 0 0 0 2px #191613; }
+
+/* Two lines, then ellipsis — club names vary a lot in length. */
+.club-tile-name {
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: center;
+  color: #191613;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
@@ -20,6 +118,53 @@ a:hover { color: #c8102e; }
 .num {
   font-family: var(--font-roboto), var(--font-rubik), system-ui, sans-serif;
   font-weight: 700;
+}
+
+/* ---- Charts ------------------------------------------------------------
+   The svg stretches to whatever width it is given (preserveAspectRatio
+   "none"), so strokes get vector-effect="non-scaling-stroke" to keep their
+   weight. The marker and its halo are HTML, positioned in percentages —
+   transform is left free for the entrance animations. */
+
+.chart-block { margin-top: 14px; }
+
+.chart-plot {
+  flex: 1;
+  position: relative;
+  height: 160px;
+  align-self: flex-start;
+}
+
+.chart-svg { width: 100%; height: 160px; display: block; overflow: visible; }
+
+.chart-marker {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  margin-left: -4.5px;
+  margin-top: -4.5px;
+  border-radius: 50%;
+}
+
+.chart-halo {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  margin-left: -8px;
+  margin-top: -8px;
+  border-radius: 50%;
+  opacity: 0.2;
+}
+
+.chart-ylabels {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 160px;
+  font-size: 9.5px;
+  color: #b9b2a6;
+  text-align: right;
+  padding: 4px 0;
 }
 
 .club-row { transition: background 0.18s ease; }

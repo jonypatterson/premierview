@@ -11,7 +11,7 @@ const shimmer = (delay = 0, dark = false): CSSProperties => ({
 /** Shown on client-side club switches; first paint arrives with data. */
 export default function Skeleton() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 28, padding: "28px 24px 96px" }}>
+    <div className="col-narrow" style={{ display: "flex", flexDirection: "column", gap: 28, padding: "28px 24px 96px" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{ width: 38, height: 38, borderRadius: "50%", ...shimmer() }} />

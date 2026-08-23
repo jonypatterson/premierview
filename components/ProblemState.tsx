@@ -1,22 +1,64 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 type Props = {
-  kind: "empty" | "error";
+  kind: "empty" | "error" | "no-matches";
+  /** Club name, for the no-matches copy. */
+  clubName?: string;
   message?: string | null;
+  /** ISO timestamp from the sync log. */
   lastSync?: string | null;
   onRetry: () => void;
+  onChooseClub: () => void;
 };
 
-export default function ProblemState({ kind, message, lastSync, onRetry }: Props) {
-  const title = kind === "empty" ? "No data for this team yet" : "Couldn't load the season";
+const pill: React.CSSProperties = {
+  border: 0,
+  cursor: "pointer",
+  fontFamily: "inherit",
+  fontSize: 12.5,
+  fontWeight: 700,
+  borderRadius: 99,
+  padding: "11px 22px",
+};
+
+export default function ProblemState({
+  kind,
+  clubName,
+  message,
+  lastSync,
+  onRetry,
+  onChooseClub,
+}: Props) {
+  // Formatted after mount: the server and the viewer are rarely in the same
+  // timezone, and a mismatch here would be a hydration error.
+  const [synced, setSynced] = useState<string | null>(null);
+  useEffect(() => {
+    if (!lastSync) return;
+    const d = new Date(lastSync);
+    if (!Number.isNaN(d.getTime())) {
+      setSynced(d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }));
+    }
+  }, [lastSync]);
+
+  const title =
+    kind === "no-matches"
+      ? "No completed matches yet"
+      : kind === "empty"
+        ? "No data for this team yet"
+        : "Couldn't load the season";
+
   const body =
-    kind === "empty"
-      ? "The hourly sync hasn't written any standings for this team. It may be a newly promoted side."
-      : (message ??
-        "The database didn't respond. Your data is cached, so this is usually brief.");
+    kind === "no-matches"
+      ? `${clubName ?? "They"} haven't finished a match this season yet. Everything appears here after the first final whistle.`
+      : kind === "empty"
+        ? "The hourly sync hasn't written any standings for this team. It may be a newly promoted side."
+        : (message ?? "The database didn't respond. Your data is cached, so this is usually brief.");
 
   return (
     <div
+      className="col-narrow"
       style={{
         display: "flex",
         flexDirection: "column",
@@ -25,7 +67,7 @@ export default function ProblemState({ kind, message, lastSync, onRetry }: Props
         textAlign: "center",
         gap: 16,
         padding: "120px 40px",
-        minHeight: 940,
+        minHeight: "70dvh",
         boxSizing: "border-box",
       }}
     >
@@ -66,7 +108,7 @@ export default function ProblemState({ kind, message, lastSync, onRetry }: Props
             color: "#8b857c",
             marginTop: 8,
             lineHeight: 1.5,
-            maxWidth: 250,
+            maxWidth: 280,
             textWrap: "pretty",
           }}
         >
@@ -75,28 +117,36 @@ export default function ProblemState({ kind, message, lastSync, onRetry }: Props
       </div>
 
       <div style={{ animation: "rise .5s ease-out .18s both", fontSize: 11, color: "#b9b2a6" }}>
-        Last successful sync {lastSync || "unknown"}
+        Last successful sync {synced ?? "unknown"}
       </div>
 
-      <button
-        type="button"
-        onClick={onRetry}
+      {/* Two ways out — this screen is never a dead end. */}
+      <div
         style={{
           animation: "rise .5s ease-out .24s both",
-          border: 0,
-          cursor: "pointer",
-          fontFamily: "inherit",
-          fontSize: 12.5,
-          fontWeight: 700,
-          color: "#fff",
-          background: "#191613",
-          borderRadius: 99,
-          padding: "11px 22px",
+          display: "flex",
+          gap: 8,
+          flexWrap: "wrap",
+          justifyContent: "center",
           marginTop: 4,
         }}
       >
-        Try again
-      </button>
+        <button type="button" onClick={onRetry} style={{ ...pill, color: "#fff", background: "#191613" }}>
+          Try again
+        </button>
+        <button
+          type="button"
+          onClick={onChooseClub}
+          style={{
+            ...pill,
+            color: "#191613",
+            background: "transparent",
+            border: "1px solid #d9d3c9",
+          }}
+        >
+          Choose another club
+        </button>
+      </div>
     </div>
   );
 }

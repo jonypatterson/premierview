@@ -9,7 +9,7 @@ import SeasonView from "./SeasonView";
 import TabBar from "./TabBar";
 import { COMPARE_MODE } from "@/lib/config";
 import { DEFAULT_ACCENT, STORAGE_KEY, short } from "@/lib/format";
-import type { Club, TeamPage } from "@/lib/types";
+import type { Club, PlayedTeamPage, TeamPage } from "@/lib/types";
 
 type Props = {
   tla: string;
@@ -32,36 +32,43 @@ export default function TeamApp({ tla, data, error, clubs }: Props) {
     }
   }, [tla]);
 
-  const accent = data?.team.colour || clubs.find((c) => c.code === tla)?.colour || DEFAULT_ACCENT;
+  const club = clubs.find((c) => c.code === tla);
+  const accent = data?.team.colour || club?.colour || DEFAULT_ACCENT;
   const teamName =
-    data?.team.short_name ||
-    data?.team.name ||
-    clubs.find((c) => c.code === tla)?.short_name ||
-    tla;
+    data?.team.short_name || data?.team.name || club?.short_name || club?.name || tla;
+
+  const seasonLabel = data
+    ? `${short(data.seasons.current)} vs ${short(data.seasons.previous)}`
+    : "";
 
   if (picker) {
     return (
       <ClubPicker
         clubs={clubs}
-        seasonLabel={
-          data ? `${short(data.seasons.current)} vs ${short(data.seasons.previous)}` : ""
-        }
+        seasonLabel={seasonLabel}
         current={{ tla, name: teamName }}
         onKeep={() => setPicker(false)}
       />
     );
   }
 
-  if (!data) {
+  // A club we know about that simply hasn't played yet reads differently from
+  // a code we can't place at all.
+  if (!data || !data.summary) {
+    const kind = error ? "error" : data ? "no-matches" : "empty";
     return (
       <ProblemState
-        kind={error ? "error" : "empty"}
+        kind={kind}
+        clubName={teamName}
         message={error}
-        lastSync="unknown"
+        lastSync={data?.lastSync ?? "unknown"}
         onRetry={() => router.refresh()}
+        onChooseClub={() => setPicker(true)}
       />
     );
   }
+
+  const played = data as PlayedTeamPage;
 
   return (
     <>
@@ -69,7 +76,7 @@ export default function TeamApp({ tla, data, error, clubs }: Props) {
       {tab === "season" ? (
         <SeasonView
           key="season"
-          data={data}
+          data={played}
           accent={accent}
           mode={COMPARE_MODE}
           onOpenPicker={() => setPicker(true)}
@@ -77,7 +84,7 @@ export default function TeamApp({ tla, data, error, clubs }: Props) {
       ) : (
         <PlayersView
           key="players"
-          data={data}
+          data={played}
           accent={accent}
           onOpenPicker={() => setPicker(true)}
         />

@@ -51,14 +51,20 @@ export type TeamPage = {
     crest: string | null;
     colour: string | null;
   };
-  summary: Summary;
+  /** null for a known club that hasn't completed a match this season. */
+  summary: Summary | null;
   /** season label -> league position by gameweek (index 0 = MW 1, null = not played) */
   series: Record<string, (number | null)[]>;
+  /** season label -> *cumulative* goals by gameweek; the UI diffs it to per-week. */
+  goals_series?: Record<string, (number | null)[]> | null;
   players: PlayerRow[];
   form: FormResult[];
   seasons: { current: string; previous: string };
   lastSync: string | null;
 };
+
+/** A team page that has a summary — what the Season and Players screens need. */
+export type PlayedTeamPage = TeamPage & { summary: Summary };
 
 /** Same-matchweek is the fair comparison; final-table is last season's finish. */
 export type CompareMode = "same-matchweek" | "final-table";

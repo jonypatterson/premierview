@@ -24,11 +24,17 @@ if (!url || !anonKey) {
 
 const db = createClient(url, anonKey, { auth: { persistSession: false } });
 
-/** Everything one club's page needs, in a single round trip. */
+/**
+ * Everything one club's page needs, in a single round trip.
+ *
+ * Returns null only when the code isn't a club at all. A known club that
+ * hasn't finished a match yet comes back with `summary: null` — the two cases
+ * get different copy on the problem screen, so they must stay distinguishable.
+ */
 export async function getTeamPage(code: string): Promise<TeamPage | null> {
   const { data, error } = await db.rpc("team_page", { p_code: code.toUpperCase() });
   if (error) throw error;
-  if (!data || !(data as TeamPage).summary) return null;
+  if (!data || !(data as TeamPage).team) return null;
   return data as TeamPage;
 }
 

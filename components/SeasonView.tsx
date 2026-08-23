@@ -4,7 +4,7 @@ import Header from "./Header";
 import PositionChart from "./PositionChart";
 import { short, textOn } from "@/lib/format";
 import { seasonView } from "@/lib/view";
-import type { CompareMode, TeamPage } from "@/lib/types";
+import type { CompareMode, PlayedTeamPage } from "@/lib/types";
 
 const LABEL: React.CSSProperties = {
   fontSize: 11,
@@ -21,7 +21,7 @@ const CARD_LABEL: React.CSSProperties = {
 };
 
 type Props = {
-  data: TeamPage;
+  data: PlayedTeamPage;
   accent: string;
   mode: CompareMode;
   onOpenPicker: () => void;
@@ -33,18 +33,20 @@ export default function SeasonView({ data, accent, mode, onOpenPicker }: Props) 
   const seasonLabel = `${short(data.seasons.current)} vs ${short(data.seasons.previous)}`;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 28, padding: "28px 24px 96px" }}>
-      <Header
-        tla={data.team.tla}
-        teamName={data.team.short_name || data.team.name}
-        subtitle="Premier League"
-        seasonLabel={seasonLabel}
-        accent={accent}
-        accentFg={accentFg}
-        onOpenPicker={onOpenPicker}
-      />
+    <div className="screen screen-season">
+      <div className="a-hdr">
+        <Header
+          tla={data.team.tla}
+          teamName={data.team.short_name || data.team.name}
+          subtitle="Premier League"
+          seasonLabel={seasonLabel}
+          accent={accent}
+          accentFg={accentFg}
+          onOpenPicker={onOpenPicker}
+        />
+      </div>
 
-      <div>
+      <div className="a-pos">
         <div
           style={{
             ...LABEL,
@@ -96,7 +98,7 @@ export default function SeasonView({ data, accent, mode, onOpenPicker }: Props) 
         </div>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div className="a-form" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         <div style={{ ...LABEL, animation: "rise .5s ease-out .6s both" }}>Form this season</div>
         <div style={{ display: "flex", gap: 10 }}>
           {vm.form.map((d, i) => (
@@ -124,7 +126,7 @@ export default function SeasonView({ data, accent, mode, onOpenPicker }: Props) 
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+      <div className="a-rec" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
         {vm.record.map((s) => (
           <div
             key={s.label}
@@ -144,7 +146,7 @@ export default function SeasonView({ data, accent, mode, onOpenPicker }: Props) 
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+      <div className="a-goals" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
         {vm.goals.map((g) => (
           <div
             key={g.label}

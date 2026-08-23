@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import ClubPicker from "./ClubPicker";
 import Skeleton from "./Skeleton";
 import { STORAGE_KEY } from "@/lib/format";
+import { FALLBACK_CLUBS } from "@/lib/clubs";
 import type { Club } from "@/lib/types";
 
 /**
@@ -14,6 +15,7 @@ import type { Club } from "@/lib/types";
 export default function Landing({ clubs, seasonLabel }: { clubs: Club[]; seasonLabel: string }) {
   const router = useRouter();
   const [checked, setChecked] = useState(false);
+  const list = clubs.length ? clubs : FALLBACK_CLUBS;
 
   useEffect(() => {
     let saved: string | null = null;
@@ -22,10 +24,10 @@ export default function Landing({ clubs, seasonLabel }: { clubs: Club[]; seasonL
     } catch {
       /* private mode — fall through to the picker */
     }
-    if (saved && clubs.some((c) => c.code === saved)) router.replace(`/${saved}`);
+    if (saved && list.some((c) => c.code === saved)) router.replace(`/${saved}`);
     else setChecked(true);
-  }, [clubs, router]);
+  }, [list, router]);
 
   if (!checked) return <Skeleton />;
-  return <ClubPicker clubs={clubs} seasonLabel={seasonLabel} />;
+  return <ClubPicker clubs={list} seasonLabel={seasonLabel} />;
 }

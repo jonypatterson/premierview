@@ -2,8 +2,16 @@
 // here, so the components stay presentational. Ported from the design's
 // renderVals() — the animation delays are part of the design and are kept.
 
-import { DEFAULT_ACCENT, ord, per, short, textOn } from "./format";
-import type { CompareMode, TeamPage } from "./types";
+import { ord, per, short, textOn } from "./format";
+import type { CompareMode, PlayedTeamPage, TeamPage } from "./types";
+
+/** Chart geometry is authored against a 320x160 box and stretched to fit. */
+export const VB_W = 320;
+export const VB_H = 160;
+
+/** The svg scales, so the marker overlay is positioned in percentages. */
+export const pctX = (x: number) => `${((x / VB_W) * 100).toFixed(3)}%`;
+export const pctY = (y: number) => `${((y / VB_H) * 100).toFixed(3)}%`;
 
 /**
  * x is inset from the axes so a single opening-week point sits inside the plot
@@ -24,22 +32,83 @@ export function points(positions: (number | null)[]): string {
     .join(" ");
 }
 
-/** Real polyline length, so the draw animation reveals exactly the whole line. */
-export function lineLength(positions: (number | null)[]): number {
-  const pts = positions
-    .map((p, i) => (p == null ? null : xy(p, i)))
-    .filter((p): p is [number, number] => p != null);
-  let len = 0;
-  for (let i = 1; i < pts.length; i++) {
-    len += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
-  }
-  return Math.ceil(len) + 1;
-}
-
 export type SeasonVM = ReturnType<typeof seasonView>;
 export type PlayersVM = ReturnType<typeof playersView>;
+export type GoalsChartVM = NonNullable<ReturnType<typeof goalsChart>>;
 
-export function seasonView(d: TeamPage, mode: CompareMode, accent: string) {
+/**
+ * Goals by matchweek. The RPC sends a running total per gameweek, so the first
+ * job is diffing it back to what was scored in each week. Returns null when
+ * there's nothing to draw — the block is hidden in that case.
+ */
+export function goalsChart(d: TeamPage, accent: string): {
+  thisLine: string;
+  lastLine: string;
+  markerLeft: string;
+  markerTop: string;
+  hasMarker: boolean;
+  accent: string;
+  gridY: number[];
+  labels: string[];
+  thisSeason: string;
+  lastSeason: string;
+} | null {
+  const raw = d.goals_series;
+  if (!raw) return null;
+
+  // cumulative -> per gameweek
+  const perWeek = (cum: (number | null)[] | undefined): (number | null)[] => {
+    if (!cum) return [];
+    let prev = 0;
+    return cum.map((v) => {
+      if (v == null) return null;
+      const week = v - prev;
+      prev = v;
+      return week < 0 ? 0 : week;
+    });
+  };
+
+  const cur = perWeek(raw[d.seasons.current]);
+  const last = perWeek(raw[d.seasons.previous]);
+  if (!cur.some((v) => v != null) && !last.some((v) => v != null)) return null;
+
+  const best = Math.max(
+    0,
+    ...cur.filter((v): v is number => v != null),
+    ...last.filter((v): v is number => v != null),
+  );
+  const yMax = Math.max(4, best);
+
+  // 0 sits on the bottom gridline; the top gridline is yMax.
+  const y = (v: number) => 150 - (v / yMax) * 140;
+  const xy = (v: number, i: number): [number, number] => [8 + (i / 37) * 304, y(v)];
+
+  const line = (vals: (number | null)[]) =>
+    vals
+      .map((v, i) => (v == null ? null : xy(v, i)))
+      .filter((p): p is [number, number] => p != null)
+      .map(([x, yy]) => `${x.toFixed(1)},${yy.toFixed(1)}`)
+      .join(" ");
+
+  const lastIdx = cur.reduce<number>((a, v, i) => (v != null ? i : a), -1);
+  const [mx, my] = lastIdx >= 0 ? xy(cur[lastIdx] as number, lastIdx) : [0, 0];
+
+  const mid = yMax / 2;
+  return {
+    thisLine: line(cur),
+    lastLine: line(last),
+    markerLeft: pctX(mx),
+    markerTop: pctY(my),
+    hasMarker: lastIdx >= 0,
+    accent,
+    gridY: [y(yMax), y(mid), y(0)],
+    labels: [String(yMax), Number.isInteger(mid) ? String(mid) : mid.toFixed(1), "0"],
+    thisSeason: short(d.seasons.current),
+    lastSeason: short(d.seasons.previous),
+  };
+}
+
+export function seasonView(d: PlayedTeamPage, mode: CompareMode, accent: string) {
   const s = d.summary;
   const games = s.won + s.drawn + s.lost;
   const aligned = mode === "same-matchweek";
@@ -115,9 +184,8 @@ export function seasonView(d: TeamPage, mode: CompareMode, accent: string) {
     chart: {
       lastLine: points(last),
       thisLine: points(cur),
-      thisLineLen: lineLength(cur),
-      markerX: mx.toFixed(1),
-      markerY: my.toFixed(1),
+      markerLeft: pctX(mx),
+      markerTop: pctY(my),
       // The legend swatch is a dot while there's only one point, so it doesn't
       // advertise a line that isn't drawn yet.
       legendW: played > 1 ? "14px" : "7px",
@@ -127,7 +195,7 @@ export function seasonView(d: TeamPage, mode: CompareMode, accent: string) {
   };
 }
 
-export function playersView(d: TeamPage, accent: string) {
+export function playersView(d: PlayedTeamPage, accent: string) {
   const s = d.summary;
 
   const rank = (key: "goals" | "assists", prevKey: "prev_goals" | "prev_assists", isGoals: boolean) => {

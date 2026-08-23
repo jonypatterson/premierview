@@ -5,7 +5,6 @@
 // current; this cache is what makes it instant. Data arrives with the HTML, so
 // the skeleton only ever shows on client-side club switches.
 
-import { notFound } from "next/navigation";
 import Frame from "@/components/Frame";
 import TeamApp from "@/components/TeamApp";
 import { getClubs, getTeamPage } from "@/lib/queries";
@@ -32,7 +31,6 @@ export default async function Page({ params }: { params: Promise<{ tla: string }
   const tla = raw.toUpperCase();
 
   const clubs = await getClubs().catch(() => []);
-  if (clubs.length && !clubs.some((c) => c.code === tla)) notFound();
 
   let data: TeamPage | null = null;
   let error: string | null = null;
