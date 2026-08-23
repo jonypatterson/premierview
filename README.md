@@ -11,14 +11,20 @@ scheduled job keeps current. The app never calls a football API at request time.
 
 ```bash
 npm install
+cp .env.example .env.local     # fill in SUPABASE_URL and SUPABASE_ANON_KEY
 npm run dev
 ```
 
-No configuration needed: `lib/queries.ts` falls back to the PremierView project's
-URL and anon key. That key is public by design — every table is read-only through
-RLS and writes only happen inside the sync Edge Function. To point the app at a
-different Supabase instance, set `NEXT_PUBLIC_SUPABASE_URL` and
-`NEXT_PUBLIC_SUPABASE_ANON_KEY` (see `.env.example`); they take precedence.
+Both are required — `lib/queries.ts` throws at import without them. Find them in
+the Supabase dashboard under Project Settings → API.
+
+Every read runs on the server, so the unprefixed names are used deliberately:
+the key never reaches the client bundle. `NEXT_PUBLIC_SUPABASE_URL` /
+`NEXT_PUBLIC_SUPABASE_ANON_KEY` are accepted as a fallback, since
+`ARCHITECTURE.md` documents those, but prefer the unprefixed pair.
+
+**On Vercel**, set the same two variables in the project's Environment Variables
+for Production, Preview and Development. The build fails without them.
 
 ## Shape
 
@@ -68,3 +74,9 @@ only rank clubs from that season).
 `.dc.html` prototype, its chat transcript, and the architecture notes. It isn't
 part of the build (excluded in `tsconfig.json`); it's there as the reference for
 what the screens are meant to look like.
+
+Two credentials appeared in that bundle — a football-data.org API key pasted
+into the transcript, and the Supabase anon key hardcoded in the prototype. Both
+are redacted from the files and purged from git history. The football-data key
+was live at the time and should be treated as compromised: rotate it, using the
+statement in `ARCHITECTURE.md`.

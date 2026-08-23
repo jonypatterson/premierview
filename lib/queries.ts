@@ -1,20 +1,26 @@
 // Server-side reads for the Vercel app. Two RPCs, no joins in app code.
-// Env: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY
+//
+// Config comes from the environment, never from the source. Every read here
+// runs on the server, so the unprefixed SUPABASE_* names are preferred: they
+// stay out of the client bundle entirely. NEXT_PUBLIC_* is accepted as a
+// fallback because ARCHITECTURE.md documents those names.
+//
+//   SUPABASE_URL       (or NEXT_PUBLIC_SUPABASE_URL)
+//   SUPABASE_ANON_KEY  (or NEXT_PUBLIC_SUPABASE_ANON_KEY)
 
 import { createClient } from "@supabase/supabase-js";
 import type { Club, TeamPage } from "./types";
 
-// The PremierView defaults, so a fresh clone or deploy works with no setup.
-// The anon key is public by design: every table is read-only through RLS and
-// writes only happen inside the sync Edge Function. Set the env vars to point
-// this at a different instance — they take precedence.
-const DEFAULT_URL = "https://bgijzlomphztrxobsgiq.supabase.co";
-const DEFAULT_ANON_KEY =
-  "REDACTED-SUPABASE-ANON-KEY";
+// `||` not `??` — an empty string must fall through too.
+const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+const anonKey = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-// `||` not `??` — an empty env var must fall back too.
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL || DEFAULT_URL;
-const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || DEFAULT_ANON_KEY;
+if (!url || !anonKey) {
+  throw new Error(
+    "Missing SUPABASE_URL / SUPABASE_ANON_KEY. Copy .env.example to .env.local " +
+      "for local work, or set them in the Vercel project's environment variables.",
+  );
+}
 
 const db = createClient(url, anonKey, { auth: { persistSession: false } });
 
