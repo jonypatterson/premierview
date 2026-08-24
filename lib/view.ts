@@ -296,6 +296,9 @@ export function leagueRows(table: LeagueTable, myTla?: string) {
   };
   const EMPTY = { ch: "", bg: "transparent", fg: "#b9b2a6", border: "1.5px dashed #d9d3c9" };
 
+  // Scale for the goal-difference bar: the widest |GD| in the division.
+  const gdMax = Math.max(1, ...table.rows.map((r) => Math.abs(r.gd)));
+
   return table.rows.map((r, i) => {
     const d = r.delta;
     const mine = !!myTla && r.code === myTla;
@@ -324,6 +327,11 @@ export function leagueRows(table: LeagueTable, myTla?: string) {
       ga: r.ga,
       points: r.points,
       gdText: r.gd > 0 ? `+${r.gd}` : String(r.gd),
+      // Diverging from a centre line, so rows compare at a glance. Ink for
+      // positive, muted for negative — green/red here would collide with the
+      // movement arrows, which mean something else entirely.
+      gdWidth: `${((Math.abs(r.gd) / gdMax) * 50).toFixed(1)}%`,
+      gdUp: r.gd > 0,
       moveGlyph: d == null ? "—" : d > 0 ? "▲" : d < 0 ? "▼" : "–",
       moveCol:
         d == null ? "#d9d3c9" : d > 0 ? "var(--move-up)" : d < 0 ? "var(--move-down)" : "#b9b2a6",

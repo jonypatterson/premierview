@@ -124,12 +124,8 @@ export default function TableView({
       </div>
 
       <div
-        style={{
-          animation: "rise .35s cubic-bezier(.2,.7,.3,1) .06s both",
-          background: "#fff",
-          borderRadius: 16,
-          padding: "8px 14px 12px",
-        }}
+        className="tbl-card"
+        style={{ animation: "rise .35s cubic-bezier(.2,.7,.3,1) .06s both" }}
       >
         <div
           className="tbl-head"
@@ -214,7 +210,19 @@ export default function TableView({
             <div className="tbl-d" style={NUM_D}>{r.losses}</div>
             <div className="tbl-d" style={NUM_D}>{r.gf}</div>
             <div className="tbl-d" style={NUM_D}>{r.ga}</div>
-            <div style={NUM}>{r.gdText}</div>
+            <div className="gd-cell" style={{ color: "#6f695f" }}>
+              <span style={{ minWidth: 22, textAlign: "right" }}>{r.gdText}</span>
+              <span className="gd-bar">
+                <span
+                  className="gd-fill"
+                  style={{
+                    width: r.gdWidth,
+                    [r.gdUp ? "left" : "right"]: "50%",
+                    background: r.gdUp ? "#191613" : "#c9c2b6",
+                  }}
+                />
+              </span>
+            </div>
             <div style={{ textAlign: "center", fontWeight: 800 }}>{r.points}</div>
             <div className="tbl-d" style={{ justifyContent: "flex-end", gap: 3 }}>
               {r.last5.map((p, i) => (

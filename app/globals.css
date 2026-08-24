@@ -118,11 +118,36 @@ a:hover { color: #c8102e; }
 }
 .tbl-d { display: none; }
 
+/* Goal difference as a diverging bar — desktop only, where there's room. */
+.gd-cell { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.gd-bar { display: none; }
+@media (min-width: 1000px) {
+  .gd-bar {
+    display: block;
+    position: relative;
+    flex: 1;
+    height: 5px;
+    border-radius: 3px;
+    background: #efebe3;
+  }
+  /* the centre line the bars diverge from */
+  .gd-bar::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: -2px;
+    bottom: -2px;
+    width: 1px;
+    background: #ded8cc;
+  }
+  .gd-fill { position: absolute; top: 0; bottom: 0; border-radius: 3px; }
+}
+
 @media (min-width: 1000px) {
   .tbl-row,
   .tbl-head {
     grid-template-columns:
-      26px 16px minmax(0, 1fr) 34px 30px 30px 30px 34px 34px 38px 42px 100px;
+      26px 16px minmax(0, 1fr) 34px 30px 30px 30px 34px 34px 104px 42px 100px;
   }
   .tbl-d { display: flex; }
 }
@@ -343,6 +368,9 @@ a:hover { color: #c8102e; }
 }
 .card { background: #fff; border-radius: 16px; padding: 14px; }
 
+/* The league table's own card, so it can shed its fill on desktop. */
+.tbl-card { background: #fff; border-radius: 16px; padding: 8px 14px 12px; }
+
 .fig-position { font-size: 76px; line-height: 0.9; letter-spacing: -2px; }
 .fig-suffix { font-size: 26px; letter-spacing: 0; }
 .fig-stat { font-size: 30px; }
@@ -356,7 +384,22 @@ a:hover { color: #c8102e; }
 @media (min-width: 1000px) {
   .eyebrow { font-size: 12.5px; letter-spacing: 1.6px; }
   .card-label { font-size: 12px; letter-spacing: 1.4px; }
-  .card { border-radius: 20px; padding: 22px 24px 20px; }
+  /* Solid white reads as a floating panel at this scale. A hairline and the
+     faintest lift off the surface give the same grouping, much more quietly. */
+  .card {
+    border-radius: 20px;
+    padding: 22px 24px 20px;
+    background: #faf8f4;
+    border: 1px solid #ece7dd;
+  }
+
+  /* The table is 20 rows — as a white slab it dominates the page. The row
+     rules already do the grouping, so the fill just goes. */
+  .tbl-card {
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
+  }
 
   .fig-position { font-size: 148px; letter-spacing: -5px; }
   .fig-suffix { font-size: 48px; }
