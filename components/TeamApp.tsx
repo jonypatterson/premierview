@@ -7,20 +7,23 @@ import PlayersView from "./PlayersView";
 import ProblemState from "./ProblemState";
 import SeasonView from "./SeasonView";
 import TabBar from "./TabBar";
+import TableView from "./TableView";
 import { COMPARE_MODE } from "@/lib/config";
-import { DEFAULT_ACCENT, STORAGE_KEY, short } from "@/lib/format";
-import type { Club, PlayedTeamPage, TeamPage } from "@/lib/types";
+import { DEFAULT_ACCENT, STORAGE_KEY, short, textOn } from "@/lib/format";
+import type { Club, LeagueTable, PlayedTeamPage, TeamPage } from "@/lib/types";
 
 type Props = {
   tla: string;
   data: TeamPage | null;
   error?: string | null;
   clubs: Club[];
+  /** Standings, fetched alongside the club page; null if the RPC failed. */
+  table?: LeagueTable | null;
 };
 
-export default function TeamApp({ tla, data, error, clubs }: Props) {
+export default function TeamApp({ tla, data, error, clubs, table }: Props) {
   const router = useRouter();
-  const [tab, setTab] = useState<"season" | "players">("season");
+  const [tab, setTab] = useState<"season" | "players" | "table">("season");
   const [picker, setPicker] = useState(false);
 
   // Visiting /MUN directly is also a choice — remember it, so / lands here next.
@@ -73,7 +76,27 @@ export default function TeamApp({ tla, data, error, clubs }: Props) {
   return (
     <>
       {/* Keyed so the staggered entrance replays on every tab switch. */}
-      {tab === "season" ? (
+      {tab === "table" ? (
+        table ? (
+          <TableView
+            key="table"
+            table={table}
+            accent={accent}
+            accentFg={textOn(accent)}
+            tla={tla}
+            myTla={tla}
+            onOpenPicker={() => setPicker(true)}
+          />
+        ) : (
+          <ProblemState
+            kind="empty"
+            message="The league table didn't load."
+            lastSync={data.lastSync}
+            onRetry={() => router.refresh()}
+            onChooseClub={() => setPicker(true)}
+          />
+        )
+      ) : tab === "season" ? (
         <SeasonView
           key="season"
           data={played}
@@ -94,6 +117,7 @@ export default function TeamApp({ tla, data, error, clubs }: Props) {
         accent={accent}
         onSeason={() => setTab("season")}
         onPlayers={() => setTab("players")}
+        onTable={() => setTab("table")}
         onPicker={() => setPicker(true)}
       />
     </>

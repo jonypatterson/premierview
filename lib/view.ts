@@ -3,7 +3,7 @@
 // renderVals() — the animation delays are part of the design and are kept.
 
 import { ord, per, short, textOn } from "./format";
-import type { CompareMode, PlayedTeamPage, TeamPage } from "./types";
+import type { CompareMode, LeagueTable, PlayedTeamPage, TeamPage } from "./types";
 
 /** Chart geometry is authored against a 320x160 box and stretched to fit. */
 export const VB_W = 320;
@@ -279,3 +279,67 @@ export function playersView(d: PlayedTeamPage, accent: string) {
     noAssisters: assisters.length === 0,
   };
 }
+
+/**
+ * League table rows, ready to render.
+ *
+ * Movement is measured against last season's *final* position, not the
+ * previous matchweek — that's the product's premise, it's defined at MW1
+ * where a week-over-week delta wouldn't be, and the header pill says so.
+ */
+export function leagueRows(table: LeagueTable, myTla?: string) {
+  // W/D/L pips use the design system's result tokens.
+  const PIP: Record<string, { bg: string; fg: string; border: string }> = {
+    W: { bg: "#DA291C", fg: "#fff", border: "0" },
+    D: { bg: "#E4DFD6", fg: "#191613", border: "0" },
+    L: { bg: "#191613", fg: "#fff", border: "0" },
+  };
+  const EMPTY = { ch: "", bg: "transparent", fg: "#b9b2a6", border: "1.5px dashed #d9d3c9" };
+
+  return table.rows.map((r, i) => {
+    const d = r.delta;
+    const mine = !!myTla && r.code === myTla;
+    const colour = r.colour || "#191613";
+
+    // Padded at the front so played matches stay flush right and the row
+    // still reads oldest to newest.
+    const last5: { ch: string; bg: string; fg: string; border: string }[] = (r.last5 ?? []).map(
+      (ch) => ({ ch: ch as string, ...(PIP[ch] ?? PIP.D) }),
+    );
+    while (last5.length < 5) last5.unshift({ ...EMPTY });
+
+    const places = d != null && Math.abs(d) === 1 ? "place" : "places";
+
+    return {
+      pos: r.pos,
+      code: r.code,
+      name: r.short_name || r.name,
+      colour,
+      fg: textOn(colour),
+      played: r.played,
+      wins: r.wins,
+      draws: r.draws,
+      losses: r.losses,
+      gf: r.gf,
+      ga: r.ga,
+      points: r.points,
+      gdText: r.gd > 0 ? `+${r.gd}` : String(r.gd),
+      moveGlyph: d == null ? "—" : d > 0 ? "▲" : d < 0 ? "▼" : "–",
+      moveCol:
+        d == null ? "#d9d3c9" : d > 0 ? "var(--move-up)" : d < 0 ? "var(--move-down)" : "#b9b2a6",
+      moveTitle:
+        d == null
+          ? "Promoted — no last-season position"
+          : d === 0
+            ? "Same position as last season"
+            : `${Math.abs(d)} ${places} ${d > 0 ? "higher" : "lower"} than last season`,
+      last5,
+      bg: mine ? "#F6F3EE" : "transparent",
+      weight: mine ? 700 : 400,
+      rule: i === table.rows.length - 1 ? "transparent" : "#EFEBE3",
+      delay: 0.16 + i * 0.022,
+    };
+  });
+}
+
+export type LeagueRowVM = ReturnType<typeof leagueRows>[number];

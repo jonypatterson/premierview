@@ -68,3 +68,33 @@ export type PlayedTeamPage = TeamPage & { summary: Summary };
 
 /** Same-matchweek is the fair comparison; final-table is last season's finish. */
 export type CompareMode = "same-matchweek" | "final-table";
+
+/** One club's row in the league table, from the league_table() RPC. */
+export type LeagueRow = {
+  pos: number;
+  code: string;
+  name: string;
+  short_name: string | null;
+  colour: string | null;
+  played: number;
+  wins: number;
+  draws: number;
+  losses: number;
+  gf: number;
+  ga: number;
+  gd: number;
+  points: number;
+  /** Final position last season; null for a promoted club. */
+  prev_pos: number | null;
+  /** prev_pos - pos, so positive means higher up than last season's finish. */
+  delta: number | null;
+  /** Oldest to newest, and shorter than five early in the season. */
+  last5: FormResult[];
+};
+
+export type LeagueTable = {
+  season: string;
+  prevSeason: string;
+  matchweek: number;
+  rows: LeagueRow[];
+};

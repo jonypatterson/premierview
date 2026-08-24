@@ -3,10 +3,11 @@
 import { textOn } from "@/lib/format";
 
 type Props = {
-  tab: "season" | "players";
+  tab: "season" | "players" | "table";
   accent: string;
   onSeason: () => void;
   onPlayers: () => void;
+  onTable: () => void;
   onPicker: () => void;
 };
 
@@ -26,7 +27,7 @@ const btn: React.CSSProperties = {
  * Floating pill: change club (neutral), Season, Players. Only the two pages
  * take the club colour, so the highlight still means "you are here".
  */
-export default function TabBar({ tab, accent, onSeason, onPlayers, onPicker }: Props) {
+export default function TabBar({ tab, accent, onSeason, onPlayers, onTable, onPicker }: Props) {
   const on = (active: boolean) => ({
     background: active ? accent : "transparent",
     color: active ? textOn(accent) : "rgba(255,255,255,.62)",
@@ -128,6 +129,30 @@ export default function TabBar({ tab, accent, onSeason, onPlayers, onPicker }: P
             <path d="M3.2 19.5c0-3.1 2.6-5.2 5.8-5.2s5.8 2.1 5.8 5.2" />
             <path d="M16.4 5.2a3 3 0 0 1 0 5.8" />
             <path d="M18 14.6c2 .6 3.4 2.2 3.4 4.4" />
+          </svg>
+        </button>
+
+        <button
+          type="button"
+          aria-label="League table"
+          aria-current={tab === "table"}
+          onClick={onTable}
+          style={{ ...btn, ...on(tab === "table") }}
+        >
+          <svg
+            width="19"
+            height="19"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.1"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <rect x="3" y="4.5" width="18" height="15" rx="2.4" />
+            <path d="M3 9.5h18" />
+            <path d="M3 14.5h18" />
+            <path d="M9.5 9.5v10" />
           </svg>
         </button>
       </div>

@@ -9,8 +9,8 @@ import Frame from "@/components/Frame";
 import TeamApp from "@/components/TeamApp";
 import { FALLBACK_CLUBS } from "@/lib/clubs";
 import { OG_IMAGE, SITE } from "@/lib/site";
-import { getClubs, getTeamPage } from "@/lib/queries";
-import type { TeamPage } from "@/lib/types";
+import { getClubs, getLeagueTable, getTeamPage } from "@/lib/queries";
+import type { LeagueTable, TeamPage } from "@/lib/types";
 
 export const revalidate = 60;
 
@@ -46,19 +46,24 @@ export default async function Page({ params }: { params: Promise<{ tla: string }
   const { tla: raw } = await params;
   const tla = raw.toUpperCase();
 
-  const clubs = await getClubs().catch(() => []);
-
+  // All three in parallel — the table is the same for every club, and ISR
+  // means this costs one round of queries per minute per route, not per visit.
   let data: TeamPage | null = null;
   let error: string | null = null;
-  try {
-    data = await getTeamPage(tla);
-  } catch (e) {
-    error = e instanceof Error ? e.message : String(e);
-  }
+  const [clubs, page, table] = await Promise.all([
+    getClubs().catch(() => []),
+    getTeamPage(tla).then(
+      (d) => ({ ok: true as const, d }),
+      (e: unknown) => ({ ok: false as const, e }),
+    ),
+    getLeagueTable().catch((): LeagueTable | null => null),
+  ]);
+  if (page.ok) data = page.d;
+  else error = page.e instanceof Error ? page.e.message : String(page.e);
 
   return (
     <Frame>
-      <TeamApp tla={tla} data={data} error={error} clubs={clubs} />
+      <TeamApp tla={tla} data={data} error={error} clubs={clubs} table={table} />
     </Frame>
   );
 }

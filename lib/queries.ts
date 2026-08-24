@@ -9,7 +9,7 @@
 //   SUPABASE_ANON_KEY  (or NEXT_PUBLIC_SUPABASE_ANON_KEY)
 
 import { createClient } from "@supabase/supabase-js";
-import type { Club, TeamPage } from "./types";
+import type { Club, LeagueTable, TeamPage } from "./types";
 
 // `||` not `??` — an empty string must fall through too.
 const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -43,4 +43,11 @@ export async function getClubs(): Promise<Club[]> {
   const { data, error } = await db.rpc("club_list");
   if (error) throw error;
   return (data ?? []) as Club[];
+}
+
+/** Standings for the latest matchweek, with each club's finish last season. */
+export async function getLeagueTable(): Promise<LeagueTable | null> {
+  const { data, error } = await db.rpc("league_table");
+  if (error) throw error;
+  return (data as LeagueTable) ?? null;
 }

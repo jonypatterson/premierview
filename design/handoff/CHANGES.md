@@ -48,7 +48,13 @@ with the assets under `assets/`. Do that alongside §4.
   haven't finished a match this season yet…" (team_page returns team but
   summary null). Unknown club keeps generic copy.
 
-## 6. Copy + type
+## 6. League table (new page + 4th nav button)
+
+Fully specified in **`LEAGUE_TABLE.md`** in this folder — new RPC, both
+column sets, arrow logic and the one new colour. Do it last; it is additive
+and touches nothing above.
+
+## 7. Copy + type
 - Typeface: Rubik (300..900) everywhere.
 - Prev-season notes read "N last season" (aligned mode) or "N in 25/26"
   (final-table mode). Delta pill / form dots / tab glyphs use contrast-aware

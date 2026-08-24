@@ -12,7 +12,14 @@ a:hover { color: #c8102e; }
    it becomes a centred card on the canvas and the screens re-flow onto two
    columns. */
 
-:root { --chart-h: 160px; }
+/* Movement needs a two-way signal, and the palette has no positive token —
+   red is the accent (wins), so it can't read as "bad" on its own. This green
+   is deliberately desaturated to sit with the warm paper. */
+:root {
+  --chart-h: 160px;
+  --move-up: #2f7a47;
+  --move-down: #da291c;
+}
 
 .frame-outer { display: flex; justify-content: center; }
 
@@ -95,6 +102,46 @@ a:hover { color: #c8102e; }
 
 @media (min-width: 1000px) {
   .site-footer { padding: 12px 60px 116px; font-size: 12.5px; }
+}
+
+/* ---- League table -------------------------------------------------------
+   Header and data rows share one grid so the columns line up without a
+   <table>; the six .tbl-d cells stay in the DOM and are simply not shown on
+   mobile, where every column has to fit without sideways scrolling. */
+
+.tbl-row,
+.tbl-head {
+  display: grid;
+  align-items: center;
+  gap: 0 6px;
+  grid-template-columns: 22px 14px minmax(0, 1fr) 30px 38px 34px;
+}
+.tbl-d { display: none; }
+
+@media (min-width: 1000px) {
+  .tbl-row,
+  .tbl-head {
+    grid-template-columns:
+      26px 16px minmax(0, 1fr) 34px 30px 30px 30px 34px 34px 38px 42px 100px;
+  }
+  .tbl-d { display: flex; }
+}
+
+/* The table is one full-width block — it does not join the two-column grid. */
+.screen-table {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 28px 20px 24px;
+}
+@media (min-width: 1000px) {
+  .screen-table {
+    padding: 48px 60px 40px;
+    max-width: 1000px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+  }
 }
 
 /* ---- Club picker ------------------------------------------------------- */
