@@ -118,36 +118,12 @@ a:hover { color: #c8102e; }
 }
 .tbl-d { display: none; }
 
-/* Goal difference as a diverging bar — desktop only, where there's room. */
-.gd-cell { display: flex; align-items: center; justify-content: center; gap: 8px; }
-.gd-bar { display: none; }
-@media (min-width: 1000px) {
-  .gd-bar {
-    display: block;
-    position: relative;
-    flex: 1;
-    height: 5px;
-    border-radius: 3px;
-    background: #efebe3;
-  }
-  /* the centre line the bars diverge from */
-  .gd-bar::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: -2px;
-    bottom: -2px;
-    width: 1px;
-    background: #ded8cc;
-  }
-  .gd-fill { position: absolute; top: 0; bottom: 0; border-radius: 3px; }
-}
 
 @media (min-width: 1000px) {
   .tbl-row,
   .tbl-head {
     grid-template-columns:
-      26px 16px minmax(0, 1fr) 34px 30px 30px 30px 34px 34px 104px 42px 100px;
+      26px 16px minmax(0, 1fr) 34px 30px 30px 30px 34px 34px 38px 42px 100px;
   }
   .tbl-d { display: flex; }
 }
