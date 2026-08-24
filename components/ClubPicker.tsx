@@ -49,16 +49,7 @@ export default function ClubPicker({ clubs, seasonLabel, current, onKeep }: Prop
   };
 
   return (
-    <div
-      className="col-narrow"
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 36,
-        padding: "56px 24px 40px",
-        boxSizing: "border-box",
-      }}
-    >
+    <div className="picker-screen">
       <Lockup />
 
       <div style={{ animation: "rise .35s cubic-bezier(.2,.7,.3,1) .06s both", textAlign: "center" }}>
@@ -113,22 +104,7 @@ export default function ClubPicker({ clubs, seasonLabel, current, onKeep }: Prop
               aria-current={isCurrent}
               style={{ animation: `pop .315s cubic-bezier(.3,1.4,.4,1) ${(0.1 + i * 0.014).toFixed(3)}s both` }}
             >
-              <div
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontWeight: 800,
-                  fontSize: 11,
-                  letterSpacing: ".3px",
-                  flex: "none",
-                  color: textOn(colour),
-                  background: colour,
-                }}
-              >
+              <div className="club-tile-badge" style={{ color: textOn(colour), background: colour }}>
                 {c.code}
               </div>
               <div className="club-tile-name">{c.short_name || c.name}</div>
