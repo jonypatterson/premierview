@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { DEFAULT_ACCENT, STORAGE_KEY, textOn } from "@/lib/format";
 import { FALLBACK_CLUBS } from "@/lib/clubs";
+import LogoLockup from "./LogoLockup";
 import type { Club } from "@/lib/types";
 
 type Props = {
@@ -46,17 +47,7 @@ function Lockup() {
           ▲ 4
         </div>
       </div>
-      <div
-        style={{
-          fontSize: 12,
-          fontWeight: 600,
-          letterSpacing: "5px",
-          color: "#8b857c",
-          textTransform: "uppercase",
-        }}
-      >
-        Matchday
-      </div>
+      <LogoLockup size={44} />
     </div>
   );
 }
@@ -126,7 +117,8 @@ export default function ClubPicker({ clubs, seasonLabel, current, onKeep }: Prop
             textWrap: "pretty",
           }}
         >
-          We&rsquo;ll remember it and open straight to their season from now on.
+          Every club&rsquo;s season set against the one before it: position, results, goals
+          and scorers.
         </div>
       </div>
 
