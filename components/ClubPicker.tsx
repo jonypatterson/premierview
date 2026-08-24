@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
-import { DEFAULT_ACCENT, STORAGE_KEY, textOn } from "@/lib/format";
+import { STORAGE_KEY, textOn } from "@/lib/format";
 import { FALLBACK_CLUBS } from "@/lib/clubs";
 import LogoLockup from "./LogoLockup";
 import type { Club } from "@/lib/types";
@@ -15,38 +15,16 @@ type Props = {
   onKeep?: () => void;
 };
 
-/** The mark: a league position, the move it represents, and what it's counting. */
+/** The lockup, centred at the top of the picker. */
 function Lockup() {
   return (
     <div
       style={{
         animation: "rise .35s cubic-bezier(.2,.7,.3,1) .025s both",
         display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: 10,
+        justifyContent: "center",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <div style={{ fontWeight: 800, fontSize: 64, lineHeight: 1, letterSpacing: "-2.5px" }}>
-          2nd
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 5,
-            background: DEFAULT_ACCENT,
-            color: textOn(DEFAULT_ACCENT),
-            borderRadius: 99,
-            padding: "5px 10px",
-            fontSize: 12,
-            fontWeight: 700,
-          }}
-        >
-          ▲ 4
-        </div>
-      </div>
       <LogoLockup size={44} />
     </div>
   );
