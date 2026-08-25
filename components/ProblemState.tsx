@@ -54,7 +54,7 @@ export default function ProblemState({
       ? `${clubName ?? "They"} haven't finished a match this season yet. Everything appears here after the first final whistle.`
       : kind === "empty"
         ? "The hourly sync hasn't written any standings for this team. It may be a newly promoted side."
-        : (message ?? "The database didn't respond. Your data is cached, so this is usually brief.");
+        : (message ?? "The database didn't respond. This is usually brief — try again in a moment.");
 
   return (
     <div

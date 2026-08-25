@@ -1,9 +1,20 @@
 // app/[tla]/page.tsx — one route per club.
 //
-// revalidate 60 means Vercel serves cached HTML for a minute at a time, so the
-// common case never touches Postgres. The hourly sync is what makes the page
-// current; this cache is what makes it instant. Data arrives with the HTML, so
-// the skeleton only ever shows on client-side club switches.
+// Rendered per request. This route used to be ISR, which was wrong for live
+// results: `revalidate` on Vercel is stale-while-revalidate, so a cache entry
+// past its window is still SERVED to the visitor who finds it — regeneration
+// happens behind them, and only the NEXT visitor sees the new data. On a site
+// that goes quiet between matches, that made the first arrival after a fixture
+// reliably the one who got yesterday's table, with a refresh appearing to
+// "fix" it.
+//
+// Freshness is the product here, so the queries run on every request. They are
+// three indexed RPCs in parallel and the page is small; if traffic ever makes
+// that a problem, the right answer is on-demand revalidation from the sync job
+// rather than a timer that can serve stale.
+//
+// Data still arrives with the HTML, so the skeleton only shows on client-side
+// club switches.
 
 import { notFound } from "next/navigation";
 import Frame from "@/components/Frame";
@@ -13,16 +24,7 @@ import { OG_IMAGE, SITE, SITE_URL } from "@/lib/site";
 import { getClubs, getLeagueTable, getTeamPage } from "@/lib/queries";
 import type { LeagueTable, TeamPage } from "@/lib/types";
 
-export const revalidate = 60;
-
-export async function generateStaticParams() {
-  try {
-    const clubs = await getClubs();
-    return clubs.map((c) => ({ tla: c.code }));
-  } catch {
-    return [];
-  }
-}
+export const dynamic = "force-dynamic";
 
 /**
  * A three-letter code is the only shape this route can ever serve. Without the

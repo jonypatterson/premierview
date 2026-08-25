@@ -6,7 +6,10 @@ import Landing from "@/components/Landing";
 import { getClubs, getTeamPage } from "@/lib/queries";
 import { short } from "@/lib/format";
 
-export const revalidate = 3600;
+// Per request, for the same reason as the club route: a cached landing page
+// hands a returning visitor a season label and club list from before the last
+// round of fixtures.
+export const dynamic = "force-dynamic";
 
 export default async function Page() {
   const clubs = await getClubs().catch(() => []);
