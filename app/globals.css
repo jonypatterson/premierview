@@ -33,7 +33,23 @@ a:hover { color: #c8102e; }
 
 @media (min-width: 1000px) {
   :root { --chart-h: 280px; }
-  .frame-outer { padding: 36px 28px; }
+
+  /* The card is a fixed height whatever the matchweek, so on a tall display it
+     used to sit against the top with the remainder as dead space below.
+     Centring it needs the container to own the viewport height.
+
+     `safe center` matters: when the card is TALLER than the viewport, ordinary
+     centring pushes its top edge above the scroll origin, where it can't be
+     reached. `safe` falls back to start-alignment in exactly that case. The
+     plain `center` before it is the fallback for browsers without `safe`. */
+  .frame-outer {
+    padding: 36px 28px;
+    box-sizing: border-box;
+    min-height: 100dvh;
+    align-items: center;
+    align-items: safe center;
+  }
+
   .frame {
     max-width: 1500px;
     min-height: 0;
