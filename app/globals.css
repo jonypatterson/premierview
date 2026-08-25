@@ -19,6 +19,8 @@ a:hover { color: #c8102e; }
   --chart-h: 160px;
   --move-up: #2f7a47;
   --move-down: #da291c;
+  /* Desktop card height — the tallest screen. See .frame below. */
+  --card-h: 1201px;
 }
 
 .frame-outer { display: flex; justify-content: center; }
@@ -50,14 +52,30 @@ a:hover { color: #c8102e; }
     align-items: safe center;
   }
 
+  /* One height for every screen, so the card doesn't resize under you when you
+     switch tabs and the docked tab bar lands in the same place each time.
+     1201px is the tallest screen measured — Players, at the narrowest desktop
+     column, where the scorer names wrap. (Season 1083, table 1129, picker 1075.)
+
+     min-height, not height: if content ever exceeds this the card grows rather
+     than clipping. The flex column with an auto top margin on the footer keeps
+     the footer at the foot of the card on the shorter screens, instead of
+     leaving it stranded mid-card above the spare space. */
   .frame {
     max-width: 1500px;
-    min-height: 0;
+    /* border-box so --card-h is the height actually rendered — the 1px border
+       would otherwise sit outside it and make the card 2px taller. */
+    box-sizing: border-box;
+    min-height: var(--card-h);
+    display: flex;
+    flex-direction: column;
     border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 24px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
     overflow: hidden;
   }
+
+  .site-footer { margin-top: auto; }
 }
 
 /* Picker, skeleton and problem screens stay readable on a wide phone. */
@@ -290,6 +308,47 @@ a:hover { color: #c8102e; }
 
 @media (min-width: 1000px) {
   .chart-ylabels { font-size: 11px; }
+}
+
+/* ---- Tab bar -----------------------------------------------------------
+   Fixed to the viewport by default. On a page taller than the screen that is
+   the only way it stays reachable — an absolute bar would sit at the foot of
+   the content, out of sight until you scrolled.
+
+   Once the viewport is tall enough to show the whole card (card height plus
+   its 36px margins), that argument stops applying: the card is fully visible,
+   nothing is out of reach, and a viewport-fixed bar would float below the
+   card's bottom edge instead of sitting on it. There it becomes absolute and
+   docks to the card. Below that height the card fills the screen anyway, so
+   the fixed bar already reads as sitting on it. */
+.tab-dock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 20px;
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* While the bar is still viewport-fixed on desktop it has to clear the card's
+   36px bottom margin, or at full scroll it hangs 16px off the card's bottom
+   edge instead of resting on it. 36 + 20 puts it exactly where the docked
+   version sits. */
+@media (min-width: 1000px) {
+  .tab-dock { bottom: 56px; }
+}
+
+/* 1273px = --card-h (1201) + the frame-outer's 36px top and bottom padding:
+   the point at which the whole card fits on screen. Media queries can't read a
+   custom property, so this is the one place the figure is repeated — keep it in
+   step with --card-h. */
+@media (min-width: 1000px) and (min-height: 1273px) {
+  .tab-dock {
+    position: absolute;
+    bottom: 20px;
+  }
 }
 
 .club-row { transition: background 0.18s ease; }

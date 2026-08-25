@@ -35,19 +35,10 @@ export default function TabBar({ tab, accent, onSeason, onPlayers, onTable, onPi
 
   return (
     <div
-      // Fixed, not absolute: on a long page an absolute bar sits at the foot of
-      // the content and you have to scroll to find it. The screens reserve
-      // bottom padding so nothing hides behind it.
-      style={{
-        position: "fixed",
-        left: 0,
-        right: 0,
-        bottom: 20,
-        zIndex: 50,
-        display: "flex",
-        justifyContent: "center",
-        pointerEvents: "none",
-      }}
+      // Positioning lives in .tab-dock (globals.css) because it changes with
+      // the viewport, and an inline style can't carry a media query. The
+      // screens reserve bottom padding so nothing hides behind the bar.
+      className="tab-dock"
     >
       <div
         style={{
