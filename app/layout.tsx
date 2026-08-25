@@ -24,6 +24,9 @@ export const metadata: Metadata = {
   title: { default: SITE, template: `%s · ${SITE}` },
   description: DESCRIPTION,
   applicationName: SITE,
+  // The site answers on several hosts (two of them still named for the old
+  // project). This points every one of them at the canonical address.
+  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     siteName: SITE,
