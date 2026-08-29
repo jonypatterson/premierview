@@ -1,103 +1,104 @@
-# Brief: this season's assists are under-counted
+# Assists were missing for the live season
 
-**Status: diagnosed from the payload, not yet confirmed against the database.**
-The session that wrote this had no database connection. Run step 1 before
-changing anything.
+**Status: diagnosed and fixed in source. Awaiting deploy of `sync-season` v11.**
 
-Not the same defect as `DATA-FIX-BRIEF.md`, which was last season's *goals* and
-is resolved. This is the *current* season's *assists*.
+Not the defect in `DATA-FIX-BRIEF.md`, which was last season's *goals*.
 
 ## The symptom
 
-`betterthanthelast.one/MCI` at MW 2 reports:
+`betterthanthelast.one/MCI` at MW 2 reported three assists for the season. The
+MW 2 match alone produced four — Foden twice, Semenyo and Gvardiol once each —
+and a cumulative figure cannot be lower than one matchweek inside it. Phil Foden
+read "—" despite setting up two goals.
 
-| | app says | actually happened in MW 2 alone |
-|---|---|---|
-| Assists, total | **3** | **4** (Foden 2, Semenyo 1, Gvardiol 1) |
-| Phil Foden | — | 2 (assisted Cherki 54', Haaland 84') |
-| Rayan Cherki | 2 | 0 — he *scored* twice (54', 59') |
-| Joško Gvardiol | 1 | 1 (assisted Cherki 59') |
+## The cause
 
-Match: Crystal Palace 1–4 Man City. City's four goals were Haaland 17'
-(Semenyo), Cherki 54' (Foden), Cherki 59' (Gvardiol), Haaland 84' (Foden).
+Two things, both confirmed against the database and the deployed source.
 
-## What that proves
+**1. Only goalscorers ever get a row.** `sync-season` builds
+`player_season_stats` with `scorers.map(...)`, and football-data's `/scorers`
+endpoint lists nobody who has not scored. A player who assists but does not
+score is therefore absent from the table entirely, not stored as zero. Foden had
+**no 2026/27 row at all** — his `players` record exists and his 2025/26 row is
+fine, so this was never a name-matching failure.
 
-**1. The season total is arithmetically impossible.** A cumulative two-matchweek
-figure cannot be lower than a single matchweek inside it. 3 < 4. This holds
-without needing to know any MW 1 value, so it is the fact to trust.
+Confirmed: every 2026/27 row sourced from football-data had `goals > 0`. Not one
+had zero.
 
-**2. Goals from the same matchweek did land.** The app's goalscorer list reads
-Haaland 2, Cherki 2, Guéhi 1, Gvardiol 1 — six goals. Four of those (Haaland's
-two, Cherki's two) are from MW 2 and are correct, leaving two for MW 1, which is
-consistent.
+**2. football-data's free tier barely reports assists.** Of 38 scorer rows,
+**6** carried an assist figure; the other 32 were NULL. v10 had deliberately made
+football-data authoritative for assists and refused to take them from FPL, for a
+good reason recorded in its header — FPL counts assists more liberally, and v8's
+`max(existing, fpl)` had inflated Bruno Fernandes' record 21 assists in 25/26 to
+24. Correct for a finished season; it left the live one nearly empty.
 
-So MW 2 *was* ingested and its **goals were written while its assists were
-not**. That is the crux: goals and assists arrive in the same FPL fetch for the
-same players in the same sync, so this is not a player that failed to match —
-a name-match failure would zero a player's goals too. It points at the assists
-value specifically: the field read from FPL, the column written, or a later
-write that overwrites it.
+The only reason any assists showed at all was **19 stale rows carrying
+`data_source = 'fpl'`**, left behind by v8 and contradicting v10's own policy.
 
-**3. It is not the app.** `playersView` in `lib/view.ts` reads `p.assists`
-straight from the `team_page` payload and sums it; the assists list is the same
-`rank()` helper as the goals list with a different key. Nothing is transposed.
-Confirm by eye if you like, but no app change will fix this.
+## The fix (v11)
 
-## Please do this
+Precedence now depends on whether the season has finished, using the same
+`maxGw < 38` test that already decided whether FPL was fetched:
 
-**1. Confirm against the rows, before touching the sync.**
+| | goals | assists | assist-only players |
+|---|---|---|---|
+| Completed season | football-data | football-data only — as v10 | not added |
+| Live season | football-data, FPL fills gaps | **FPL** | **inserted** |
 
-```sql
--- Does the stored row disagree with the match? Foden should hold >= 2 assists.
-select pl.name, s.label, p.goals, p.assists
-from players pl
-join player_season_stats p on p.player_id = pl.id
-join seasons s on s.id = p.season_id
-join clubs c on c.id = pl.club_id
-where c.tla = 'MCI' and s.label = '2026/27'
-order by p.assists desc nulls last, p.goals desc;
+A season therefore reverts to the official record by itself once its 38th
+gameweek completes, so the Bruno case cannot come back.
 
--- Is `assists` null rather than 0? Null and 0 mean different things here:
--- null suggests never written, 0 suggests written as empty.
-select count(*) filter (where assists is null) as null_assists,
-       count(*) filter (where assists = 0)    as zero_assists,
-       count(*) filter (where assists > 0)    as real_assists,
-       count(*) filter (where goals   > 0)    as real_goals
-from player_season_stats p
-join seasons s on s.id = p.season_id
-where s.label = '2026/27';
+Identity resolution for the new inserts goes through `players.full_name`,
+`players.display_name` and `player_aliases` — the path `backfill-assists`
+already uses — rather than v10's match on the scorer's name alone, which was
+failing for 20 players a run (Calafiori, Ben White, Evanilson…). New FPL
+spellings are recorded as aliases so the next run resolves instead of creating a
+duplicate.
 
--- League-wide sanity: assists should be roughly 60-70% of goals, not ~0.
-select sum(goals) as goals, sum(assists) as assists
-from player_season_stats p
-join seasons s on s.id = p.season_id
-where s.label = '2026/27';
+The 19 stale `fpl` rows are corrected in place by the upsert on
+`(player_id, season_id)` — they do not need deleting.
+
+## Deploy and verify
+
+```
+deploy supabase/functions/sync-season/index.ts as sync-season
+POST {"season":"2026/27","triggered_by":"manual"}
 ```
 
-If `sum(assists)` is far below `sum(goals)` league-wide, the defect is
-systematic rather than a few unmatched players.
+Then check, in order:
 
-**2. Read the sync.** `get_edge_function` on `sync-season`. Check, in order:
+```sql
+-- Foden should now hold >= 2 assists for 2026/27
+select pl.display_name, p.goals, p.assists, p.data_source
+from player_season_stats p
+join players pl on pl.id = p.player_id
+join seasons s on s.id = p.season_id
+join clubs c on c.id = p.club_id
+where c.code = 'MCI' and s.label = '2026/27'
+order by p.goals desc nulls last, p.assists desc nulls last;
 
-- The FPL field being read. Goals are `goals_scored` and assists are `assists`
-  on an FPL element — reading `assist` or `expected_assists` silently yields
-  nothing useful.
-- Whether the football-data write runs *after* the FPL write and includes an
-  `assists` column. football-data's free tier does not populate assists
-  reliably — that is the stated reason FPL was chosen for it (`design/chats/
-  chat1.md`) — so a later upsert carrying its empty assist value would erase the
-  good one. Goals would survive because both sources agree on goals.
-- Whether `assists` is in the upsert's conflict-update list at all. A column
-  omitted from `do update set` keeps its first-ever value and never moves again,
-  which would fit assists being stuck while goals advance each week.
+-- MCI's season total must be >= 4, and league-wide assists should be
+-- roughly 60-70% of goals rather than a handful.
+select sum(goals) as goals, sum(assists) as assists
+from player_season_stats p join seasons s on s.id = p.season_id
+where s.label = '2026/27';
 
-**3. Fix, then verify** with the MW 2 facts above: Foden ≥ 2 assists for
-2026/27, and the MCI season assist total ≥ 4.
+-- 2025/26 must be UNCHANGED: Bruno Fernandes still 21, not 24.
+select pl.display_name, p.goals, p.assists, p.data_source
+from player_season_stats p
+join players pl on pl.id = p.player_id
+join seasons s on s.id = p.season_id
+where s.label = '2025/26' and pl.full_name ilike '%fernandes%';
+```
 
-> As with the last brief: `sync-season` exists only in Supabase and is still
-> unversioned. Please paste the source into
-> `supabase/functions/sync-season/index.ts` while you are in there.
+The run's `ingestion_runs.notes` reports the assist-only row count and any
+unresolved FPL names.
+
+## No app changes needed
+
+`playersView` in `lib/view.ts` reads `p.assists` from the payload and sums it;
+the assists list is the same `rank()` helper as the goals list with a different
+key. It renders whatever the RPC returns.
 
 ## Still outstanding
 
