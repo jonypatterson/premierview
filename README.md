@@ -26,6 +26,31 @@ the key never reaches the client bundle. `NEXT_PUBLIC_SUPABASE_URL` /
 **On Vercel**, set the same two variables in the project's Environment Variables
 for Production, Preview and Development. The build fails without them.
 
+## Analytics
+
+Google Analytics 4, wired in `app/layout.tsx` via `@next/third-parties`. It is
+driven by one optional variable:
+
+```
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+```
+
+Unset, no tag is rendered at all — which is how local runs and preview
+deployments stay out of the numbers without a second property. Set it on
+Production only. The measurement ID is public by design: it names the property,
+it does not grant access to it, and gtag runs in the browser, so it cannot be a
+server-only value the way the Supabase key is.
+
+Club switches are `router.push`, and GA4's enhanced measurement counts a history
+change as a page view, so `/ARS`, `/MUN` and the rest are counted without any
+manual `send`. The three tabs within a club are React state rather than routes,
+so they are not — if you want them, they need an explicit `event`.
+
+**Consent.** GA4 sets cookies, and in the UK/EU that needs consent before the
+tag runs, not after. There is no consent banner in this app yet, so this is
+worth settling before the site gets meaningful traffic — either a banner gating
+the tag, or Google's consent mode with analytics storage denied by default.
+
 ## Shape
 
 ```
