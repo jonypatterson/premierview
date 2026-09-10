@@ -51,5 +51,3 @@ export function errorMessage(e: unknown): string {
   }
   return String(e);
 }
-
-export const STORAGE_KEY = "plc.team";
