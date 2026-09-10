@@ -10,6 +10,8 @@ import type { LeagueTable } from "@/lib/types";
 type Props = {
   table: LeagueTable;
   myTla?: string;
+  /** The club's chalk. Your own row is highlighted in it. */
+  accent?: string;
   onOpenPicker: () => void;
 };
 
@@ -22,12 +24,12 @@ const NUM: React.CSSProperties = {
   color: "var(--text-meta)",
 };
 
-export default function TableView({ table, myTla, onOpenPicker }: Props) {
+export default function TableView({ table, myTla, accent, onOpenPicker }: Props) {
   const [filter, setFilter] = useState<"six" | "all">("all");
   const scroller = useRef<HTMLDivElement>(null);
   const centred = useRef(false);
 
-  const all = leagueRows(table, myTla);
+  const all = leagueRows(table, myTla, accent);
   const rows = filter === "six" ? all.slice(0, 6) : all;
 
   // Land on your own club: the row is parked in the middle of the visible area
@@ -162,7 +164,19 @@ export default function TableView({ table, myTla, onOpenPicker }: Props) {
             </span>
             <span style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: 9 }}>
               <span
-                style={{ width: 7, height: 22, borderRadius: 3, flex: "none", background: r.zone }}
+                style={{
+                  width: 7,
+                  height: 22,
+                  borderRadius: 3,
+                  flex: "none",
+                  background: r.zone,
+                  // Your own row is filled with your club's chalk, and the
+                  // zones and form pips are drawn from the same four — so a
+                  // green club in a European place had an invisible zone bar.
+                  // An ink hairline puts the edge back without introducing a
+                  // colour, and only on the one row that needs it.
+                  boxShadow: r.me ? "inset 0 0 0 1px var(--ink-15)" : undefined,
+                }}
               />
               <span
                 style={{
@@ -200,6 +214,9 @@ export default function TableView({ table, myTla, onOpenPicker }: Props) {
                     background: f
                       ? { W: "var(--result-win)", D: "var(--result-draw)", L: "var(--result-loss)" }[f]
                       : "var(--ink-08)",
+                    // Same reason as the zone bar: on your own row the ground
+                    // is a chalk these pips also use.
+                    boxShadow: r.me ? "inset 0 0 0 1px var(--ink-15)" : undefined,
                   }}
                 />
               ))}
