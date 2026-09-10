@@ -12,8 +12,14 @@ import type { Club } from "@/lib/types";
 
 type Props = {
   clubs: Club[];
-  /** The saved club, if there is one — it keeps its tile lit. */
+  /** The club we are already on, if any — it keeps its tile lit. */
   currentTla?: string;
+  /**
+   * Dismiss the picker without navigating. Passed when the picker is opened
+   * over a club page; absent on the landing route, where there is nothing to
+   * go back to.
+   */
+  onClose?: () => void;
 };
 
 /**
@@ -24,13 +30,20 @@ type Props = {
  * The lockup stands there instead: BRAND.md §3 puts the mark on the picker and
  * nowhere else, and an eyebrow repeating the name beneath it would say it twice.
  */
-export default function ClubPicker({ clubs, currentTla }: Props) {
+export default function ClubPicker({ clubs, currentTla, onClose }: Props) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const list = clubs.length ? clubs : FALLBACK_CLUBS;
 
   const pick = (code: string) => {
     rememberClub(code);
+    // Re-picking the club you are already on is a push to the current URL,
+    // which Next treats as a no-op — so the picker stayed open and the tile
+    // appeared dead. It is a dismissal, not a navigation.
+    if (code === currentTla && onClose) {
+      onClose();
+      return;
+    }
     startTransition(() => router.push(`/${code}`));
   };
 

@@ -42,7 +42,7 @@ export default function TeamApp({ tla, data, error, clubs, table }: Props) {
     data?.team.short_name || data?.team.name || club?.short_name || club?.name || tla;
 
   if (picker) {
-    return <ClubPicker clubs={clubs} currentTla={tla} />;
+    return <ClubPicker clubs={clubs} currentTla={tla} onClose={() => setPicker(false)} />;
   }
 
   if (!data || !data.summary) {
