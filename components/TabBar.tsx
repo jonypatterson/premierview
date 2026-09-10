@@ -102,9 +102,12 @@ function TabButton({
         alignItems: "center",
         justifyContent: "center",
         gap: 4,
-        transition: "var(--transition-state)",
+        transition: "var(--transition-state), color .2s ease",
         background: on ? "var(--cream-14)" : "transparent",
-        color: on ? "var(--text-on-inverse)" : "var(--text-on-inverse-muted)",
+        // The selected glyph takes the same pink as its underscore, so the
+        // colour and the rule say the same thing rather than only the capsule
+        // carrying the state.
+        color: on ? "var(--accent-1)" : "var(--text-on-inverse-muted)",
       }}
     >
       <svg

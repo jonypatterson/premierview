@@ -11,6 +11,7 @@ export default function SiteFooter() {
     <footer
       style={{
         marginTop: 40,
+        textAlign: "center",
         fontFamily: "var(--font-mono)",
         fontSize: "var(--size-mono-sm)",
         letterSpacing: "var(--track-mono-eyebrow)",
