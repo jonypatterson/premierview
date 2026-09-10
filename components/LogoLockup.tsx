@@ -1,76 +1,58 @@
 /**
- * The two-line lockup: red badge, then the name stacked beside it.
+ * The lockup: the mark, then the name stacked beside it in two lines.
  *
- * The badge is drawn rather than using assets/logo-badge-512px.png — BRAND.md
- * offers the vector route, and it's the better one here: the PNG's edges are
- * feathered (the corner pixel is only ~48% opaque), so a flat square rendered
- * from it looks soft. Inline SVG stays crisp at any size and matches the
- * tab-bar glyph's stroke style.
+ * The wordmark is live text rather than a flat render, so it stays sharp and
+ * can invert on the ink surface. The design sheet permits no substitute for
+ * Outfit 600 at −2px tracking, stacked "Better Than" over "The Last One" —
+ * tracking is expressed in em (−2px at 44px, −1.2px at 26px both work out to
+ * ≈ −0.046em) so it holds at whatever size the caller asks for.
  *
- * The wordmark is live text, not the flat render, so it stays sharp and can
- * invert on the ink nav. Both lines are separate elements so the leading is
- * controllable, per the brand notes.
+ * Proportions come from the sheet's primary lockup — a 64px mark against 44px
+ * text with a 28px gap — kept as ratios of `size`.
  */
+import BrandMark from "./BrandMark";
+
+/** Below this the wordmark is unreadable, so the mark stands alone. */
+const MIN_LOCKUP = 40;
+
 export default function LogoLockup({
-  size = 44,
+  size = 64,
   inverted = false,
 }: {
-  /** Badge height in px; the wordmark matches it. Below 40px use the badge alone. */
+  /** Mark height in px; the wordmark scales with it. */
   size?: number;
-  /** On the ink nav the wordmark inverts; the badge never changes. */
+  /** On the ink surface the wordmark inverts and the mark takes a cream ground. */
   inverted?: boolean;
 }) {
-  const badgeOnly = size < 40;
-
-  const badge = (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      style={{ flex: "none", display: "block" }}
-      role="img"
-      aria-label="Better than the last one"
-    >
-      <rect width="24" height="24" fill="#DA291C" />
-      <polyline
-        points="4.5 16.5 9.5 11.5 13 15 18.5 8.5"
-        fill="none"
-        stroke="#fff"
-        strokeWidth="2.1"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <polyline
-        points="14.5 8.5 18.5 8.5 18.5 12.5"
-        fill="none"
-        stroke="#fff"
-        strokeWidth="2.1"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
+  const mark = (
+    <BrandMark
+      size={size}
+      ground={inverted ? "cream" : "ink"}
+      // Below the threshold the mark is the whole lockup, so it carries the
+      // name; otherwise the wordmark beside it already says it.
+      title={size < MIN_LOCKUP ? undefined : null}
+    />
   );
 
-  if (badgeOnly) return badge;
+  if (size < MIN_LOCKUP) return mark;
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: size * 0.45 }}>
-      {badge}
+    <div style={{ display: "flex", alignItems: "center", gap: size * 0.4375 }}>
+      {mark}
       <div
-        aria-hidden
         style={{
-          // Two lines at 0.92 leading add up to the badge height.
-          fontSize: size / 1.84,
-          fontWeight: 800,
-          lineHeight: 0.92,
-          letterSpacing: "-0.02em",
-          textTransform: "uppercase",
-          color: inverted ? "#F6F3EE" : "#191613",
+          fontFamily: "var(--font-outfit), system-ui, sans-serif",
+          fontSize: size * 0.6875,
+          fontWeight: 600,
+          lineHeight: 1.02,
+          letterSpacing: "-0.046em",
+          color: inverted ? "#FBF4E4" : "#14140F",
           textAlign: "left",
         }}
       >
-        <div>Better than</div>
-        <div>The last one</div>
+        {/* Separate elements, not a <br>, so the leading stays controllable. */}
+        <div>Better Than</div>
+        <div>The Last One</div>
       </div>
     </div>
   );

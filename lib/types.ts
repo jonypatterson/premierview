@@ -58,7 +58,13 @@ export type TeamPage = {
   /** season label -> *cumulative* goals by gameweek; the UI diffs it to per-week. */
   goals_series?: Record<string, (number | null)[]> | null;
   players: PlayerRow[];
+  /** Most recent first six of this season, oldest to newest. */
   form: FormResult[];
+  /**
+   * The same for last season, capped at the current matchweek so the two
+   * strips compare like with like. Empty for a promoted club.
+   */
+  form_prev?: FormResult[];
   seasons: { current: string; previous: string };
   lastSync: string | null;
 };

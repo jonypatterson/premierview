@@ -1,17 +1,17 @@
 // Every number, label, bar width and chart point the page renders is derived
 // here, so the components stay presentational. Ported from the design's
-// renderVals() — the animation delays are part of the design and are kept.
+// renderVals() in `Season Comparison - Matchday.dc.html`.
 
-import { ord, per, short, textOn } from "./format";
-import type { CompareMode, LeagueTable, PlayedTeamPage, TeamPage } from "./types";
+import { initials, ord, places, short, signed } from "./format";
+import { ACCENT, DOWN, FLAT, UP } from "./palette";
+import type { CompareMode, LeagueTable, PlayedTeamPage } from "./types";
 
 /** Chart geometry is authored against a 320x160 box and stretched to fit. */
 export const VB_W = 320;
 export const VB_H = 160;
 
-/** The svg scales, so the marker overlay is positioned in percentages. */
-export const pctX = (x: number) => `${((x / VB_W) * 100).toFixed(3)}%`;
-export const pctY = (y: number) => `${((y / VB_H) * 100).toFixed(3)}%`;
+export const pctX = (x: number) => `${((x / VB_W) * 100).toFixed(2)}%`;
+export const pctY = (y: number) => `${((y / VB_H) * 100).toFixed(2)}%`;
 
 /**
  * x is inset from the axes so a single opening-week point sits inside the plot
@@ -34,191 +34,189 @@ export function points(positions: (number | null)[]): string {
 
 export type SeasonVM = ReturnType<typeof seasonView>;
 export type PlayersVM = ReturnType<typeof playersView>;
-export type GoalsChartVM = NonNullable<ReturnType<typeof goalsChart>>;
 
-/**
- * Goals by matchweek. The RPC sends a running total per gameweek, so the first
- * job is diffing it back to what was scored in each week. Returns null when
- * there's nothing to draw — the block is hidden in that case.
- */
-export function goalsChart(d: TeamPage, accent: string): {
-  thisLine: string;
-  lastLine: string;
-  markerLeft: string;
-  markerTop: string;
-  hasMarker: boolean;
-  accent: string;
-  gridY: number[];
-  labels: string[];
-  thisSeason: string;
-  lastSeason: string;
-} | null {
-  const raw = d.goals_series;
-  if (!raw) return null;
-
-  // cumulative -> per gameweek
-  const perWeek = (cum: (number | null)[] | undefined): (number | null)[] => {
-    if (!cum) return [];
-    let prev = 0;
-    return cum.map((v) => {
-      if (v == null) return null;
-      const week = v - prev;
-      prev = v;
-      return week < 0 ? 0 : week;
-    });
-  };
-
-  const cur = perWeek(raw[d.seasons.current]);
-  const last = perWeek(raw[d.seasons.previous]);
-  if (!cur.some((v) => v != null) && !last.some((v) => v != null)) return null;
-
-  const best = Math.max(
-    0,
-    ...cur.filter((v): v is number => v != null),
-    ...last.filter((v): v is number => v != null),
-  );
-  const yMax = Math.max(4, best);
-
-  // 0 sits on the bottom gridline; the top gridline is yMax.
-  const y = (v: number) => 150 - (v / yMax) * 140;
-  const xy = (v: number, i: number): [number, number] => [8 + (i / 37) * 304, y(v)];
-
-  const line = (vals: (number | null)[]) =>
-    vals
-      .map((v, i) => (v == null ? null : xy(v, i)))
-      .filter((p): p is [number, number] => p != null)
-      .map(([x, yy]) => `${x.toFixed(1)},${yy.toFixed(1)}`)
-      .join(" ");
-
-  const lastIdx = cur.reduce<number>((a, v, i) => (v != null ? i : a), -1);
-  const [mx, my] = lastIdx >= 0 ? xy(cur[lastIdx] as number, lastIdx) : [0, 0];
-
-  const mid = yMax / 2;
-  return {
-    thisLine: line(cur),
-    lastLine: line(last),
-    markerLeft: pctX(mx),
-    markerTop: pctY(my),
-    hasMarker: lastIdx >= 0,
-    accent,
-    gridY: [y(yMax), y(mid), y(0)],
-    labels: [String(yMax), Number.isInteger(mid) ? String(mid) : mid.toFixed(1), "0"],
-    thisSeason: short(d.seasons.current),
-    lastSeason: short(d.seasons.previous),
-  };
-}
-
-export function seasonView(d: PlayedTeamPage, mode: CompareMode, accent: string) {
+export function seasonView(d: PlayedTeamPage, mode: CompareMode) {
   const s = d.summary;
-  const games = s.won + s.drawn + s.lost;
   const aligned = mode === "same-matchweek";
 
   const prevPos = aligned ? s.prev_position_same_mw : s.prev_final_position;
   const delta = prevPos != null ? prevPos - s.position : null;
-  const prevGames = aligned
-    ? (s.prev_won_same_mw ?? 0) + (s.prev_drawn_same_mw ?? 0) + (s.prev_lost_same_mw ?? 0)
-    : 38;
   const pgf = aligned ? s.prev_gf_same_mw : s.prev_final_gf;
   const pga = aligned ? s.prev_ga_same_mw : s.prev_final_ga;
-  const prevTag = aligned ? "last season" : `in ${short(d.seasons.previous)}`;
+  const prevWon = aligned ? s.prev_won_same_mw : s.prev_final_won;
+  const prevDrawn = aligned ? s.prev_drawn_same_mw : s.prev_final_drawn;
+  const prevLost = aligned ? s.prev_lost_same_mw : s.prev_final_lost;
+  const prevShort = short(d.seasons.previous);
 
   const cur = d.series[d.seasons.current] ?? [];
   const last = d.series[d.seasons.previous] ?? [];
   const lastIdx = cur.reduce<number>((a, p, i) => (p != null ? i : a), 0);
-  const played = cur.filter((p) => p != null).length;
   const [mx, my] = xy(cur[lastIdx] ?? 1, lastIdx);
+
+  const games = s.won + s.drawn + s.lost;
+  const prevGames = (prevWon ?? 0) + (prevDrawn ?? 0) + (prevLost ?? 0);
+  const pts = s.won * 3 + s.drawn;
+  const prevPts = (prevWon ?? 0) * 3 + (prevDrawn ?? 0);
+  const ptsDelta = pts - prevPts;
+  const gdNow = s.goals_for - s.goals_against;
+  const gdPrev = (pgf ?? 0) - (pga ?? 0);
+
+  // One sentence, declarative and causal: what happened, then why.
+  const insight =
+    delta == null
+      ? `${d.team.short_name || d.team.name} were not in this division at the same stage of ${prevShort}.`
+      : delta > 0
+        ? `${places(delta)} up on this stage of ${prevShort}, and ${
+            gdNow >= gdPrev ? "the goal difference is the reason" : "fewer defeats are the reason"
+          }.`
+        : delta < 0
+          ? `${places(Math.abs(delta))} down on this stage of ${prevShort}, on ${
+              ptsDelta === 0
+                ? "the same points"
+                : `${Math.abs(ptsDelta)} ${Math.abs(ptsDelta) === 1 ? "point" : "points"} ${
+                    ptsDelta > 0 ? "more" : "fewer"
+                  }`
+            }.`
+          : `Level with this stage of ${prevShort}, ${
+              ptsDelta === 0
+                ? "on the same points"
+                : `on ${Math.abs(ptsDelta)} ${ptsDelta > 0 ? "more" : "fewer"}`
+            }.`;
+
+  // Both bars are scaled against the largest figure either season reached, so
+  // the two are directly comparable.
+  const maxSeen = Math.max(1, s.goals_for, s.goals_against, pgf ?? 0, pga ?? 0);
 
   return {
     matchweek: s.matchweek,
-    position: s.position,
-    positionSuffix: ord(s.position),
-    deltaLabel:
-      delta == null ? "—" : delta > 0 ? `▲ ${delta}` : delta < 0 ? `▼ ${Math.abs(delta)}` : "level",
-    deltaBg: delta == null || delta === 0 ? "#E4DFD6" : delta > 0 ? accent : "#191613",
-    deltaFg: delta == null || delta === 0 ? "#8b857c" : delta > 0 ? textOn(accent) : "#fff",
-    comparisonNote: aligned
-      ? `${prevPos ? prevPos + ord(prevPos) : "Unplaced"} at this stage last season`
-      : `Finished ${prevPos}${prevPos ? ord(prevPos) : ""} last season`,
+    headerMeta: `${short(d.seasons.current)} · matchweek ${s.matchweek}`,
+    thisSeasonShort: short(d.seasons.current),
+    lastSeasonShort: prevShort,
 
-    // Six slots: played matches fill in, the rest stay as dashed placeholders.
-    form: Array.from({ length: 6 }, (_, i) => {
-      const r = d.form[i];
-      const filled = r === "W" || r === "L" || r === "D";
-      return {
-        letter: filled ? r : "",
-        bg: r === "W" ? accent : r === "L" ? "#191613" : r === "D" ? "#E4DFD6" : "#F0ECE5",
-        fg: r === "W" ? textOn(accent) : r === "D" ? "#8b857c" : "#fff",
-        border: filled ? "0" : "1.5px dashed #d9d3c9",
-        delay: 0.165 + i * 0.035,
-      };
-    }),
+    heroValue: `${s.position}${ord(s.position)}`,
+    // The chip reads the direction of travel: green up, pink down, yellow
+    // level, blue for a club with no last-season position.
+    heroFill:
+      delta == null
+        ? "var(--accent-4)"
+        : delta > 0
+          ? "var(--accent-3)"
+          : delta < 0
+            ? "var(--accent-1)"
+            : "var(--accent-2)",
+    deltaText:
+      delta == null
+        ? "no comparison"
+        : delta > 0
+          ? `${places(delta)} up`
+          : delta < 0
+            ? `${places(Math.abs(delta))} down`
+            : "level",
+    vsLabel: `on ${prevShort}`,
+    insight,
+
+    splits: [
+      { label: "points", value: String(pts), previous: String(prevPts), fill: "var(--accent-3)" },
+      {
+        label: "goal difference",
+        value: signed(gdNow),
+        previous: signed(gdPrev),
+        fill: "var(--accent-4)",
+      },
+      {
+        label: "points per game",
+        value: (pts / Math.max(1, games)).toFixed(1),
+        previous: (prevPts / Math.max(1, prevGames)).toFixed(1),
+        fill: "var(--accent-1)",
+      },
+    ],
+
+    formNow: (d.form ?? []).slice(0, 6),
+    formPast: (d.form_prev ?? []).slice(0, 6),
+    formLegend: `${short(d.seasons.current)} above, ${prevShort} below, same stage`,
+    /** A promoted club has no previous strip, so the legend would be a lie. */
+    hasPastForm: (d.form_prev ?? []).length > 0,
 
     record: [
-      { label: "Wins", value: s.won, prev: `${aligned ? s.prev_won_same_mw : s.prev_final_won} ${prevTag}`, delay: 0.5 },
-      { label: "Draws", value: s.drawn, prev: `${aligned ? s.prev_drawn_same_mw : s.prev_final_drawn} ${prevTag}`, delay: 0.54 },
-      { label: "Losses", value: s.lost, prev: `${aligned ? s.prev_lost_same_mw : s.prev_final_lost} ${prevTag}`, delay: 0.58 },
+      { code: "W", value: String(s.won), fill: "var(--green-400)", caption: `was ${prevWon ?? 0}` },
+      { code: "D", value: String(s.drawn), fill: "var(--yellow-400)", caption: `was ${prevDrawn ?? 0}` },
+      { code: "L", value: String(s.lost), fill: "var(--pink-400)", caption: `was ${prevLost ?? 0}` },
     ],
 
-    // Bars are normalised against 3 goals/game.
     goals: [
       {
-        label: "Goals scored",
-        total: s.goals_for,
-        perGame: `${per(s.goals_for, games)} / game`,
-        pct: `${Math.min(100, Math.round(((s.goals_for / (games || 1)) / 3) * 100))}%`,
-        color: accent,
-        prev: `${per(pgf, prevGames)} / game ${prevTag}`,
-        delay: 0.62,
+        tag: "GF",
+        label: "goals scored",
+        color: ACCENT[0],
+        total: String(s.goals_for),
+        prevTotal: String(pgf ?? 0),
+        delta: s.goals_for === (pgf ?? 0) ? "level" : signed(s.goals_for - (pgf ?? 0)),
+        deltaCol: s.goals_for === (pgf ?? 0) ? FLAT : s.goals_for > (pgf ?? 0) ? UP : DOWN,
+        pct: `${Math.round((s.goals_for / maxSeen) * 100)}%`,
+        prevPct: `${Math.round(((pgf ?? 0) / maxSeen) * 100)}%`,
       },
       {
-        label: "Goals conceded",
-        total: s.goals_against,
-        perGame: `${per(s.goals_against, games)} / game`,
-        pct: `${Math.min(100, Math.round(((s.goals_against / (games || 1)) / 3) * 100))}%`,
-        color: "#191613",
-        prev: `${per(pga, prevGames)} / game ${prevTag}`,
-        delay: 0.66,
+        tag: "GA",
+        label: "goals conceded",
+        color: ACCENT[2],
+        total: String(s.goals_against),
+        prevTotal: String(pga ?? 0),
+        delta: s.goals_against === (pga ?? 0) ? "level" : signed(s.goals_against - (pga ?? 0)),
+        // Conceding fewer is the improvement, so the test inverts.
+        deltaCol:
+          s.goals_against === (pga ?? 0) ? FLAT : s.goals_against < (pga ?? 0) ? UP : DOWN,
+        pct: `${Math.round((s.goals_against / maxSeen) * 100)}%`,
+        prevPct: `${Math.round(((pga ?? 0) / maxSeen) * 100)}%`,
       },
     ],
+    markerLegend: `marker shows ${prevShort} at the same stage`,
 
     chart: {
       lastLine: points(last),
       thisLine: points(cur),
       markerLeft: pctX(mx),
       markerTop: pctY(my),
-      // The legend swatch is a dot while there's only one point, so it doesn't
-      // advertise a line that isn't drawn yet.
-      legendW: played > 1 ? "14px" : "7px",
-      legendH: played > 1 ? "3px" : "7px",
-      legendR: played > 1 ? "2px" : "50%",
+      hasMarker: cur.some((p) => p != null),
     },
   };
 }
 
-export function playersView(d: PlayedTeamPage, accent: string) {
+export function playersView(d: PlayedTeamPage) {
   const s = d.summary;
+  const prevShort = short(d.seasons.previous);
 
-  const rank = (key: "goals" | "assists", prevKey: "prev_goals" | "prev_assists", isGoals: boolean) => {
+  // Bars are scaled against the larger of the two seasons, so both compare.
+  const rank = (
+    key: "goals" | "assists",
+    prevKey: "prev_goals" | "prev_assists",
+    colour: string,
+  ) => {
     const rows = d.players
       .filter((p) => (p[key] ?? 0) > 0 || (p[prevKey] ?? 0) > 0)
       .sort((a, b) => (b[key] ?? 0) - (a[key] ?? 0) || (b[prevKey] ?? 0) - (a[prevKey] ?? 0))
       .slice(0, 5);
-    const top = Math.max(1, ...rows.map((p) => p[key] ?? 0));
-    const bd = isGoals ? 0.5 : 0.81;
-    const rd = isGoals ? 0.43 : 0.74;
-    return rows.map((p, i) => ({
-      rank: i + 1,
-      name: p.player_name,
-      value: (p[key] ?? 0) > 0 ? String(p[key]) : "—",
-      pct: `${Math.round(((p[key] ?? 0) / top) * 100)}%`,
-      prev: `${p[prevKey] ?? 0} last`,
-      delay: rd + i * 0.035,
-      barDelay: bd + i * 0.035,
-    }));
+    const top = Math.max(1, ...rows.map((p) => Math.max(p[key] ?? 0, p[prevKey] ?? 0)));
+    return rows.map((p) => {
+      const now = p[key];
+      const was = p[prevKey];
+      const diff = now == null || was == null ? null : now - was;
+      return {
+        name: p.player_name,
+        initials: initials(p.player_name),
+        bar: colour,
+        value: now == null ? "—" : String(now),
+        meta: was == null ? "not reported" : `was ${was}`,
+        delta: diff == null ? "" : diff === 0 ? "level" : signed(diff),
+        deltaCol: diff == null || diff === 0 ? FLAT : diff > 0 ? UP : DOWN,
+        // 46% each, so the pair of bars can never exceed the row.
+        pct: `${Math.round(((now ?? 0) / top) * 46)}%`,
+        prevPct: `${Math.round(((was ?? 0) / top) * 46)}%`,
+      };
+    });
   };
 
-  const scorers = rank("goals", "prev_goals", true);
-  const assisters = rank("assists", "prev_assists", false);
+  const scorers = rank("goals", "prev_goals", ACCENT[1]);
+  const assisters = rank("assists", "prev_assists", ACCENT[3]);
 
   const topScorer = d.players.slice().sort((a, b) => (b.goals ?? 0) - (a.goals ?? 0))[0];
   const scored = (topScorer?.goals ?? 0) > 0;
@@ -226,51 +224,52 @@ export function playersView(d: PlayedTeamPage, accent: string) {
     .slice()
     .sort((a, b) => (b.prev_goals ?? 0) - (a.prev_goals ?? 0))
     .find((p) => (p.prev_goals ?? 0) > 0);
-  const assists = d.players.reduce((n, p) => n + (p.assists ?? 0), 0);
 
-  // Counts over the whole squad — not `scorers`, which is capped at five.
-  const scoredCount = d.players.filter((p) => (p.goals ?? 0) > 0).length;
-  const prevScorers = d.players.filter((p) => (p.prev_goals ?? 0) > 0).length;
-  const prevAssists = d.players.reduce((n, p) => n + (p.prev_assists ?? 0), 0);
+  const assistTotal = d.players.reduce((n, p) => n + (p.assists ?? 0), 0);
+  const prevAssistTotal = d.players.reduce((n, p) => n + (p.prev_assists ?? 0), 0);
+  // Over the whole squad, not the ranked list, which is capped at five.
+  const scorersUsed = d.players.filter((p) => (p.goals ?? 0) > 0).length;
+  const prevScorersUsed = d.players.filter((p) => (p.prev_goals ?? 0) > 0).length;
 
-  // With no goals yet the headline credits nobody — last season's leader is
-  // named underneath as context instead.
+  const matches = `${s.matchweek} ${s.matchweek === 1 ? "match" : "matches"}`;
+
+  // With no goals yet the hero credits nobody — last season's leader is named
+  // underneath as context instead. The figure carries the hero, so a long name
+  // never has to hold the display tracking.
   const head = scored
     ? {
-        topScorerLabel: `Top scorer · MW ${s.matchweek}`,
-        topScorerName: topScorer.player_name.split(" ").slice(-1)[0],
-        topScorerGoals: `${topScorer.goals} ${topScorer.goals === 1 ? "goal" : "goals"}`,
-        topScorerNote: `${topScorer.prev_goals ?? 0} in ${short(d.seasons.previous)}`,
+        topScorerLabel: "Top scorer",
+        topScorerName: topScorer.player_name,
+        topScorerGoals: `${topScorer.goals} ${topScorer.goals === 1 ? "goal" : "goals"} in ${matches}`,
+        topScorerDelta: `was ${topScorer.prev_goals ?? 0}`,
+        topScorerNote: `in ${prevShort}`,
       }
     : {
-        topScorerLabel: `Goalscorers · MW ${s.matchweek}`,
+        topScorerLabel: "Top scorer",
         topScorerName: "None yet",
-        topScorerGoals: `0 goals in ${s.matchweek} ${s.matchweek === 1 ? "game" : "games"}`,
+        topScorerGoals: `no goals in ${matches}`,
+        topScorerDelta: prevTopScorer ? `was ${prevTopScorer.prev_goals}` : "",
         topScorerNote: prevTopScorer
-          ? `${prevTopScorer.player_name} led the scoring in ${short(d.seasons.previous)} with ${prevTopScorer.prev_goals}`
-          : `No goals in ${short(d.seasons.previous)} either`,
+          ? `${prevTopScorer.player_name} led ${prevShort}`
+          : `no goals in ${prevShort} either`,
       };
 
   return {
     ...head,
-    accent,
-    // Same shape as the Wins / Draws / Losses cards: a plain label, a number,
-    // and the same number for last season. No ratios, no second unit — the
-    // earlier "1 of 1 goals" and "100%" were arithmetic, not information.
-    summary: [
+    headerMeta: `${short(d.seasons.current)} · matchweek ${s.matchweek}`,
+    rowLegend: `upper bar this season, lower ${prevShort}`,
+    playerSummary: [
       {
-        label: "Players who scored",
-        value: scored ? String(scoredCount) : "—",
-        unit: "",
-        prev: `${prevScorers} last season`,
-        delay: 0.31,
+        code: "Scorers used",
+        fill: ACCENT[2],
+        value: scored ? String(scorersUsed) : "—",
+        caption: scored ? `was ${prevScorersUsed}` : "no goals yet",
       },
       {
-        label: "Assists",
-        value: assists > 0 ? String(assists) : "—",
-        unit: "",
-        prev: `${prevAssists} last season`,
-        delay: 0.35,
+        code: "Assisted",
+        fill: ACCENT[3],
+        value: scored ? String(assistTotal) : "—",
+        caption: scored ? `was ${prevAssistTotal}` : "no goals yet",
       },
     ],
     scorers,
@@ -284,38 +283,24 @@ export function playersView(d: PlayedTeamPage, accent: string) {
  * League table rows, ready to render.
  *
  * Movement is measured against last season's *final* position, not the
- * previous matchweek — that's the product's premise, it's defined at MW1
- * where a week-over-week delta wouldn't be, and the header pill says so.
+ * previous matchweek — that's the product's premise, it's defined at MW1 where
+ * a week-over-week delta wouldn't be, and the header line says so.
  */
 export function leagueRows(table: LeagueTable, myTla?: string) {
-  // W/D/L pips use the design system's result tokens.
-  const PIP: Record<string, { bg: string; fg: string; border: string }> = {
-    W: { bg: "#DA291C", fg: "#fff", border: "0" },
-    D: { bg: "#E4DFD6", fg: "#191613", border: "0" },
-    L: { bg: "#191613", fg: "#fff", border: "0" },
+  const zone = (pos: number, total: number) => {
+    if (pos <= 5) return "var(--zone-europe)";
+    if (pos <= 8) return "var(--zone-chasing)";
+    if (pos > total - 3) return "var(--zone-relegation)";
+    return "var(--zone-neutral)";
   };
-  const EMPTY = { ch: "", bg: "transparent", fg: "#b9b2a6", border: "1.5px dashed #d9d3c9" };
 
-  return table.rows.map((r, i) => {
+  return table.rows.map((r) => {
     const d = r.delta;
     const mine = !!myTla && r.code === myTla;
-    const colour = r.colour || "#191613";
-
-    // Padded at the front so played matches stay flush right and the row
-    // still reads oldest to newest.
-    const last5: { ch: string; bg: string; fg: string; border: string }[] = (r.last5 ?? []).map(
-      (ch) => ({ ch: ch as string, ...(PIP[ch] ?? PIP.D) }),
-    );
-    while (last5.length < 5) last5.unshift({ ...EMPTY });
-
-    const places = d != null && Math.abs(d) === 1 ? "place" : "places";
-
     return {
       pos: r.pos,
       code: r.code,
       name: r.short_name || r.name,
-      colour,
-      fg: textOn(colour),
       played: r.played,
       wins: r.wins,
       draws: r.draws,
@@ -323,21 +308,13 @@ export function leagueRows(table: LeagueTable, myTla?: string) {
       gf: r.gf,
       ga: r.ga,
       points: r.points,
-      gdText: r.gd > 0 ? `+${r.gd}` : String(r.gd),
-      moveGlyph: d == null ? "—" : d > 0 ? "▲" : d < 0 ? "▼" : "–",
-      moveCol:
-        d == null ? "#d9d3c9" : d > 0 ? "var(--move-up)" : d < 0 ? "var(--move-down)" : "#b9b2a6",
-      moveTitle:
-        d == null
-          ? "Promoted — no last-season position"
-          : d === 0
-            ? "Same position as last season"
-            : `${Math.abs(d)} ${places} ${d > 0 ? "higher" : "lower"} than last season`,
-      last5,
-      bg: mine ? "#F6F3EE" : "transparent",
-      weight: mine ? 700 : 400,
-      rule: i === table.rows.length - 1 ? "transparent" : "#EFEBE3",
-      delay: 0.16 + i * 0.022,
+      gdText: signed(r.gd),
+      zone: zone(r.pos, table.rows.length),
+      me: mine,
+      // Exactly one row may be highlighted — the user's own club.
+      rowBg: mine ? "var(--accent-1)" : "transparent",
+      moveText: d == null ? "—" : d > 0 ? `▲${d}` : d < 0 ? `▼${Math.abs(d)}` : "–",
+      moveCol: d == null ? "var(--ink-35)" : d > 0 ? UP : d < 0 ? DOWN : FLAT,
     };
   });
 }

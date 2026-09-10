@@ -20,6 +20,7 @@ import { notFound } from "next/navigation";
 import Frame from "@/components/Frame";
 import TeamApp from "@/components/TeamApp";
 import { FALLBACK_CLUBS } from "@/lib/clubs";
+import { errorMessage } from "@/lib/format";
 import { OG_IMAGE, SITE, SITE_URL } from "@/lib/site";
 import { getClubs, getLeagueTable, getTeamPage } from "@/lib/queries";
 import type { LeagueTable, TeamPage } from "@/lib/types";
@@ -84,7 +85,7 @@ export default async function Page({ params }: { params: Promise<{ tla: string }
     getLeagueTable().catch((): LeagueTable | null => null),
   ]);
   if (page.ok) data = page.d;
-  else error = page.e instanceof Error ? page.e.message : String(page.e);
+  else error = errorMessage(page.e);
 
   return (
     <Frame>

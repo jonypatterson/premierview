@@ -3,31 +3,21 @@
 
 import Frame from "@/components/Frame";
 import Landing from "@/components/Landing";
-import { getClubs, getTeamPage } from "@/lib/queries";
-import { short } from "@/lib/format";
+import { getClubs } from "@/lib/queries";
 
 // Per request, for the same reason as the club route: a cached landing page
-// hands a returning visitor a season label and club list from before the last
-// round of fixtures.
+// hands a returning visitor a club list from before the last round of fixtures.
 export const dynamic = "force-dynamic";
 
 export default async function Page() {
+  // The picker opens on the lockup now rather than a season line, so this route
+  // no longer needs a sample club page to read the season pair out of — one
+  // fewer round trip before the first paint.
   const clubs = await getClubs().catch(() => []);
-
-  // One club's page gives us the season pair for the picker's eyebrow line.
-  let seasonLabel = "";
-  if (clubs.length) {
-    try {
-      const sample = await getTeamPage(clubs[0].code);
-      if (sample) seasonLabel = `${short(sample.seasons.current)} vs ${short(sample.seasons.previous)}`;
-    } catch {
-      /* the picker reads fine without it */
-    }
-  }
 
   return (
     <Frame>
-      <Landing clubs={clubs} seasonLabel={seasonLabel} />
+      <Landing clubs={clubs} />
     </Frame>
   );
 }

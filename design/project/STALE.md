@@ -1,9 +1,22 @@
-# The HTML reference here is one revision stale
+# The HTML reference here is superseded outright
+
+> **Superseded.** The app has since been rebuilt on the Matchday design system,
+> from `Season Comparison - Matchday.dc.html` in a later Claude Design export.
+> `Season Comparison.dc.html` in this folder describes a design the app no
+> longer has — a different palette, a different typeface and a different
+> layout. It is kept only as the record of what the first build was made from.
+>
+> The current source of truth is the design system's own tokens, transcribed
+> into `app/globals.css`, and the components in `components/ds/`.
+
+Everything below concerns that earlier design, and is retained for history.
+
+---
 
 `Season Comparison.dc.html` in this folder is the Claude Design snapshot taken
-at commit `276d2361`. A later design revision has since been implemented in the
-app, and that prototype file was **not** regenerated — so where the two
-disagree, **the components in `components/` are correct and this file is not**.
+at commit `276d2361`. A later design revision was implemented in the app, and
+that prototype file was **not** regenerated — so where the two disagree, the
+components were correct and this file was not.
 
 Landed after this snapshot:
 

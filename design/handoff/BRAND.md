@@ -1,6 +1,21 @@
 # Brand: "Better than the last one" — logo + favicon
 
-New name. The app is called **Better than the last one**. Replace the working
+> **Superseded (mark and favicon only) by `Brand Mark.dc.html`.**
+>
+> The name and the `betterthanthelast.one` address below still stand. What
+> changed is the mark: the red badge and rising arrow described in §1–§2 are
+> replaced by two bars — last season short and quiet, this season tall and
+> pink — on ink, and the wordmark moves from Rubik 800 to Outfit 600 at −2px.
+> `components/BrandMark.tsx` is the implementation and `app/icon.svg` the
+> master; the red `#DA291C` and the assets in `assets/` are no longer the
+> brand. §3 (where the logo goes) is unaffected.
+>
+> The screens followed: the whole app is now on the Matchday design system
+> (`Season Comparison - Matchday.dc.html`) — cream and ink, four chalk accents,
+> Outfit and DM Mono. Nothing described below that concerns colour or type is
+> still true of the app; `app/globals.css` carries the tokens.
+
+The app is called **Better than the last one**. Replace the working
 title "Matchday" / "Season Comparison" everywhere it appears in UI copy,
 `<title>`, and metadata.
 

@@ -30,17 +30,29 @@ for Production, Preview and Development. The build fails without them.
 
 ```
 app/page.tsx        landing — saved club → /TLA, otherwise the picker
-app/[tla]/page.tsx  one route per club, ISR 60s, prerendered for all 20
-components/         the design, split by screen
-lib/queries.ts      the two RPCs: team_page(code), club_list()
+app/[tla]/page.tsx  one route per club, rendered per request
+app/globals.css     the design system's tokens, transcribed, then the shell
+components/ds/      the design system primitives, ported from the handoff
+components/         one file per screen, composed from components/ds
+lib/queries.ts      the three RPCs: team_page(code), club_list(), league_table()
 lib/view.ts         every derived number, label, bar width and chart point
+lib/palette.ts      club colour → nearest chalk, and the accent rotation
 lib/config.ts       COMPARE_MODE — same-matchweek or final-table
 ```
 
-**Why it's fast.** `revalidate = 60` means Vercel serves cached HTML for a minute
-at a time, so the common case never reaches Postgres. Data arrives with the
-HTML; the skeleton only ever appears on a client-side club switch. The hourly
-sync is what makes the page current, the cache is what makes it instant.
+**Layout.** Screens are absolutely positioned inside `.mw-inner` and scroll
+independently, because the tab bar is the one fixed element and everything else
+passes under it — that is what the 132px of bottom clearance on each screen is
+for. Anything rendered outside a screen can never be scrolled to, which is why
+the footer sits inside each one.
+
+**Why it's current.** Both routes are `force-dynamic`, so the RPCs run on every
+request. They used to be ISR, which was wrong for live results: `revalidate` on
+Vercel is stale-while-revalidate, so the first visitor after a fixture was
+reliably served yesterday's table while regeneration happened behind them. The
+queries are indexed RPCs issued in parallel and the pages are small. Data still
+arrives with the HTML, so the loading screen only appears on a client-side club
+switch.
 
 **Club memory.** The chosen club is written to `localStorage` and the route is
 the source of truth — `/` redirects to it on later visits. Visiting `/ARS`
@@ -48,18 +60,32 @@ directly also sets it.
 
 **Comparison basis.** `COMPARE_MODE` switches the whole page between
 "same matchweek last season" (the fair comparison, and the default) and "last
-season's final table". The note, the delta pill and every *last season* figure
-move together.
+season's final table". The insight sentence, the hero's delta and every
+*was …* figure move together.
 
-**Club colour.** The accent — position pill, form dots, goals bar, chart line and
-marker, active tab icon — comes from `clubs.colour`. Anything sitting on that
-colour takes a computed foreground, so light clubs (Leeds, Hull, City, Coventry,
-Villa) get near-black text rather than unreadable white.
+**The two form strips** come from `team_page`'s `form` and `form_prev`. The
+second was added to the RPC for this design — see
+`supabase/migrations/20260910_team_page_form_prev.sql`. It is capped by
+gameweek number, not by count, so matchweek 3 is set against matchweek 3 rather
+than against the end of last season. A promoted club returns `[]` and the
+screen drops the strip and its legend rather than showing an empty row.
+
+**Club colour.** The club mark does *not* use `clubs.colour` directly. The
+design system allows no colour outside its own five chalks, so `lib/palette.ts`
+snaps the kit hex to the nearest chalk **by hue** — which is why Arsenal reads
+pink rather than red, and why a navy kit lands on the blue chalk instead of
+whichever pastel is closest in raw RGB. Initials are always ink: every chalk is
+light enough that no contrast test is needed.
+
+**Colour means metric, not value.** The four accents rotate in order down a
+list; they never encode good or bad. Judgement is carried only by
+`--delta-up` / `--delta-down` on small bold text, never by a fill.
 
 ## Type
 
-Rubik throughout, with figures set in Roboto 700 — a little narrower and quieter
-than Rubik's 800.
+Outfit for everything read, DM Mono for everything labelled — mono is never used
+for a sentence. The signature is the display figure: Outfit 700 with tracking
+that tightens as size grows and returns to zero by 15px.
 
 ## Backend
 
@@ -70,13 +96,30 @@ only rank clubs from that season).
 
 ## Design source
 
-`design/` holds the Claude Design handoff this was built from — the
-`.dc.html` prototype, its chat transcript, and the architecture notes. It isn't
-part of the build (excluded in `tsconfig.json`); it's there as the reference for
-what the screens are meant to look like.
+`design/` holds the Claude Design handoff the **first** build was made from —
+the `.dc.html` prototype, its chat transcript, and the architecture notes. It
+isn't part of the build (excluded in `tsconfig.json`).
 
-Two credentials appeared in that bundle — a football-data.org API key pasted
-into the transcript, and the Supabase anon key hardcoded in the prototype. Both
-are redacted from the files and purged from git history. The football-data key
-was live at the time and should be treated as compromised: rotate it, using the
+The current design is a later export, the **Matchday design system**, and the
+app was rebuilt on it: `Brand Mark.dc.html` for the mark and
+`Season Comparison - Matchday.dc.html` for the screens. That bundle is *not*
+committed — see the note below — so the tokens are transcribed into
+`app/globals.css` and the components ported into `components/ds/`, each marked
+as a transcription so a later revision can be diffed against them.
+`design/project/STALE.md` says which parts of the older handoff no longer apply.
+
+### Credentials in the handoff bundles
+
+Two appeared in the first bundle — a football-data.org API key pasted into the
+transcript, and the Supabase anon key hardcoded in the prototype. Both are
+redacted from the files and purged from git history. The football-data key was
+live at the time and should be treated as compromised: rotate it, using the
 statement in `ARCHITECTURE.md`.
+
+**The Matchday bundle carries the Supabase anon key too**, hardcoded in
+`Season Comparison - Matchday.dc.html` so the prototype could call the RPCs
+directly from the browser. That is why it is not in this repo. The key is the
+publishable one and RLS is what actually guards the data, but this app has
+always kept it server-side — `lib/queries.ts` reads the unprefixed
+`SUPABASE_ANON_KEY` deliberately, so it never reaches the client bundle — and
+committing the prototype would undo that. Keep it out.
