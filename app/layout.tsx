@@ -1,7 +1,21 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Mono, Outfit } from "next/font/google";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 import { DESCRIPTION, OG_IMAGE, SITE, SITE_URL } from "@/lib/site";
+
+/**
+ * Google Analytics 4, or nothing at all.
+ *
+ * A measurement ID is public by design — it identifies the property, it does
+ * not grant access to it — so unlike the Supabase key this one is deliberately
+ * NEXT_PUBLIC_: gtag runs in the browser and cannot read a server-only value.
+ *
+ * Unset, the tag is not rendered. That keeps local development and preview
+ * deployments out of the numbers without a second property, and means the app
+ * still builds and runs for anyone who clones it without a Google account.
+ */
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 
 // "Outfit for everything read, DM Mono for everything labelled." Rubik and
 // Roboto are gone with the old palette — the system has one text family.
@@ -55,6 +69,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${outfit.variable} ${dmMono.variable}`}>
       <body>{children}</body>
+      {/* After the body, so the tag never delays first paint. Club switches are
+          router.push, and GA4's enhanced measurement counts a history change as
+          a page view, so the per-club routes are counted without a manual
+          send — the three tabs are state, not routes, and are not. */}
+      {GA_ID ? <GoogleAnalytics gaId={GA_ID} /> : null}
     </html>
   );
 }
