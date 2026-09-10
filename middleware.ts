@@ -26,6 +26,6 @@ export const config = {
   // known, short set, and exempting every dotted path would hand /.env and
   // friends the same soft 200 this exists to remove.
   matcher: [
-    "/((?!_next/|robots\\.txt|sitemap\\.xml|favicon\\.ico|og\\.png|icon\\.png|apple-icon\\.png).*)",
+    "/((?!_next/|robots\\.txt|sitemap\\.xml|favicon\\.ico|og\\.png|icon\\.svg|apple-icon\\.png).*)",
   ],
 };

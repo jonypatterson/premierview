@@ -1,6 +1,20 @@
 # Brand: "Better than the last one" — logo + favicon
 
-New name. The app is called **Better than the last one**. Replace the working
+> **Superseded (mark and favicon only) by `Brand Mark.dc.html`.**
+>
+> The name and the `betterthanthelast.one` address below still stand. What
+> changed is the mark: the red badge and rising arrow described in §1–§2 are
+> replaced by two bars — last season short and quiet, this season tall and
+> pink — on ink, and the wordmark moves from Rubik 800 to Outfit 600 at −2px.
+> `components/BrandMark.tsx` is the implementation and `app/icon.svg` the
+> master; the red `#DA291C` and the assets in `assets/` are no longer the
+> brand. §3 (where the logo goes) is unaffected.
+>
+> Only the mark was implemented. The rest of the app is still on the old
+> palette — `#EBE8E2` canvas, Rubik — so the new mark currently sits in a
+> screen that hasn't caught up with it.
+
+The app is called **Better than the last one**. Replace the working
 title "Matchday" / "Season Comparison" everywhere it appears in UI copy,
 `<title>`, and metadata.
 

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Roboto, Rubik } from "next/font/google";
+import { Outfit, Roboto, Rubik } from "next/font/google";
 import "./globals.css";
 import { DESCRIPTION, OG_IMAGE, SITE, SITE_URL } from "@/lib/site";
 
@@ -15,6 +15,15 @@ const roboto = Roboto({
   subsets: ["latin"],
   weight: ["700"],
   variable: "--font-roboto",
+  display: "swap",
+});
+
+// The wordmark only, which the brand sheet fixes at Outfit 600 — so just the
+// one weight, rather than the whole family for a single two-line lockup.
+const outfit = Outfit({
+  subsets: ["latin"],
+  weight: ["600"],
+  variable: "--font-outfit",
   display: "swap",
 });
 
@@ -49,7 +58,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${rubik.variable} ${roboto.variable}`}>
+    <html lang="en" className={`${rubik.variable} ${roboto.variable} ${outfit.variable}`}>
       <body>{children}</body>
     </html>
   );
