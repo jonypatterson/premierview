@@ -12,7 +12,7 @@ import type { Club } from "@/lib/types";
  * No saved club → picker. Saved → straight to their season page, with the
  * skeleton covering the hop so the picker never flashes.
  */
-export default function Landing({ clubs, seasonLabel }: { clubs: Club[]; seasonLabel: string }) {
+export default function Landing({ clubs }: { clubs: Club[] }) {
   const router = useRouter();
   const [checked, setChecked] = useState(false);
   const list = clubs.length ? clubs : FALLBACK_CLUBS;
@@ -29,5 +29,5 @@ export default function Landing({ clubs, seasonLabel }: { clubs: Club[]; seasonL
   }, [list, router]);
 
   if (!checked) return <Skeleton />;
-  return <ClubPicker clubs={list} seasonLabel={seasonLabel} />;
+  return <ClubPicker clubs={list} />;
 }

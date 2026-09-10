@@ -1,467 +1,425 @@
+/* Matchday design system — tokens verbatim from the handoff, then the shell.
+ *
+ * The token blocks below are copied from _ds/…/tokens/*.css rather than
+ * paraphrased, so a later revision of the system can be diffed against them.
+ * Nothing here is invented; where the app needs a value the system doesn't
+ * define, it is marked.
+ */
+
+/* ── tokens: colors ───────────────────────────────────────────────────────── */
+:root {
+  /* base: paper & ink */
+  --cream-100: #FBF4E4; /* app surface */
+  --cream-200: #EDE4CE; /* page / desk behind the app */
+  --ink-900: #14140F;   /* the only true dark */
+  --ink-700: #33332a;   /* ink hover */
+
+  /* base: the five chalk accents */
+  --pink-400: #FFB0D6;
+  --yellow-400: #F6D34A;
+  --green-400: #A8BE6E;
+  --blue-400: #A9C9F0;
+  --claret-700: #7A263F; /* club mark only */
+  --sky-300: #9FD3E8;    /* pairs with claret */
+
+  /* base: outcome reds */
+  --red-300: #E7A2A2;
+  --red-400: #E0A0A0;
+
+  /* ink alphas: every neutral in the system is ink at an opacity */
+  --ink-05: rgba(20, 20, 15, .05);
+  --ink-07: rgba(20, 20, 15, .07);
+  --ink-08: rgba(20, 20, 15, .08);
+  --ink-12: rgba(20, 20, 15, .12);
+  --ink-14: rgba(20, 20, 15, .14);
+  --ink-15: rgba(20, 20, 15, .15);
+  --ink-35: rgba(20, 20, 15, .35);
+  --ink-40: rgba(20, 20, 15, .40);
+  --ink-45: rgba(20, 20, 15, .45);
+  --ink-50: rgba(20, 20, 15, .50);
+  --ink-55: rgba(20, 20, 15, .55);
+  --ink-60: rgba(20, 20, 15, .60);
+  --ink-65: rgba(20, 20, 15, .65);
+  --ink-70: rgba(20, 20, 15, .70);
+  --cream-14: rgba(251, 244, 228, .14); /* selected pill on dark */
+  --cream-55: rgba(251, 244, 228, .55); /* inactive label on dark */
+  --cream-32: rgba(251, 244, 228, .32); /* blob highlight */
+
+  /* semantic: surfaces */
+  --surface-page: var(--cream-200);
+  --surface-app: var(--cream-100);
+  --surface-sunken: var(--ink-05);
+  --surface-quiet: var(--ink-07);
+  --surface-quiet-hover: var(--ink-14);
+  --surface-inverse: var(--ink-900);
+  --surface-inverse-hover: var(--ink-700);
+
+  /* semantic: text */
+  --text-body: var(--ink-900);
+  --text-muted: var(--ink-70);
+  --text-meta: var(--ink-50);
+  --text-faint: var(--ink-45);
+  --text-ghost: var(--ink-40);
+  --text-on-inverse: var(--cream-100);
+  --text-on-inverse-muted: var(--cream-55);
+
+  /* semantic: direction of travel */
+  --delta-up: #3E7A3A;
+  --delta-down: #B4383A;
+  --delta-flat: var(--ink-45);
+
+  /* semantic: match outcomes — the app screen overrides these, see .mw-app */
+  --result-win: var(--green-400);
+  --result-draw: var(--yellow-400);
+  --result-loss: var(--red-300);
+  --result-win-past: #A8BE6E80;
+  --result-draw-past: #F6D34A80;
+  --result-loss-past: #E7A2A280;
+
+  /* semantic: table zones */
+  --zone-europe: var(--green-400);
+  --zone-chasing: var(--yellow-400);
+  --zone-relegation: var(--red-400);
+  --zone-neutral: var(--ink-12);
+
+  /* semantic: accent rotation (cycle in this order) */
+  --accent-1: var(--pink-400);
+  --accent-2: var(--yellow-400);
+  --accent-3: var(--green-400);
+  --accent-4: var(--blue-400);
+
+  /* semantic: rules & markers */
+  --border-hairline: rgba(20, 20, 15, .08);
+  --rule-divider: rgba(20, 20, 15, .10);
+  --marker-benchmark: var(--ink-900);
+  --track-bar: var(--ink-08);
+  --track-bar-past: var(--ink-15);
+}
+
+/* ── tokens: typography ───────────────────────────────────────────────────── */
+:root {
+  --font-core: var(--font-outfit), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-dm-mono), ui-monospace, SFMono-Regular, monospace;
+
+  --weight-light: 300;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* display numerals — always Outfit bold, always negative tracking */
+  --size-hero: 96px;      --track-hero: -6px;    --leading-hero: .86;
+  --size-figure-xl: 36px; --track-figure-xl: -1.8px;
+  --size-figure-lg: 23px; --track-figure-lg: -.6px;
+  --size-figure-md: 20px; --track-figure-md: -.5px;
+  --size-figure-sm: 19px; --track-figure-sm: -.5px;
+  --size-figure-xs: 15.5px;
+
+  /* headings */
+  --size-title: 29px;   --track-title: -.9px;
+  --size-section: 23px; --track-section: -.6px;
+  --size-name: 17px;    --track-name: -.3px;
+
+  /* body */
+  --size-lead: 17.5px;  --track-lead: -.2px;   --leading-lead: 1.35;
+  --size-body: 15px;    --leading-body: 1.25;
+  --size-body-sm: 14.5px;
+  --size-control: 13px;
+  --size-control-sm: 12.5px;
+  --size-caption: 11.5px;
+
+  /* mono — labels, metadata, units. Never body copy. */
+  --size-mono-lg: 11.5px;
+  --size-mono: 10.5px;
+  --size-mono-sm: 10px;
+  --size-mono-xs: 9.5px;
+  --track-mono-eyebrow: .06em;
+  --track-mono-head: .05em;
+}
+
+/* ── tokens: radius ───────────────────────────────────────────────────────── */
+:root {
+  /* nothing in this system has a sharp corner */
+  --radius-chip: 9px;     /* form squares */
+  --radius-mark: 13px;    /* club avatar square */
+  --radius-node: 14px;    /* metric node chip */
+  --radius-tile-sm: 15px; /* metric row icon */
+  --radius-row: 16px;     /* table row */
+  --radius-pill-sm: 22px; /* split row */
+  --radius-tile: 24px;    /* stat tile */
+  --radius-card: 28px;    /* insight card */
+  --radius-hero: 34px;    /* hero chip */
+  --radius-full: 999px;   /* every button, every bar, every track */
+}
+
+/* ── tokens: spacing ──────────────────────────────────────────────────────── */
+:root {
+  --gap-inline: 7px;
+  --gap-list: 10px;
+  --gap-row: 13px;
+  --card-pad: 18px;
+  --gutter: 20px;
+  --tabbar-inset: 16px;
+  --tabbar-bottom: 26px;
+  --control-h: 50px;
+  --node-h: 42px;
+  --avatar-sm: 40px;
+  --avatar-md: 46px;
+  --tabbar-h: 66px;
+}
+
+/* ── tokens: elevation & motion ───────────────────────────────────────────── */
+:root {
+  /* exactly one shadow in the system: the floating tab bar */
+  --shadow-float: 0 14px 32px rgba(20, 20, 15, .28);
+  --transition-state: background .2s ease, transform .2s ease;
+  --transition-theme: background .25s ease;
+  --scale-unselected: .96;
+  --scale-selected: 1;
+}
+
+@keyframes rise {
+  from { transform: translateY(12px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+/* ── shell ────────────────────────────────────────────────────────────────── */
+
+* { box-sizing: border-box; }
+
 body {
   margin: 0;
-  background: #ebe8e2;
-  font-family: var(--font-rubik), system-ui, sans-serif;
+  background: var(--surface-page);
+  color: var(--text-body);
+  font-family: var(--font-core);
   -webkit-font-smoothing: antialiased;
 }
-a { color: #1a1a1a; }
-a:hover { color: #c8102e; }
 
-/* ---- Frame -------------------------------------------------------------
-   Below 1000px there is no card: the app is the viewport. At 1000px and up
-   it becomes a centred card on the canvas and the screens re-flow onto two
-   columns. */
-
-/* Movement needs a two-way signal, and the palette has no positive token —
-   red is the accent (wins), so it can't read as "bad" on its own. This green
-   is deliberately desaturated to sit with the warm paper. */
-:root {
-  --chart-h: 160px;
-  --move-up: #2f7a47;
-  --move-down: #da291c;
-  /* Desktop card height — the tallest screen. See .frame below. */
-  --card-h: 1201px;
-}
-
-.frame-outer { display: flex; justify-content: center; }
-
-.frame {
-  position: relative;
-  width: 100%;
-  min-height: 100dvh;
-  background: #f6f3ee;
-  color: #191613;
-}
-
-@media (min-width: 1000px) {
-  :root { --chart-h: 280px; }
-
-  /* The card is a fixed height whatever the matchweek, so on a tall display it
-     used to sit against the top with the remainder as dead space below.
-     Centring it needs the container to own the viewport height.
-
-     `safe center` matters: when the card is TALLER than the viewport, ordinary
-     centring pushes its top edge above the scroll origin, where it can't be
-     reached. `safe` falls back to start-alignment in exactly that case. The
-     plain `center` before it is the fallback for browsers without `safe`. */
-  .frame-outer {
-    padding: 36px 28px;
-    box-sizing: border-box;
-    min-height: 100dvh;
-    align-items: center;
-    align-items: safe center;
-  }
-
-  /* One height for every screen, so the card doesn't resize under you when you
-     switch tabs and the docked tab bar lands in the same place each time.
-     1201px is the tallest screen measured — Players, at the narrowest desktop
-     column, where the scorer names wrap. (Season 1083, table 1129, picker 1075.)
-
-     min-height, not height: if content ever exceeds this the card grows rather
-     than clipping. The flex column with an auto top margin on the footer keeps
-     the footer at the foot of the card on the shorter screens, instead of
-     leaving it stranded mid-card above the spare space. */
-  .frame {
-    max-width: 1500px;
-    /* border-box so --card-h is the height actually rendered — the 1px border
-       would otherwise sit outside it and make the card 2px taller. */
-    box-sizing: border-box;
-    min-height: var(--card-h);
-    display: flex;
-    flex-direction: column;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    border-radius: 24px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
-    overflow: hidden;
-  }
-
-  .site-footer { margin-top: auto; }
-}
-
-/* Picker, skeleton and problem screens stay readable on a wide phone. */
-.col-narrow { width: 100%; max-width: 520px; margin: 0 auto; }
-@media (min-width: 1000px) { .col-narrow { max-width: none; } }
-
-/* ---- Screens ----------------------------------------------------------- */
-
-.screen {
+/* The desk the app sits on. */
+.mw-desk {
   display: flex;
-  flex-direction: column;
-  gap: 28px;
-  padding: 28px 24px 24px;
-}
-
-.site-footer {
-  padding: 8px 24px 104px;
-  text-align: center;
-  font-size: 11.5px;
-  line-height: 1.5;
-  color: #b9b2a6;
-}
-.site-footer a {
-  color: #8b857c;
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-.site-footer a:hover { color: #191613; }
-
-@media (min-width: 1000px) {
-  .screen {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 36px 52px;
-    padding: 48px 60px 40px;
-    box-sizing: border-box;
-    align-content: start;
-  }
-  .screen-season {
-    grid-template-areas: "hdr hdr" "pos rec" "form goals" "chart chart";
-  }
-  .screen-players {
-    grid-template-areas: "hdr hdr" "top sum" "scorers assists" "gchart gchart";
-  }
-  .a-hdr { grid-area: hdr; }
-  .a-pos { grid-area: pos; }
-  .a-rec { grid-area: rec; }
-  .a-form { grid-area: form; }
-  .a-goals { grid-area: goals; }
-  .a-chart { grid-area: chart; }
-  .a-top { grid-area: top; }
-  .a-sum { grid-area: sum; }
-  .a-scorers { grid-area: scorers; }
-  .a-assists { grid-area: assists; }
-  .a-gchart { grid-area: gchart; }
-}
-
-@media (min-width: 1000px) {
-  .site-footer { padding: 12px 60px 116px; font-size: 12.5px; }
-}
-
-/* ---- League table -------------------------------------------------------
-   Header and data rows share one grid so the columns line up without a
-   <table>; the six .tbl-d cells stay in the DOM and are simply not shown on
-   mobile, where every column has to fit without sideways scrolling. */
-
-.tbl-row,
-.tbl-head {
-  display: grid;
-  align-items: center;
-  gap: 0 6px;
-  grid-template-columns: 22px 14px minmax(0, 1fr) 30px 38px 34px;
-}
-.tbl-d { display: none; }
-
-
-@media (min-width: 1000px) {
-  .tbl-row,
-  .tbl-head {
-    grid-template-columns:
-      26px 16px minmax(0, 1fr) 34px 30px 30px 30px 34px 34px 38px 42px 100px;
-  }
-  .tbl-d { display: flex; }
-}
-
-/* The table is one full-width block — it does not join the two-column grid. */
-.screen-table {
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-  padding: 28px 20px 24px;
-}
-@media (min-width: 1000px) {
-  .screen-table {
-    padding: 48px 60px 40px;
-    max-width: 1000px;
-    margin: 0 auto;
-    width: 100%;
-    box-sizing: border-box;
-  }
-}
-
-/* ---- Club picker ------------------------------------------------------- */
-
-/* The picker is a narrow column even on a wide card — left to fill 1500px the
-   tiles stretch into letterboxes. */
-.picker-screen {
-  display: flex;
-  flex-direction: column;
-  gap: 36px;
-  padding: 56px 24px 40px;
-  width: 100%;
-  max-width: 520px;
-  margin: 0 auto;
-  box-sizing: border-box;
-}
-
-.picker-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-}
-
-.club-tile-badge {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
   justify-content: center;
-  font-weight: 800;
-  font-size: 11px;
-  letter-spacing: 0.3px;
-  flex: none;
+  align-items: flex-start;
+  padding: 40px 20px;
+  min-height: 100dvh;
+  background: var(--surface-page);
 }
 
+/* The app surface itself. The house voice is slightly oversized: figures and
+   card copy step up a size, mono labels stay small so the contrast widens. */
+.mw-app {
+  width: min(430px, 100%);
+  background: var(--surface-app);
+  color: var(--text-body);
+  border-radius: var(--radius-hero);
+  overflow: hidden;
+
+  --size-figure-xl: 48px; --track-figure-xl: -2.2px;
+  --size-figure-lg: 28px;
+  --size-figure-md: 26px; --track-figure-md: -.8px;
+  --size-figure-sm: 24px; --track-figure-sm: -.7px;
+  --size-figure-xs: 20px;
+  --size-lead: 19px;
+  --size-body: 16.5px;
+  --size-body-sm: 16.5px;
+  --size-caption: 13px;
+  --size-name: 19px;
+  --size-mono-lg: 13px;
+
+  /* results read green / pink / yellow: win, loss, draw */
+  --result-win: var(--green-400);
+  --result-loss: var(--pink-400);
+  --result-draw: var(--yellow-400);
+  --result-win-past: #A8BE6E80;
+  --result-loss-past: #FFB0D680;
+  --result-draw-past: #F6D34A80;
+}
+
+/* Screens are absolutely positioned inside this box and scroll under the tab
+   bar, which is the one fixed element. */
+.mw-inner {
+  position: relative;
+  height: 940px;
+  overflow: hidden;
+}
+
+.mw-screen {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.mw-pad { padding: 56px 20px 132px; }
+
+.mw-grid { display: flex; flex-direction: column; gap: 28px; }
+
+/* Columns only exist above 760px; on a phone every screen is one column. */
+.a-shero, .a-insight, .a-splits, .a-form, .a-record, .a-goals,
+.a-hero, .a-tiles, .a-scored, .a-assisted, .mw-span { min-width: 0; }
+
+.tb-d { display: none; }
+.tb-frozen { padding-top: 56px; }
+
+.mw-tablepage {
+  --size-body-sm: 19px;
+  --size-figure-xs: 23px;
+  --size-mono-lg: 16px;
+  --size-mono-sm: 11.5px;
+}
+
+/* The name is big but never tight: its own display size, not the hero figure. */
+.a-hero { --size-hero: 44px; --track-hero: -1.6px; --leading-hero: 1.06; }
+
+@media (max-width: 759px) {
+  .mw-desk { padding: 0; }
+  .mw-app { width: 100%; min-height: 100dvh; border-radius: 0; }
+  .mw-inner { height: 100dvh; }
+}
+
+@media (min-width: 760px) {
+  .mw-desk { padding: 40px; align-items: stretch; }
+
+  /* A real desktop surface, not a phone on a big screen: the card fills the
+     viewport and the type scale steps up with it. */
+  .mw-app {
+    width: min(1560px, 100%);
+    --size-hero: 112px; --track-hero: -7px;
+    --size-title: 42px; --track-title: -2px;
+    --size-figure-xl: 58px;
+    --size-figure-md: 30px;
+    --size-figure-sm: 27px;
+    --size-figure-xs: 23px;
+    --size-figure-lg: 32px;
+    --size-lead: 21px;
+    --size-body: 18px;
+    --size-body-sm: 18px;
+    --size-name: 23px;
+    --size-caption: 14px;
+    --size-mono: 11.5px;
+    --size-mono-sm: 11px;
+    --size-mono-lg: 15px;
+  }
+
+  .mw-inner {
+    height: calc(100dvh - 80px);
+    min-height: min(840px, calc(100dvh - 80px));
+  }
+
+  .mw-pad { padding: 44px 40px 132px; }
+
+  .mw-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 36px 40px;
+    align-items: start;
+  }
+  .mw-span { grid-column: 1 / -1; }
+
+  .mw-clubgrid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
+  .mw-clubgrid button { padding: 16px 12px; }
+
+  .mw-tablepage > div { max-width: 640px; margin-left: auto; margin-right: auto; }
+  .mw-tablepage.mw-pad { padding-top: 0; }
+  .tb-frozen { padding-top: 44px; }
+  .mw-tablepage {
+    --size-body-sm: 22px;
+    --size-figure-xs: 27px;
+    --size-mono-lg: 18px;
+    --size-mono-sm: 12.5px;
+  }
+
+  .mw-players {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas: "hero tiles" "scored assisted";
+  }
+  .a-hero { grid-area: hero; --size-hero: 52px; --track-hero: -2px; --leading-hero: 1.06; }
+  .a-tiles { grid-area: tiles; }
+  .a-scored { grid-area: scored; }
+  .a-assisted { grid-area: assisted; }
+
+  .mw-season {
+    grid-template-areas:
+      "shero insight"
+      "splits record"
+      "form goals"
+      "chart chart";
+  }
+  .a-shero { grid-area: shero; }
+  .a-insight { grid-area: insight; }
+  .a-splits { grid-area: splits; }
+  .a-form { grid-area: form; }
+  .a-record { grid-area: record; }
+  .a-goals { grid-area: goals; }
+  .mw-season .mw-span { grid-area: chart; }
+}
+
+@media (min-width: 1180px) {
+  .mw-pad { padding: 64px 64px 148px; }
+  .mw-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 44px 48px; }
+  .mw-clubgrid { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 16px; }
+  .mw-clubgrid button { padding: 18px 14px; }
+
+  .mw-season {
+    grid-template-areas:
+      "shero insight splits"
+      "record form goals"
+      "chart chart chart";
+    /* the chart takes up the slack at the foot of the overview */
+    --chart-h: min(320px, calc(100dvh - 620px));
+  }
+
+  /* Players stays two columns: .mw-grid's three would add a third track that
+     its "hero tiles" / "scored assisted" areas never fill, leaving the screen
+     with a dead column. */
+  .mw-players { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .a-hero { --size-hero: 58px; }
+  .tb-d { display: block; }
+  .mw-tablepage > div { max-width: 900px; }
+  .tb-frozen { padding-top: 64px; }
+}
+
+/* Button tones. The bundle held hover in React state; as CSS it keeps the
+   components server-rendered. "Nothing changes opacity on hover." */
+.ds-btn { transition: var(--transition-state); }
+.ds-btn-primary { background: var(--surface-inverse); color: var(--text-on-inverse); }
+.ds-btn-primary:hover:not(:disabled) { background: var(--surface-inverse-hover); }
+.ds-btn-quiet { background: var(--surface-quiet); color: var(--text-body); }
+.ds-btn-quiet:hover:not(:disabled) { background: var(--surface-quiet-hover); }
+.ds-btn-accent { background: var(--accent-1); color: var(--text-body); }
+
+/* Club tiles on the picker: selected is a fill change and a scale to 1.00. */
 .club-tile {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 14px 6px 12px;
-  background: #fff;
+  gap: 10px;
+  padding: 12px 10px;
   border: 0;
-  border-radius: 14px;
+  border-radius: var(--radius-tile);
   cursor: pointer;
-  font-family: inherit;
-  transition: box-shadow 0.18s ease, transform 0.18s ease;
+  font-family: var(--font-core);
+  transition: var(--transition-state);
+  background: var(--surface-quiet);
+  transform: scale(var(--scale-unselected));
 }
-.club-tile:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08); }
-.club-tile-current { box-shadow: inset 0 0 0 2px #191613; }
-
-/* Two lines, then ellipsis — club names vary a lot in length. */
-.club-tile-name {
-  font-size: 10px;
-  font-weight: 600;
-  line-height: 1.25;
-  text-align: center;
-  color: #191613;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.club-tile:hover { background: var(--surface-quiet-hover); }
+.club-tile-current {
+  background: var(--surface-quiet-hover);
+  transform: scale(var(--scale-selected));
 }
 
-@media (min-width: 1000px) {
-  .picker-screen { max-width: 940px; gap: 44px; padding: 64px 40px 48px; }
-  .picker-grid { grid-template-columns: repeat(5, 1fr); gap: 14px; }
-  .club-tile { padding: 22px 12px 18px; gap: 12px; border-radius: 18px; }
-  .club-tile-badge { width: 50px; height: 50px; font-size: 14px; }
-  .club-tile-name { font-size: 13px; line-height: 1.3; }
-}
-
-/* Figures are Roboto 700 — a touch narrower and quieter than Rubik's 800. */
-.num {
-  font-family: var(--font-roboto), var(--font-rubik), system-ui, sans-serif;
-  font-weight: 700;
-}
-
-/* ---- Charts ------------------------------------------------------------
-   The svg stretches to whatever width it is given (preserveAspectRatio
-   "none"), so strokes get vector-effect="non-scaling-stroke" to keep their
-   weight. The marker and its halo are HTML, positioned in percentages —
-   transform is left free for the entrance animations. */
-
-.chart-block { margin-top: 14px; }
-
-.chart-block { display: flex; flex-direction: column; }
-.chart-row { display: flex; gap: 8px; }
-
-.chart-plot {
-  flex: 1;
-  position: relative;
-  height: var(--chart-h);
-  align-self: flex-start;
-}
-
-.chart-svg { width: 100%; height: 100%; display: block; overflow: visible; }
-
-.chart-marker {
-  position: absolute;
-  width: 9px;
-  height: 9px;
-  margin-left: -4.5px;
-  margin-top: -4.5px;
-  border-radius: 50%;
-}
-
-.chart-halo {
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  margin-left: -8px;
-  margin-top: -8px;
-  border-radius: 50%;
-  opacity: 0.2;
-}
-
-.chart-ylabels {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: var(--chart-h);
-  font-size: 9.5px;
-  color: #b9b2a6;
-  text-align: right;
-  padding: 4px 0;
-}
-
-@media (min-width: 1000px) {
-  .chart-ylabels { font-size: 11px; }
-}
-
-/* ---- Tab bar -----------------------------------------------------------
-   Fixed to the viewport by default. On a page taller than the screen that is
-   the only way it stays reachable — an absolute bar would sit at the foot of
-   the content, out of sight until you scrolled.
-
-   Once the viewport is tall enough to show the whole card (card height plus
-   its 36px margins), that argument stops applying: the card is fully visible,
-   nothing is out of reach, and a viewport-fixed bar would float below the
-   card's bottom edge instead of sitting on it. There it becomes absolute and
-   docks to the card. Below that height the card fills the screen anyway, so
-   the fixed bar already reads as sitting on it. */
-.tab-dock {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 20px;
-  z-index: 50;
-  display: flex;
-  justify-content: center;
-  pointer-events: none;
-}
-
-/* While the bar is still viewport-fixed on desktop it has to clear the card's
-   36px bottom margin, or at full scroll it hangs 16px off the card's bottom
-   edge instead of resting on it. 36 + 20 puts it exactly where the docked
-   version sits. */
-@media (min-width: 1000px) {
-  .tab-dock { bottom: 56px; }
-}
-
-/* 1273px = --card-h (1201) + the frame-outer's 36px top and bottom padding:
-   the point at which the whole card fits on screen. Media queries can't read a
-   custom property, so this is the one place the figure is repeated — keep it in
-   step with --card-h. */
-@media (min-width: 1000px) and (min-height: 1273px) {
-  .tab-dock {
-    position: absolute;
-    bottom: 20px;
-  }
-}
-
-.club-row { transition: background 0.18s ease; }
-.club-row:hover { background: #fff !important; }
-
-.tab-ghost:hover {
-  background: rgba(255, 255, 255, 0.12) !important;
-  color: #fff !important;
-}
-
-@keyframes rise {
-  from { opacity: 0; transform: translateY(14px); }
-  to { opacity: 1; transform: none; }
-}
-@keyframes pop {
-  0% { opacity: 0; transform: scale(0.72); }
-  60% { transform: scale(1.06); }
-  100% { opacity: 1; transform: scale(1); }
-}
-@keyframes bigin {
-  from { opacity: 0; transform: translateY(18px) scale(0.9); }
-  to { opacity: 1; transform: none; }
-}
-@keyframes grow {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
-}
-@keyframes draw {
-  from { stroke-dashoffset: var(--len); }
-  to { stroke-dashoffset: 0; }
-}
-@keyframes ping {
-  0% { transform: scale(0.4); opacity: 0.55; }
-  70% { transform: scale(2.1); opacity: 0; }
-  100% { transform: scale(2.1); opacity: 0; }
-}
-@keyframes shimmer {
-  from { background-position: -320px 0; }
-  to { background-position: 320px 0; }
+/* Focus is not styled in the source; the system's own note says to add one. */
+:where(button, a, [tabindex]):focus-visible {
+  outline: 2px solid var(--ink-900);
+  outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    animation-delay: 0ms !important;
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
+    transition-duration: .01ms !important;
   }
 }
-
-/* ---- Type scale --------------------------------------------------------
-   Phone sizes are the base; the wide layout has room, so the figures get
-   considerably bigger rather than floating in space. */
-
-.eyebrow {
-  font-size: 11px;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
-  color: #8b857c;
-}
-.card-label {
-  font-size: 10.5px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: #8b857c;
-}
-.card { background: #fff; border-radius: 16px; padding: 14px; }
-
-/* The league table's own card, so it can shed its fill on desktop. */
-.tbl-card { background: #fff; border-radius: 16px; padding: 8px 14px 12px; }
-
-.fig-position { font-size: 76px; line-height: 0.9; letter-spacing: -2px; }
-.fig-suffix { font-size: 26px; letter-spacing: 0; }
-.fig-stat { font-size: 30px; }
-.fig-name { font-size: 46px; line-height: 1; letter-spacing: -1.5px; }
-.fig-player { font-size: 15px; }
-.fig-rank { font-size: 11px; }
-.pill-delta { font-size: 12px; }
-.sub-note { font-size: 12px; color: #8b857c; }
-.prev-note { font-size: 11px; color: #8b857c; }
-
-@media (min-width: 1000px) {
-  .eyebrow { font-size: 12.5px; letter-spacing: 1.6px; }
-  .card-label { font-size: 12px; letter-spacing: 1.4px; }
-  /* Solid white reads as a floating panel at this scale. A hairline and the
-     faintest lift off the surface give the same grouping, much more quietly. */
-  .card {
-    border-radius: 20px;
-    padding: 22px 24px 20px;
-    background: #faf8f4;
-    border: 1px solid #ece7dd;
-  }
-
-  /* The table is 20 rows — as a white slab it dominates the page. The row
-     rules already do the grouping, so the fill just goes. */
-  .tbl-card {
-    background: transparent;
-    border-radius: 0;
-    padding: 0;
-  }
-
-  .fig-position { font-size: 148px; letter-spacing: -5px; }
-  .fig-suffix { font-size: 48px; }
-  .fig-stat { font-size: 62px; }
-  .fig-name { font-size: 78px; letter-spacing: -3px; }
-  .fig-player { font-size: 22px; }
-  .fig-rank { font-size: 13px; }
-  .pill-delta { font-size: 16px; padding: 7px 14px; }
-  .sub-note { font-size: 15px; }
-  .prev-note { font-size: 13px; }
-}
-
-.player-name { font-weight: 700; font-size: 13.5px; }
-@media (min-width: 1000px) { .player-name { font-size: 17px; } }

@@ -1,41 +1,66 @@
 import Link from "next/link";
 import Frame from "@/components/Frame";
+import { Eyebrow } from "@/components/ds";
 
 export default function NotFound() {
   return (
     <Frame>
       <div
+        className="mw-screen"
         style={{
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
           justifyContent: "center",
-          textAlign: "center",
-          gap: 14,
-          padding: "120px 40px",
-          minHeight: 940,
-          boxSizing: "border-box",
+          padding: "56px 20px",
+          gap: 18,
         }}
       >
-        <div style={{ fontWeight: 700, fontSize: 17 }}>Not a Premier League club</div>
-        <div style={{ fontSize: 13, color: "#8b857c", lineHeight: 1.5, maxWidth: 250 }}>
-          That three-letter code isn&rsquo;t in this season&rsquo;s twenty.
+        <div style={{ animation: "rise .34s ease both" }}>
+          <Eyebrow>Nothing to compare</Eyebrow>
+          <div
+            style={{
+              fontSize: "var(--size-title)",
+              fontWeight: 600,
+              letterSpacing: "var(--track-title)",
+              lineHeight: 1.02,
+              marginTop: 10,
+              textWrap: "pretty",
+            }}
+          >
+            Not a Premier League club
+          </div>
+          <div
+            style={{
+              fontSize: "var(--size-lead)",
+              fontWeight: 500,
+              lineHeight: "var(--leading-lead)",
+              color: "var(--text-muted)",
+              marginTop: 12,
+              maxWidth: 340,
+              textWrap: "pretty",
+            }}
+          >
+            That three-letter code isn&rsquo;t in this season&rsquo;s twenty.
+          </div>
         </div>
-        <Link
-          href="/"
-          style={{
-            fontSize: 12.5,
-            fontWeight: 700,
-            color: "#fff",
-            background: "#191613",
-            borderRadius: 99,
-            padding: "11px 22px",
-            marginTop: 4,
-            textDecoration: "none",
-          }}
-        >
-          Pick a club
-        </Link>
+        <div>
+          <Link
+            href="/"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              borderRadius: "var(--radius-full)",
+              padding: "11px 17px",
+              fontSize: 13,
+              fontWeight: 600,
+              background: "var(--surface-inverse)",
+              color: "var(--text-on-inverse)",
+              textDecoration: "none",
+            }}
+          >
+            Pick a club
+          </Link>
+        </div>
       </div>
     </Frame>
   );

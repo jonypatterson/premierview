@@ -6,10 +6,12 @@ import ClubPicker from "./ClubPicker";
 import PlayersView from "./PlayersView";
 import ProblemState from "./ProblemState";
 import SeasonView from "./SeasonView";
-import TabBar from "./TabBar";
+import TabBar, { type Tab } from "./TabBar";
 import TableView from "./TableView";
 import { COMPARE_MODE } from "@/lib/config";
-import { DEFAULT_ACCENT, STORAGE_KEY, short, textOn } from "@/lib/format";
+import { STORAGE_KEY } from "@/lib/format";
+import { MARK_INK, snap } from "@/lib/palette";
+import { playersView, seasonView } from "@/lib/view";
 import type { Club, LeagueTable, PlayedTeamPage, TeamPage } from "@/lib/types";
 
 type Props = {
@@ -23,7 +25,7 @@ type Props = {
 
 export default function TeamApp({ tla, data, error, clubs, table }: Props) {
   const router = useRouter();
-  const [tab, setTab] = useState<"season" | "players" | "table">("season");
+  const [tab, setTab] = useState<Tab>("season");
   const [picker, setPicker] = useState(false);
 
   // Visiting /MUN directly is also a choice — remember it, so / lands here next.
@@ -36,27 +38,15 @@ export default function TeamApp({ tla, data, error, clubs, table }: Props) {
   }, [tla]);
 
   const club = clubs.find((c) => c.code === tla);
-  const accent = data?.team.colour || club?.colour || DEFAULT_ACCENT;
+  // The mark takes the nearest chalk, never the club's own hex.
+  const markColour = snap(data?.team.colour || club?.colour);
   const teamName =
     data?.team.short_name || data?.team.name || club?.short_name || club?.name || tla;
 
-  const seasonLabel = data
-    ? `${short(data.seasons.current)} vs ${short(data.seasons.previous)}`
-    : "";
-
   if (picker) {
-    return (
-      <ClubPicker
-        clubs={clubs}
-        seasonLabel={seasonLabel}
-        current={{ tla, name: teamName }}
-        onKeep={() => setPicker(false)}
-      />
-    );
+    return <ClubPicker clubs={clubs} currentTla={tla} />;
   }
 
-  // A club we know about that simply hasn't played yet reads differently from
-  // a code we can't place at all.
   if (!data || !data.summary) {
     const kind = error ? "error" : data ? "no-matches" : "empty";
     return (
@@ -72,26 +62,19 @@ export default function TeamApp({ tla, data, error, clubs, table }: Props) {
   }
 
   const played = data as PlayedTeamPage;
+  const identity = { tla, teamName, markColour, markInk: MARK_INK };
 
   return (
     <>
-      {/* Keyed so the staggered entrance replays on every tab switch. */}
+      {/* Keyed so the entrance replays on every tab switch. */}
       {tab === "table" ? (
         table ? (
-          <TableView
-            key="table"
-            table={table}
-            accent={accent}
-            accentFg={textOn(accent)}
-            tla={tla}
-            myTla={tla}
-            onOpenPicker={() => setPicker(true)}
-          />
+          <TableView key="table" table={table} myTla={tla} onOpenPicker={() => setPicker(true)} />
         ) : (
           <ProblemState
             kind="empty"
             message="The league table didn't load."
-            lastSync={data.lastSync}
+            lastSync={data.lastSync ?? "unknown"}
             onRetry={() => router.refresh()}
             onChooseClub={() => setPicker(true)}
           />
@@ -99,22 +82,20 @@ export default function TeamApp({ tla, data, error, clubs, table }: Props) {
       ) : tab === "season" ? (
         <SeasonView
           key="season"
-          data={played}
-          accent={accent}
-          mode={COMPARE_MODE}
+          vm={seasonView(played, COMPARE_MODE)}
+          {...identity}
           onOpenPicker={() => setPicker(true)}
         />
       ) : (
         <PlayersView
           key="players"
-          data={played}
-          accent={accent}
+          vm={playersView(played)}
+          {...identity}
           onOpenPicker={() => setPicker(true)}
         />
       )}
       <TabBar
         tab={tab}
-        accent={accent}
         onSeason={() => setTab("season")}
         onPlayers={() => setTab("players")}
         onTable={() => setTab("table")}

@@ -1,16 +1,21 @@
 import type { ReactNode } from "react";
-import SiteFooter from "./SiteFooter";
 
 /**
- * Below 1000px there is no card — the app is the viewport. At 1000px and up
- * it becomes a centred card on the canvas. See .frame in globals.css.
+ * The desk, the app surface, and the box the screens are positioned inside.
+ *
+ * Below 760px there is no card — the app is the viewport. Above it the card
+ * fills the viewport with a 40px margin. See .mw-desk / .mw-app / .mw-inner in
+ * globals.css.
+ *
+ * The footer used to live here. It moved inside each screen: screens are
+ * absolutely positioned and scroll independently, so anything rendered outside
+ * them can never be scrolled to.
  */
 export default function Frame({ children }: { children: ReactNode }) {
   return (
-    <div className="frame-outer">
-      <div className="frame">
-        {children}
-        <SiteFooter />
+    <div className="mw-desk">
+      <div className="mw-app">
+        <div className="mw-inner">{children}</div>
       </div>
     </div>
   );

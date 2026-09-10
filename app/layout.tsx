@@ -1,29 +1,23 @@
 import type { Metadata, Viewport } from "next";
-import { Outfit, Roboto, Rubik } from "next/font/google";
+import { DM_Mono, Outfit } from "next/font/google";
 import "./globals.css";
 import { DESCRIPTION, OG_IMAGE, SITE, SITE_URL } from "@/lib/site";
 
-const rubik = Rubik({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
-  variable: "--font-rubik",
-  display: "swap",
-});
-
-// Numbers only — bold, but not as heavy as Rubik 800.
-const roboto = Roboto({
-  subsets: ["latin"],
-  weight: ["700"],
-  variable: "--font-roboto",
-  display: "swap",
-});
-
-// The wordmark only, which the brand sheet fixes at Outfit 600 — so just the
-// one weight, rather than the whole family for a single two-line lockup.
+// "Outfit for everything read, DM Mono for everything labelled." Rubik and
+// Roboto are gone with the old palette — the system has one text family.
 const outfit = Outfit({
   subsets: ["latin"],
-  weight: ["600"],
+  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-outfit",
+  display: "swap",
+});
+
+// Eyebrows, metadata and units only. The system forbids it for body copy, so
+// the two weights it actually sets are all that's loaded.
+const dmMono = DM_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-dm-mono",
   display: "swap",
 });
 
@@ -53,12 +47,13 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#EBE8E2",
+  // The desk the app sits on, so the browser chrome matches the page edge.
+  themeColor: "#EDE4CE",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${rubik.variable} ${roboto.variable} ${outfit.variable}`}>
+    <html lang="en" className={`${outfit.variable} ${dmMono.variable}`}>
       <body>{children}</body>
     </html>
   );

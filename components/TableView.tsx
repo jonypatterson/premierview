@@ -1,262 +1,214 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+import { Button, Eyebrow } from "./ds";
+import SiteFooter from "./SiteFooter";
 import { short } from "@/lib/format";
 import { leagueRows } from "@/lib/view";
 import type { LeagueTable } from "@/lib/types";
 
-const NUM: React.CSSProperties = { textAlign: "center", color: "#6f695f" };
-const NUM_D: React.CSSProperties = { justifyContent: "center", color: "#6f695f" };
-
-/**
- * League-wide standings. One flat card, and one grid shared by the header and
- * the rows so the columns line up without a <table>. Six cells are desktop-only
- * (see .tbl-d) so every column fits on a phone without sideways scrolling.
- */
-export default function TableView({
-  table,
-  accent,
-  accentFg,
-  tla,
-  myTla,
-  onOpenPicker,
-}: {
+type Props = {
   table: LeagueTable;
-  accent: string;
-  accentFg: string;
-  /** The club whose badge sits in the header — the way back to the picker. */
-  tla: string;
-  /** The saved club, highlighted in the standings. */
   myTla?: string;
   onOpenPicker: () => void;
-}) {
-  const rows = leagueRows(table, myTla);
+};
+
+/** Column widths are shared by the head and the rows, so they stay aligned. */
+const NUM: React.CSSProperties = {
+  width: 34,
+  textAlign: "right",
+  fontFamily: "var(--font-mono)",
+  fontSize: "var(--size-mono-lg)",
+  color: "var(--text-meta)",
+};
+
+export default function TableView({ table, myTla, onOpenPicker }: Props) {
+  const [filter, setFilter] = useState<"six" | "all">("all");
+  const scroller = useRef<HTMLDivElement>(null);
+  const centred = useRef(false);
+
+  const all = leagueRows(table, myTla);
+  const rows = filter === "six" ? all.slice(0, 6) : all;
+
+  // Land on your own club: the row is parked in the middle of the visible area
+  // rather than left for the reader to hunt down a list of twenty.
+  useEffect(() => {
+    if (centred.current) return;
+    const el = scroller.current;
+    const row = el?.querySelector<HTMLElement>('[data-me="1"]');
+    if (!el || !row) return;
+    el.scrollTop = Math.max(0, row.offsetTop - (el.clientHeight - row.offsetHeight) / 2);
+    centred.current = true;
+  }, [filter]);
+
+  const options = [
+    { label: "Top six", value: "six" as const },
+    { label: "All 20", value: "all" as const },
+  ];
 
   return (
-    <div className="screen-table">
+    <div className="mw-pad mw-screen mw-tablepage" ref={scroller} style={{ padding: "0 20px 132px" }}>
       <div
+        className="tb-frozen"
         style={{
-          animation: "rise .35s cubic-bezier(.2,.7,.3,1) .025s both",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 12,
+          position: "sticky",
+          top: 0,
+          zIndex: 3,
+          background: "var(--surface-app)",
+          paddingBottom: 2,
         }}
       >
-        <button
-          type="button"
-          onClick={onOpenPicker}
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+          <div>
+            <div
+              style={{
+                fontSize: "var(--size-title)",
+                fontWeight: 600,
+                letterSpacing: "var(--track-title)",
+                lineHeight: 1.02,
+              }}
+            >
+              League table
+            </div>
+            <div style={{ marginTop: 6 }}>
+              <Eyebrow>
+                {short(table.season)} · matchweek {table.matchweek} · move vs {short(table.prevSeason)}
+              </Eyebrow>
+            </div>
+          </div>
+          <Button size="sm" onClick={onOpenPicker}>
+            Change club
+          </Button>
+        </div>
+
+        {/* Selected is a fill change, never an outline. */}
+        <div style={{ margin: "16px 0", display: "flex", gap: 8 }}>
+          {options.map((o) => {
+            const on = o.value === filter;
+            return (
+              <button
+                key={o.value}
+                type="button"
+                onClick={() => {
+                  centred.current = false;
+                  setFilter(o.value);
+                }}
+                style={{
+                  border: "none",
+                  cursor: "pointer",
+                  borderRadius: "var(--radius-full)",
+                  padding: "10px 16px",
+                  fontFamily: "var(--font-core)",
+                  fontSize: "12.5px",
+                  fontWeight: 500,
+                  background: on ? "var(--surface-inverse)" : "var(--surface-quiet)",
+                  color: on ? "var(--text-on-inverse)" : "var(--text-body)",
+                  transition: "var(--transition-state)",
+                }}
+              >
+                {o.label}
+              </button>
+            );
+          })}
+        </div>
+
+        <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 10,
-            border: 0,
-            background: "none",
-            padding: 0,
-            cursor: "pointer",
-            fontFamily: "inherit",
-            color: "inherit",
-            textAlign: "left",
+            padding: "0 8px 10px",
+            fontFamily: "var(--font-mono)",
+            fontSize: "var(--size-mono-sm)",
+            letterSpacing: "var(--track-mono-eyebrow)",
+            color: "var(--text-faint)",
           }}
         >
-          <div
-            style={{
-              width: 38,
-              height: 38,
-              borderRadius: "50%",
-              background: accent,
-              color: accentFg,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontWeight: 800,
-              fontSize: 13,
-              letterSpacing: ".5px",
-              flex: "none",
-            }}
-          >
-            {tla}
-          </div>
-          <div>
-            <div style={{ fontWeight: 700, fontSize: 15, lineHeight: 1.1 }}>League table</div>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 3,
-                fontSize: 11,
-                color: "#8b857c",
-                marginTop: 2,
-              }}
-            >
-              {short(table.season)} · MW {table.matchweek}
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                style={{ flex: "none" }}
-              >
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
-            </div>
-          </div>
-        </button>
-
-        {/* Movement is against last season's finish, and the pill says so. */}
-        <div
-          style={{
-            fontSize: 10.5,
-            fontWeight: 600,
-            letterSpacing: ".4px",
-            padding: "6px 10px",
-            border: "1px solid #d9d3c9",
-            borderRadius: 99,
-            color: "#6f695f",
-            flex: "none",
-          }}
-        >
-          Move vs {short(table.prevSeason)}
+          <span style={{ width: 24 }}>#</span>
+          <span style={{ flex: 1, paddingLeft: 16 }}>Club</span>
+          {["P", "W", "D", "L"].map((h) => (
+            <span key={h} className="tb-d" style={{ width: 34, textAlign: "right" }}>
+              {h}
+            </span>
+          ))}
+          {["GF", "GA"].map((h) => (
+            <span key={h} className="tb-d" style={{ width: 38, textAlign: "right" }}>
+              {h}
+            </span>
+          ))}
+          <span style={{ width: 34, textAlign: "right" }}>GD</span>
+          <span style={{ width: 34, textAlign: "right" }}>Pts</span>
+          <span style={{ width: 44, textAlign: "right" }}>Move</span>
         </div>
       </div>
 
-      <div
-        className="tbl-card"
-        style={{ animation: "rise .35s cubic-bezier(.2,.7,.3,1) .06s both" }}
-      >
-        <div
-          className="tbl-head"
-          style={{
-            fontSize: 9.5,
-            letterSpacing: ".8px",
-            textTransform: "uppercase",
-            color: "#b9b2a6",
-            fontWeight: 600,
-            padding: "8px 0 9px",
-            borderBottom: "1px solid #E7E2D9",
-          }}
-        >
-          <div>#</div>
-          <div />
-          <div>Club</div>
-          <div style={{ textAlign: "center" }}>P</div>
-          <div className="tbl-d" style={{ justifyContent: "center" }}>W</div>
-          <div className="tbl-d" style={{ justifyContent: "center" }}>D</div>
-          <div className="tbl-d" style={{ justifyContent: "center" }}>L</div>
-          <div className="tbl-d" style={{ justifyContent: "center" }}>GF</div>
-          <div className="tbl-d" style={{ justifyContent: "center" }}>GA</div>
-          <div style={{ textAlign: "center" }}>GD</div>
-          <div style={{ textAlign: "center" }}>Pts</div>
-          <div className="tbl-d" style={{ justifyContent: "flex-end" }}>Last 5</div>
-        </div>
-
+      <div style={{ position: "relative", zIndex: 1 }}>
         {rows.map((r) => (
           <div
             key={r.code}
-            className="tbl-row"
+            data-me={r.me ? "1" : "0"}
             style={{
-              animation: `rise .4s cubic-bezier(.2,.7,.3,1) ${r.delay.toFixed(3)}s both`,
-              padding: "7px 0",
-              borderBottom: `1px solid ${r.rule}`,
-              background: r.bg,
-              fontSize: 12.5,
-              fontWeight: r.weight,
+              display: "flex",
+              alignItems: "center",
+              padding: "11px 8px",
+              borderRadius: "var(--radius-row)",
+              background: r.rowBg,
             }}
           >
-            {/* The rank is a locator, not a figure — so it stays quiet. */}
-            <div style={{ fontSize: 11.5, fontWeight: 700, color: "#b9b2a6" }}>{r.pos}</div>
-            <div
-              title={r.moveTitle}
+            <span style={{ width: 24, fontSize: 13, fontWeight: 600, color: "var(--text-meta)" }}>
+              {r.pos}
+            </span>
+            <span style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: 9 }}>
+              <span
+                style={{ width: 7, height: 22, borderRadius: 3, flex: "none", background: r.zone }}
+              />
+              <span
+                style={{
+                  fontSize: "var(--size-body-sm)",
+                  color: "var(--text-body)",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  fontWeight: r.me ? 600 : 400,
+                }}
+              >
+                {r.name}
+              </span>
+            </span>
+            <span className="tb-d" style={NUM}>{r.played}</span>
+            <span className="tb-d" style={NUM}>{r.wins}</span>
+            <span className="tb-d" style={NUM}>{r.draws}</span>
+            <span className="tb-d" style={NUM}>{r.losses}</span>
+            <span className="tb-d" style={{ ...NUM, width: 38 }}>{r.gf}</span>
+            <span className="tb-d" style={{ ...NUM, width: 38 }}>{r.ga}</span>
+            <span style={NUM}>{r.gdText}</span>
+            <span
               style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 9,
-                lineHeight: 1,
+                width: 34,
+                textAlign: "right",
+                fontSize: "var(--size-figure-xs)",
+                fontWeight: 700,
+                color: "var(--text-body)",
+              }}
+            >
+              {r.points}
+            </span>
+            <span
+              style={{
+                width: 44,
+                textAlign: "right",
+                fontSize: "var(--size-mono-lg)",
+                fontWeight: 600,
                 color: r.moveCol,
               }}
             >
-              {r.moveGlyph}
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
-              <div
-                style={{
-                  width: 24,
-                  height: 24,
-                  flex: "none",
-                  borderRadius: "50%",
-                  background: r.colour,
-                  color: r.fg,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontWeight: 800,
-                  fontSize: 8.5,
-                  letterSpacing: ".2px",
-                }}
-              >
-                {r.code}
-              </div>
-              <div style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                {r.name}
-              </div>
-            </div>
-            <div style={NUM}>{r.played}</div>
-            <div className="tbl-d" style={NUM_D}>{r.wins}</div>
-            <div className="tbl-d" style={NUM_D}>{r.draws}</div>
-            <div className="tbl-d" style={NUM_D}>{r.losses}</div>
-            <div className="tbl-d" style={NUM_D}>{r.gf}</div>
-            <div className="tbl-d" style={NUM_D}>{r.ga}</div>
-            <div style={NUM}>{r.gdText}</div>
-            <div style={{ textAlign: "center", fontWeight: 800 }}>{r.points}</div>
-            <div className="tbl-d" style={{ justifyContent: "flex-end", gap: 3 }}>
-              {r.last5.map((p, i) => (
-                <div
-                  key={i}
-                  style={{
-                    width: 17,
-                    height: 17,
-                    borderRadius: "50%",
-                    flex: "none",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 8.5,
-                    fontWeight: 800,
-                    background: p.bg,
-                    color: p.fg,
-                    border: p.border,
-                    boxSizing: "border-box",
-                  }}
-                >
-                  {p.ch}
-                </div>
-              ))}
-            </div>
+              {r.moveText}
+            </span>
           </div>
         ))}
-
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 14,
-            paddingTop: 11,
-            fontSize: 10,
-            color: "#b9b2a6",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-            <span style={{ color: "var(--move-up)", fontSize: 8 }}>▲</span>Risen since last season
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-            <span style={{ color: "var(--move-down)", fontSize: 8 }}>▼</span>Fallen
-          </div>
-          <div>— Promoted, no comparison</div>
+        <div style={{ padding: "14px 8px 0" }}>
+          <Eyebrow tone="faint">▲ up on last season · ▼ down · — promoted</Eyebrow>
         </div>
+        <SiteFooter />
       </div>
     </div>
   );

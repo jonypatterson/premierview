@@ -1,26 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Button, Eyebrow } from "./ds";
 
 type Props = {
-  kind: "empty" | "error" | "no-matches";
-  /** Club name, for the no-matches copy. */
+  /** A club we know that hasn't played reads differently from a code we can't place. */
+  kind: "error" | "no-matches" | "empty";
   clubName?: string;
   message?: string | null;
-  /** ISO timestamp from the sync log. */
-  lastSync?: string | null;
+  lastSync: string;
   onRetry: () => void;
   onChooseClub: () => void;
-};
-
-const pill: React.CSSProperties = {
-  border: 0,
-  cursor: "pointer",
-  fontFamily: "inherit",
-  fontSize: 12.5,
-  fontWeight: 700,
-  borderRadius: 99,
-  padding: "11px 22px",
 };
 
 export default function ProblemState({
@@ -31,84 +20,54 @@ export default function ProblemState({
   onRetry,
   onChooseClub,
 }: Props) {
-  // Formatted after mount: the server and the viewer are rarely in the same
-  // timezone, and a mismatch here would be a hydration error.
-  const [synced, setSynced] = useState<string | null>(null);
-  useEffect(() => {
-    if (!lastSync) return;
-    const d = new Date(lastSync);
-    if (!Number.isNaN(d.getTime())) {
-      setSynced(d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }));
-    }
-  }, [lastSync]);
-
   const title =
     kind === "no-matches"
       ? "No completed matches yet"
       : kind === "empty"
-        ? "No data for this team yet"
-        : "Couldn't load the season";
+        ? "No data for this club yet"
+        : "The season did not load";
 
   const body =
     kind === "no-matches"
-      ? `${clubName ?? "They"} haven't finished a match this season yet. Everything appears here after the first final whistle.`
+      ? `${clubName ?? "This club"} have not finished a match this season. Everything appears after the first final whistle.`
       : kind === "empty"
-        ? "The hourly sync hasn't written any standings for this team. It may be a newly promoted side."
-        : (message ?? "The database didn't respond. This is usually brief — try again in a moment.");
+        ? "The hourly sync has not written any standings for this club yet."
+        : (message ??
+          "The database did not respond. The data is cached, so this is usually brief.");
 
   return (
     <div
-      className="col-narrow"
+      className="mw-screen"
       style={{
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
         justifyContent: "center",
-        textAlign: "center",
-        gap: 16,
-        padding: "120px 40px",
-        minHeight: "70dvh",
-        boxSizing: "border-box",
+        padding: "56px 20px",
+        gap: 18,
       }}
     >
-      <div
-        style={{
-          animation: "pop .35s cubic-bezier(.3,1.4,.4,1) both",
-          width: 56,
-          height: 56,
-          borderRadius: "50%",
-          background: "#EFEBE3",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: "#b9b2a6",
-        }}
-      >
-        <svg
-          width="26"
-          height="26"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.9"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <circle cx="12" cy="12" r="9" />
-          <path d="M12 8v4.5" />
-          <path d="M12 16.2h.01" />
-        </svg>
-      </div>
-
-      <div style={{ animation: "rise .35s ease-out .05s both" }}>
-        <div style={{ fontWeight: 700, fontSize: 17 }}>{title}</div>
+      <div style={{ animation: "rise .34s ease both" }}>
+        <Eyebrow>Nothing to compare</Eyebrow>
         <div
           style={{
-            fontSize: 13,
-            color: "#8b857c",
-            marginTop: 8,
-            lineHeight: 1.5,
-            maxWidth: 280,
+            fontSize: "var(--size-title)",
+            fontWeight: 600,
+            letterSpacing: "var(--track-title)",
+            lineHeight: 1.02,
+            marginTop: 10,
+            textWrap: "pretty",
+          }}
+        >
+          {title}
+        </div>
+        <div
+          style={{
+            fontSize: "var(--size-lead)",
+            fontWeight: 500,
+            lineHeight: "var(--leading-lead)",
+            color: "var(--text-muted)",
+            marginTop: 12,
+            maxWidth: 340,
             textWrap: "pretty",
           }}
         >
@@ -116,36 +75,15 @@ export default function ProblemState({
         </div>
       </div>
 
-      <div style={{ animation: "rise .35s ease-out .09s both", fontSize: 11, color: "#b9b2a6" }}>
-        Last successful sync {synced ?? "unknown"}
-      </div>
+      <Eyebrow tone="faint">Last sync {lastSync}</Eyebrow>
 
-      {/* Two ways out — this screen is never a dead end. */}
-      <div
-        style={{
-          animation: "rise .35s ease-out .12s both",
-          display: "flex",
-          gap: 8,
-          flexWrap: "wrap",
-          justifyContent: "center",
-          marginTop: 4,
-        }}
-      >
-        <button type="button" onClick={onRetry} style={{ ...pill, color: "#fff", background: "#191613" }}>
+      <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
+        <Button size="md" onClick={onRetry}>
           Try again
-        </button>
-        <button
-          type="button"
-          onClick={onChooseClub}
-          style={{
-            ...pill,
-            color: "#191613",
-            background: "transparent",
-            border: "1px solid #d9d3c9",
-          }}
-        >
-          Choose another club
-        </button>
+        </Button>
+        <Button variant="quiet" size="md" onClick={onChooseClub}>
+          Another club
+        </Button>
       </div>
     </div>
   );

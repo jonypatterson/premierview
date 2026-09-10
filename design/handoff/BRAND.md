@@ -10,9 +10,10 @@
 > master; the red `#DA291C` and the assets in `assets/` are no longer the
 > brand. §3 (where the logo goes) is unaffected.
 >
-> Only the mark was implemented. The rest of the app is still on the old
-> palette — `#EBE8E2` canvas, Rubik — so the new mark currently sits in a
-> screen that hasn't caught up with it.
+> The screens followed: the whole app is now on the Matchday design system
+> (`Season Comparison - Matchday.dc.html`) — cream and ink, four chalk accents,
+> Outfit and DM Mono. Nothing described below that concerns colour or type is
+> still true of the app; `app/globals.css` carries the tokens.
 
 The app is called **Better than the last one**. Replace the working
 title "Matchday" / "Season Comparison" everywhere it appears in UI copy,
