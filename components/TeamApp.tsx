@@ -8,6 +8,7 @@ import ProblemState from "./ProblemState";
 import SeasonView from "./SeasonView";
 import TabBar, { type Tab } from "./TabBar";
 import TableView from "./TableView";
+import { track } from "@/lib/analytics";
 import { rememberClub } from "@/lib/club-memory";
 import { COMPARE_MODE } from "@/lib/config";
 import { cardChalk, MARK_INK, snap } from "@/lib/palette";
@@ -34,6 +35,16 @@ export default function TeamApp({ tla, data, error, clubs, table }: Props) {
   useEffect(() => {
     rememberClub(tla);
   }, [tla]);
+
+  /**
+   * A tab change is a state change, so it leaves no trace in the URL and no
+   * page view behind it. The club goes with the event: which screen a reader
+   * opens is only interesting next to which club they opened it for.
+   */
+  const show = (next: Tab) => {
+    setTab(next);
+    track("select_tab", { tab: next, club: tla });
+  };
 
   const club = clubs.find((c) => c.code === tla);
   // The mark takes the nearest chalk, never the club's own hex.
@@ -104,9 +115,9 @@ export default function TeamApp({ tla, data, error, clubs, table }: Props) {
       <TabBar
         tab={tab}
         accent={clubChalk}
-        onSeason={() => setTab("season")}
-        onPlayers={() => setTab("players")}
-        onTable={() => setTab("table")}
+        onSeason={() => show("season")}
+        onPlayers={() => show("players")}
+        onTable={() => show("table")}
         onPicker={() => setPicker(true)}
       />
     </>

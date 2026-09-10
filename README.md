@@ -44,12 +44,27 @@ server-only value the way the Supabase key is.
 Club switches are `router.push`, and GA4's enhanced measurement counts a history
 change as a page view, so `/ARS`, `/MUN` and the rest are counted without any
 manual `send`. The three tabs within a club are React state rather than routes,
-so they are not — if you want them, they need an explicit `event`.
+so they send a `select_tab` event instead — `lib/analytics.ts`, which no-ops
+entirely when no measurement ID is set.
 
-**Consent.** GA4 sets cookies, and in the UK/EU that needs consent before the
-tag runs, not after. There is no consent banner in this app yet, so this is
-worth settling before the site gets meaningful traffic — either a banner gating
-the tag, or Google's consent mode with analytics storage denied by default.
+**No cookies, and so no banner.** The tag runs under consent mode v2 with every
+storage type set to `denied`, permanently. That is the setting, not a
+placeholder waiting on a banner: GA4 then measures without writing or reading a
+cookie, which is what makes it lawful here with nothing for the reader to
+dismiss. A cookie banner on a screen that is one card and four buttons costs
+more than the data it would buy.
+
+What that means for the numbers: page views and events are collected and report
+normally, per club and per tab. Anything that needs a returning visitor to be
+recognised — unique users, retention, sessions stitched across visits — is
+modelled at best, and should not be quoted as fact. If you ever want those
+properly, `CONSENT` in `app/layout.tsx` is the switch, and it must go behind a
+real consent banner: flipping it alone turns the cookies on without asking.
+
+Consent mode is also why the tag is written out in `layout.tsx` rather than
+taken from `@next/third-parties`: gtag reads `dataLayer` in push order, and a
+consent default only counts if it is pushed before the `config` that starts
+measuring. Both are in one block so they cannot drift apart.
 
 ## Shape
 
