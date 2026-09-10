@@ -81,6 +81,7 @@ export default function SeasonView({
               label={s.label}
               value={s.value}
               previous={s.previous}
+              previousLabel={"previousLabel" in s ? s.previousLabel : undefined}
               background={s.fill}
             />
           ))}

@@ -135,6 +135,9 @@ export default function TableView({ table, myTla, onOpenPicker }: Props) {
               {h}
             </span>
           ))}
+          <span className="tb-d" style={{ width: 96, paddingLeft: 14 }}>
+            Form
+          </span>
           <span style={{ width: 34, textAlign: "right" }}>GD</span>
           <span style={{ width: 34, textAlign: "right" }}>Pts</span>
           <span style={{ width: 44, textAlign: "right" }}>Move</span>
@@ -180,6 +183,27 @@ export default function TableView({ table, myTla, onOpenPicker }: Props) {
             <span className="tb-d" style={NUM}>{r.losses}</span>
             <span className="tb-d" style={{ ...NUM, width: 38 }}>{r.gf}</span>
             <span className="tb-d" style={{ ...NUM, width: 38 }}>{r.ga}</span>
+            <span
+              className="tb-d"
+              style={{ width: 96, paddingLeft: 14, display: "flex", gap: 3 }}
+              aria-label={`Last five: ${r.form.filter(Boolean).join(" ") || "none played"}`}
+            >
+              {r.form.map((f, i) => (
+                <span
+                  key={i}
+                  style={{
+                    width: 14,
+                    height: 14,
+                    borderRadius: 4,
+                    flex: "none",
+                    // A blank slot is the empty track, not a result.
+                    background: f
+                      ? { W: "var(--result-win)", D: "var(--result-draw)", L: "var(--result-loss)" }[f]
+                      : "var(--ink-08)",
+                  }}
+                />
+              ))}
+            </span>
             <span style={NUM}>{r.gdText}</span>
             <span
               style={{

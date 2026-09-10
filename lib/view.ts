@@ -54,7 +54,6 @@ export function seasonView(d: PlayedTeamPage, mode: CompareMode) {
   const [mx, my] = xy(cur[lastIdx] ?? 1, lastIdx);
 
   const games = s.won + s.drawn + s.lost;
-  const prevGames = (prevWon ?? 0) + (prevDrawn ?? 0) + (prevLost ?? 0);
   const pts = s.won * 3 + s.drawn;
   const prevPts = (prevWon ?? 0) * 3 + (prevDrawn ?? 0);
   const ptsDelta = pts - prevPts;
@@ -124,9 +123,19 @@ export function seasonView(d: PlayedTeamPage, mode: CompareMode) {
         fill: "var(--accent-4)",
       },
       {
-        label: "points per game",
-        value: (pts / Math.max(1, games)).toFixed(1),
-        previous: (prevPts / Math.max(1, prevGames)).toFixed(1),
+        // The projection replaces points per game, which was the same number
+        // in a duller unit — 3.0 a game *is* 114 over a season, and the season
+        // total is the one anybody quotes.
+        //
+        // It compares against last season's *finished* total, not the figure
+        // at this stage, because a projection is itself a full-season number.
+        // That is a like-for-like comparison and the row says "finished" so it
+        // cannot be read as the same-stage "was" every other row means. Always
+        // last season's final, whatever COMPARE_MODE is set to.
+        label: "on pace for",
+        value: String(Math.round((pts / Math.max(1, games)) * 38)),
+        previous: String((s.prev_final_won ?? 0) * 3 + (s.prev_final_drawn ?? 0)),
+        previousLabel: "finished",
         fill: "var(--accent-1)",
       },
     ],
@@ -315,7 +324,13 @@ export function leagueRows(table: LeagueTable, myTla?: string) {
   return table.rows.map((r) => {
     const d = r.delta;
     const mine = !!myTla && r.code === myTla;
+    // Oldest to newest, and shorter than five early in the season. Padded at
+    // the front with blanks so played matches stay flush right and the column
+    // lines up down the table.
+    const form: (string | null)[] = [...(r.last5 ?? [])];
+    while (form.length < 5) form.unshift(null);
     return {
+      form,
       pos: r.pos,
       code: r.code,
       name: r.short_name || r.name,
