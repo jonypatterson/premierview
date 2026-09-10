@@ -2,11 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
-import { Avatar } from "./ds";
 import LogoLockup from "./LogoLockup";
 import SiteFooter from "./SiteFooter";
 import { rememberClub } from "@/lib/club-memory";
-import { MARK_INK, snap } from "@/lib/palette";
 import { FALLBACK_CLUBS } from "@/lib/clubs";
 import type { Club } from "@/lib/types";
 
@@ -81,10 +79,10 @@ export default function ClubPicker({ clubs, currentTla, onClose }: Props) {
         </div>
       </div>
 
-      <div
-        className="mw-clubgrid"
-        style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}
-      >
+      {/* Columns live in globals.css. Setting them inline here beat the media
+          queries on specificity, so the grid stayed at its phone width on
+          every screen. */}
+      <div className="mw-clubgrid">
         {list.map((c) => {
           const isCurrent = currentTla === c.code;
           return (
@@ -95,28 +93,7 @@ export default function ClubPicker({ clubs, currentTla, onClose }: Props) {
               onClick={() => pick(c.code)}
               aria-current={isCurrent}
             >
-              <Avatar
-                initials={c.code}
-                size={72}
-                background={snap(c.colour)}
-                color={MARK_INK}
-                style={{ width: "100%" }}
-              />
-              <div
-                style={{
-                  fontSize: 11,
-                  fontWeight: 500,
-                  lineHeight: 1.2,
-                  textAlign: "center",
-                  width: "100%",
-                  overflow: "hidden",
-                  display: "-webkit-box",
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: "vertical",
-                }}
-              >
-                {c.short_name || c.name}
-              </div>
+              {c.short_name || c.name}
             </button>
           );
         })}
