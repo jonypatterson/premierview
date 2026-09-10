@@ -70,7 +70,13 @@ export default function TeamApp({ tla, data, error, clubs, table }: Props) {
       {/* Keyed so the entrance replays on every tab switch. */}
       {tab === "table" ? (
         table ? (
-          <TableView key="table" table={table} myTla={tla} onOpenPicker={() => setPicker(true)} />
+          <TableView
+            key="table"
+            table={table}
+            myTla={tla}
+            accent={clubChalk}
+            onOpenPicker={() => setPicker(true)}
+          />
         ) : (
           <ProblemState
             kind="empty"

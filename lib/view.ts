@@ -333,8 +333,12 @@ export function playersView(d: PlayedTeamPage, clubChalk: string) {
  * Movement is measured against last season's *final* position, not the
  * previous matchweek — that's the product's premise, it's defined at MW1 where
  * a week-over-week delta wouldn't be, and the header line says so.
+ *
+ * @param myChalk The club's own chalk, already made safe to fill with. Exactly
+ *   one row is ever highlighted, so it may as well be highlighted in the colour
+ *   the rest of that club's page is wearing.
  */
-export function leagueRows(table: LeagueTable, myTla?: string) {
+export function leagueRows(table: LeagueTable, myTla?: string, myChalk?: string) {
   const zone = (pos: number, total: number) => {
     if (pos <= 5) return "var(--zone-europe)";
     if (pos <= 8) return "var(--zone-chasing)";
@@ -366,7 +370,7 @@ export function leagueRows(table: LeagueTable, myTla?: string) {
       zone: zone(r.pos, table.rows.length),
       me: mine,
       // Exactly one row may be highlighted — the user's own club.
-      rowBg: mine ? "var(--accent-1)" : "transparent",
+      rowBg: mine ? (myChalk ?? "var(--accent-1)") : "transparent",
       moveText: d == null ? "—" : d > 0 ? `▲${d}` : d < 0 ? `▼${Math.abs(d)}` : "–",
       moveCol: d == null ? "var(--ink-35)" : d > 0 ? UP : d < 0 ? DOWN : FLAT,
     };

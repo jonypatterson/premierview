@@ -4,11 +4,17 @@ import SiteFooter from "./SiteFooter";
 import type { PlayersVM } from "@/lib/view";
 
 /**
- * How many rows the two columns split into above 1180px. Half the list, so the
- * names fill the left column top to bottom and continue down the right —
- * `repeat(0, …)` is invalid, hence the floor of one.
+ * How many rows the list splits into above 1180px — half of it for the
+ * two-column layout a tall window gets, a third for the three-column one a
+ * short window gets. Setting both means the breakpoint chooses a column count
+ * without the component knowing which. `repeat(0, …)` is invalid, hence the
+ * floor of one.
  */
-const cols = (n: number) => ({ "--rows": Math.max(1, Math.ceil(n / 2)) }) as CSSProperties;
+const cols = (n: number) =>
+  ({
+    "--rows": Math.max(1, Math.ceil(n / 2)),
+    "--rows3": Math.max(1, Math.ceil(n / 3)),
+  }) as CSSProperties;
 
 type Props = {
   vm: PlayersVM;

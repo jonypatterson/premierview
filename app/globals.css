@@ -618,22 +618,68 @@ body {
   .mw-players .ds-hero { padding: 20px 22px 18px; }
   .a-hero { --size-hero: 44px; }
 
-  /* Column-major: the list reads 1-2-3 down the left, then 4-5-6 down the
-     right. `--rows` is set per list to half its length, so a short list splits
-     across both columns instead of stranding every name on the left — with
-     three scorers it is 1-2 then 3, still in reading order. */
+  /* Column-major, so the list reads down one column and on to the next rather
+     than across. `--rows` is set per list to a fraction of its length, so a
+     short list still spreads across the columns instead of stranding every
+     name in the first one.
+
+     Three columns is the short-window layout: six players in two rows instead
+     of three, which is what lets a 900px-tall window hold both lists without
+     the footer landing on top of them. A taller window gets two columns back
+     — see the height-gated block below. */
   .player-cols {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-rows: repeat(var(--rows, 3), auto);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(var(--rows3, 2), auto);
     grid-auto-flow: column;
-    column-gap: 48px;
+    column-gap: 40px;
   }
+
+  /* The grid may be shorter than its own content — that is the point on the
+     season screen, where the chart's 1fr row absorbs whatever is left. Players
+     has no such row, so a grid box shorter than its rows just overflowed:
+     names printed over the footer and the last one sat under the tab bar, and
+     because the overflow never reached the screen box it could not be scrolled
+     to either. Floored at its content, a window too short to hold the screen
+     scrolls instead, which is what the scroll is for.
+
+     The other direction is the taller window, where the space-between the
+     season grid uses put every spare pixel into the two gaps and left the
+     screen as three bands with voids between them. Here the two lists take the
+     spare height themselves, so the rows breathe and the screen reads as one
+     list rather than as content stranded around a hole. */
+  .mw-screen.mw-pad > .mw-players {
+    min-height: min-content;
+    align-content: stretch;
+    /* .mw-grid aligns its items to the start of their row; a list that is to
+       take the row's spare height has to fill it first. */
+    align-items: stretch;
+    grid-template-rows: auto 1fr 1fr;
+  }
+  .mw-players .a-scored,
+  .mw-players .a-assisted { display: flex; flex-direction: column; min-height: 0; }
+  .mw-players .player-cols { flex: 1; grid-template-rows: repeat(var(--rows3, 2), 1fr); }
+  /* A row that has grown holds its content in the middle of itself; left at
+     the top, the rule underneath would drift away from what it divides. */
+  .mw-players .ds-player { display: flex; flex-direction: column; justify-content: center; }
 
   .a-hero { --size-hero: 58px; }
   .tb-d { display: block; }
   .mw-tablepage > div { max-width: 900px; }
   .tb-frozen { padding-top: 64px; }
+}
+
+/* Two columns per list, on a window tall enough to hold three rows of them.
+   Below about 1000px of viewport it cannot: the two lists come to roughly
+   680px and the screen has the viewport less its chrome to put them in, which
+   is where the three-column layout above takes over. Six players in three rows
+   reach further down a tall card, which is what this layout is for. */
+@media (min-width: 1180px) and (min-height: 1024px) {
+  .mw-players .player-cols {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(var(--rows, 3), 1fr);
+    column-gap: 48px;
+  }
 }
 
 /* Skeleton placeholder.
