@@ -1,9 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useState } from "react";
 import LogoLockup from "./LogoLockup";
 import SiteFooter from "./SiteFooter";
+import Skeleton from "./Skeleton";
 import { rememberClub } from "@/lib/club-memory";
 import { FALLBACK_CLUBS } from "@/lib/clubs";
 import type { Club } from "@/lib/types";
@@ -30,7 +31,7 @@ type Props = {
  */
 export default function ClubPicker({ clubs, currentTla, onClose }: Props) {
   const router = useRouter();
-  const [, startTransition] = useTransition();
+  const [leaving, setLeaving] = useState(false);
   const list = clubs.length ? clubs : FALLBACK_CLUBS;
 
   const pick = (code: string) => {
@@ -42,8 +43,18 @@ export default function ClubPicker({ clubs, currentTla, onClose }: Props) {
       onClose();
       return;
     }
-    startTransition(() => router.push(`/${code}`));
+    // Paint the skeleton on this click, before the navigation starts.
+    //
+    // The push used to sit inside startTransition, and holding the old screen
+    // on display is exactly what a transition is for — so the picker stayed
+    // up, the route's loading.tsx never got a chance to show, and the tap read
+    // as a tap that had missed. This is an urgent update, so React commits it
+    // in the same frame as the click and the wait becomes visible work.
+    setLeaving(true);
+    router.push(`/${code}`);
   };
+
+  if (leaving) return <Skeleton />;
 
   return (
     /* Layout lives in globals.css. Setting it inline put it out of reach of
