@@ -493,10 +493,12 @@ export function PlayerRow({
   name: string;
   meta: string;
   value: ReactNode;
+  /** Omitted where the two seasons are not measured over the same stretch. */
   delta?: string;
   deltaColor?: string;
   widthNow: string;
-  widthPrevious: string;
+  /** Omitted with `delta`, for the same reason. */
+  widthPrevious?: string;
   color?: string;
   style?: CSSProperties;
 }) {
@@ -536,22 +538,26 @@ export function PlayerRow({
           >
             {value}
           </div>
-          <div
-            style={{ fontSize: "var(--size-mono)", fontWeight: 600, marginTop: 3, color: deltaColor }}
-          >
-            {delta}
-          </div>
+          {delta ? (
+            <div
+              style={{ fontSize: "var(--size-mono)", fontWeight: 600, marginTop: 3, color: deltaColor }}
+            >
+              {delta}
+            </div>
+          ) : null}
         </div>
       </div>
       <div className="ds-player-bars">
         <div style={{ borderRadius: "var(--radius-full)", background: color, width: widthNow }} />
-        <div
-          style={{
-            borderRadius: "var(--radius-full)",
-            background: "var(--track-bar-past)",
-            width: widthPrevious,
-          }}
-        />
+        {widthPrevious ? (
+          <div
+            style={{
+              borderRadius: "var(--radius-full)",
+              background: "var(--track-bar-past)",
+              width: widthPrevious,
+            }}
+          />
+        ) : null}
       </div>
     </div>
   );

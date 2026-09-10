@@ -5,6 +5,13 @@ const config: NextConfig = {
   // Club crests come straight from football-data.org.
   images: { remotePatterns: [{ protocol: "https", hostname: "crests.football-data.org" }] },
 
+  // The share card reads its font files off disk, and nothing imports them, so
+  // tracing cannot see them on its own — without this they are missing from
+  // the deployed bundle and the card 500s in production but not locally.
+  outputFileTracingIncludes: {
+    "/[tla]/opengraph-image": ["./assets/fonts/**"],
+  },
+
   async redirects() {
     return [
       // The project's stable *.vercel.app aliases still carry the old name, and
