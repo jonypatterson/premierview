@@ -1,6 +1,14 @@
+import type { CSSProperties } from "react";
 import { AppHeader, Button, Eyebrow, HeroStat, PlayerRow, StatTile } from "./ds";
 import SiteFooter from "./SiteFooter";
 import type { PlayersVM } from "@/lib/view";
+
+/**
+ * How many rows the two columns split into above 1180px. Half the list, so the
+ * names fill the left column top to bottom and continue down the right —
+ * `repeat(0, …)` is invalid, hence the floor of one.
+ */
+const cols = (n: number) => ({ "--rows": Math.max(1, Math.ceil(n / 2)) }) as CSSProperties;
 
 type Props = {
   vm: PlayersVM;
@@ -65,7 +73,7 @@ export default function PlayersView({
           <div style={{ margin: "4px 0 8px" }}>
             <Eyebrow tone="faint">{vm.rowLegend}</Eyebrow>
           </div>
-          <div className="player-cols">
+          <div className="player-cols" style={cols(vm.scorers.length)}>
             {vm.scorers.map((p) => (
               <PlayerRow
                 key={p.name}
@@ -101,7 +109,7 @@ export default function PlayersView({
           <div style={{ margin: "4px 0 8px" }}>
             <Eyebrow tone="faint">{vm.rowLegend}</Eyebrow>
           </div>
-          <div className="player-cols">
+          <div className="player-cols" style={cols(vm.assisters.length)}>
             {vm.assisters.map((p) => (
               <PlayerRow
                 key={p.name}
