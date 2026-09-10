@@ -246,18 +246,37 @@ export default function SeasonView({
               {/* An HTML dot, not an SVG circle: the svg is stretched, and a
                   circle in it would come out as an ellipse. */}
               {vm.chart.hasMarker ? (
-                <div
-                  style={{
-                    position: "absolute",
-                    width: 11,
-                    height: 11,
-                    borderRadius: "var(--radius-full)",
-                    margin: "-5.5px 0 0 -5.5px",
-                    background: "var(--ink-900)",
-                    left: vm.chart.markerLeft,
-                    top: vm.chart.markerTop,
-                  }}
-                />
+                <>
+                  {/* The pulse halo, at the geometry and timing the design set:
+                      18px, centred on the marker by negative margins, opening
+                      once the entrance animations have finished. */}
+                  <div
+                    aria-hidden
+                    style={{
+                      position: "absolute",
+                      width: 18,
+                      height: 18,
+                      borderRadius: "var(--radius-full)",
+                      margin: "-9px 0 0 -9px",
+                      background: "var(--ink-900)",
+                      animation: "ping 1.6s ease-out 2.7s infinite",
+                      left: vm.chart.markerLeft,
+                      top: vm.chart.markerTop,
+                    }}
+                  />
+                  <div
+                    style={{
+                      position: "absolute",
+                      width: 11,
+                      height: 11,
+                      borderRadius: "var(--radius-full)",
+                      margin: "-5.5px 0 0 -5.5px",
+                      background: "var(--ink-900)",
+                      left: vm.chart.markerLeft,
+                      top: vm.chart.markerTop,
+                    }}
+                  />
+                </>
               ) : null}
             </div>
           </div>
