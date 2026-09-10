@@ -365,9 +365,19 @@ body {
       "shero insight splits"
       "record form goals"
       "chart chart chart";
-    /* the chart takes up the slack at the foot of the overview */
-    --chart-h: min(320px, calc(100dvh - 620px));
+    /* The chart takes up the slack at the foot of the overview. It grows with
+       the viewport rather than stopping at a fixed cap, which is most of what
+       made a tall monitor look top-heavy. */
+    --chart-h: clamp(200px, calc(100dvh - 560px), 440px);
   }
+
+  /* On a tall display the grid sat at the top of a much taller card and left
+     dead space beneath it. The screen becomes a flex column so the grid takes
+     the remaining height and spreads its rows down it instead of bunching.
+     Scoped by :has() to the screens that actually hold a grid — the table page
+     is a sticky header over a row list and must stay a normal block. */
+  .mw-screen.mw-pad:has(> .mw-grid) { display: flex; flex-direction: column; }
+  .mw-screen.mw-pad > .mw-grid { flex: 1; align-content: space-between; }
 
   /* Players stays two columns: .mw-grid's three would add a third track that
      its "hero tiles" / "scored assisted" areas never fill, leaving the screen
