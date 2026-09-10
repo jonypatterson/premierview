@@ -214,8 +214,9 @@ export function HeroStat({
         ...style,
       }}
     >
-      {/* Two blobs per hero chip, never more. */}
+      {/* Two blobs per hero chip, never more. They drift — see .ds-blob. */}
       <div
+        className="ds-blob ds-blob-a"
         style={{
           position: "absolute",
           right: -70,
@@ -227,6 +228,7 @@ export function HeroStat({
         }}
       />
       <div
+        className="ds-blob ds-blob-b"
         style={{
           position: "absolute",
           right: -30,
@@ -321,6 +323,7 @@ export function InsightCard({
     >
       {blob ? (
         <div
+          className="ds-blob ds-blob-c"
           style={{
             position: "absolute",
             right: -20,

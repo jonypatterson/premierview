@@ -183,6 +183,41 @@
   to   { transform: translateY(0); opacity: 1; }
 }
 
+/* The blob drift.
+ *
+ * The system's one decorative motif is an oversized circle bleeding off a card
+ * corner. These give it a slow breath: a few px of travel and a few percent of
+ * scale, over ten seconds or more, so it reads as the card being alive rather
+ * than as something animating. Each blob gets its own duration and direction —
+ * in lockstep they would look like the card itself was moving.
+ *
+ * Transform only, so it stays on the compositor and never reflows the card.
+ */
+@keyframes drift-a {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-12px, 9px, 0) scale(1.06); }
+}
+@keyframes drift-b {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(10px, -11px, 0) scale(1.08); }
+}
+@keyframes drift-c {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-9px, -7px, 0) scale(1.05); }
+}
+
+.ds-blob { will-change: transform; }
+.ds-blob-a { animation: drift-a 13s ease-in-out infinite; }
+.ds-blob-b { animation: drift-b 17s ease-in-out -4s infinite; }
+.ds-blob-c { animation: drift-c 15s ease-in-out -6s infinite; }
+
+/* The chart marker's halo, verbatim from the design system that defined it. */
+@keyframes ping {
+  0% { transform: scale(0.4); opacity: 0.55; }
+  70% { transform: scale(2.1); opacity: 0; }
+  100% { transform: scale(2.1); opacity: 0; }
+}
+
 /* ── shell ────────────────────────────────────────────────────────────────── */
 
 * { box-sizing: border-box; }
