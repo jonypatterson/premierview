@@ -6,6 +6,8 @@ export type Tab = "season" | "players" | "table";
 
 type Props = {
   tab: Tab;
+  /** The club's chalk. The selected glyph and its rule wear it. */
+  accent: string;
   onSeason: () => void;
   onPlayers: () => void;
   onTable: () => void;
@@ -20,7 +22,7 @@ type Props = {
  * screen it was signed off against both use icons. The artboard wins — it is
  * the design of this screen, not a general statement about the system.
  */
-export default function TabBar({ tab, onSeason, onPlayers, onTable, onPicker }: Props) {
+export default function TabBar({ tab, accent, onSeason, onPlayers, onTable, onPicker }: Props) {
   return (
     <div
       style={{
@@ -51,24 +53,24 @@ export default function TabBar({ tab, onSeason, onPlayers, onTable, onPicker }: 
           pointerEvents: "auto",
         }}
       >
-        <TabButton label="Season" on={tab === "season"} onClick={onSeason}>
+        <TabButton label="Season" on={tab === "season"} accent={accent} onClick={onSeason}>
           <polyline points="3 17 9 11 13 15 21 7" />
           <polyline points="15 7 21 7 21 13" />
         </TabButton>
-        <TabButton label="Players" on={tab === "players"} onClick={onPlayers}>
+        <TabButton label="Players" on={tab === "players"} accent={accent} onClick={onPlayers}>
           <circle cx="9" cy="8" r="3.2" />
           <path d="M3.4 19.4c0-3 2.5-5 5.6-5s5.6 2 5.6 5" />
           <path d="M16.6 5.4a2.9 2.9 0 0 1 0 5.6" />
           <path d="M18.1 14.7c1.9.6 3.3 2.1 3.3 4.2" />
         </TabButton>
-        <TabButton label="League table" on={tab === "table"} onClick={onTable}>
+        <TabButton label="League table" on={tab === "table"} accent={accent} onClick={onTable}>
           <rect x="3" y="4.5" width="18" height="15" rx="2.4" />
           <path d="M3 9.5h18" />
           <path d="M3 14.5h18" />
           <path d="M9.5 9.5v10" />
         </TabButton>
         {/* Not a screen, so it never takes the selected capsule or the rule. */}
-        <TabButton label="Change club" on={false} onClick={onPicker}>
+        <TabButton label="Change club" on={false} accent={accent} onClick={onPicker}>
           <rect x="3.5" y="3.5" width="7" height="7" rx="2" />
           <rect x="13.5" y="3.5" width="7" height="7" rx="2" />
           <rect x="3.5" y="13.5" width="7" height="7" rx="2" />
@@ -82,11 +84,13 @@ export default function TabBar({ tab, onSeason, onPlayers, onTable, onPicker }: 
 function TabButton({
   label,
   on,
+  accent,
   onClick,
   children,
 }: {
   label: string;
   on: boolean;
+  accent: string;
   onClick: () => void;
   children: ReactNode;
 }) {
@@ -110,10 +114,11 @@ function TabButton({
         gap: 4,
         transition: "var(--transition-state), color .2s ease",
         background: on ? "var(--cream-14)" : "transparent",
-        // The selected glyph takes the same pink as its underscore, so the
+        // The selected glyph takes the same chalk as its underscore, so the
         // colour and the rule say the same thing rather than only the capsule
-        // carrying the state.
-        color: on ? "var(--accent-1)" : "var(--text-on-inverse-muted)",
+        // carrying the state — and that chalk is the club's, so the bar reads
+        // as part of this club's page rather than a fixed pink on all twenty.
+        color: on ? accent : "var(--text-on-inverse-muted)",
       }}
     >
       <svg
@@ -134,7 +139,7 @@ function TabButton({
           width: 14,
           height: 2,
           borderRadius: 2,
-          background: on ? "var(--accent-1)" : "transparent",
+          background: on ? accent : "transparent",
         }}
       />
     </button>

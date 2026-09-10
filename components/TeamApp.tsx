@@ -10,7 +10,7 @@ import TabBar, { type Tab } from "./TabBar";
 import TableView from "./TableView";
 import { rememberClub } from "@/lib/club-memory";
 import { COMPARE_MODE } from "@/lib/config";
-import { MARK_INK, snap } from "@/lib/palette";
+import { cardChalk, MARK_INK, snap } from "@/lib/palette";
 import { playersView, seasonView } from "@/lib/view";
 import type { Club, LeagueTable, PlayedTeamPage, TeamPage } from "@/lib/types";
 
@@ -38,6 +38,9 @@ export default function TeamApp({ tla, data, error, clubs, table }: Props) {
   const club = clubs.find((c) => c.code === tla);
   // The mark takes the nearest chalk, never the club's own hex.
   const markColour = snap(data?.team.colour || club?.colour);
+  // The same chalk, safe to fill a card or paint a glyph with — a club that
+  // snaps to cream would otherwise be an invisible card on a cream app.
+  const clubChalk = cardChalk(markColour);
   const teamName =
     data?.team.short_name || data?.team.name || club?.short_name || club?.name || tla;
 
@@ -87,13 +90,14 @@ export default function TeamApp({ tla, data, error, clubs, table }: Props) {
       ) : (
         <PlayersView
           key="players"
-          vm={playersView(played)}
+          vm={playersView(played, clubChalk)}
           {...identity}
           onOpenPicker={() => setPicker(true)}
         />
       )}
       <TabBar
         tab={tab}
+        accent={clubChalk}
         onSeason={() => setTab("season")}
         onPlayers={() => setTab("players")}
         onTable={() => setTab("table")}

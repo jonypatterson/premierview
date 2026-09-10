@@ -584,12 +584,15 @@ export function SplitRow({
   style?: CSSProperties;
 }) {
   return (
+    // Padding lives in globals.css (.ds-split) rather than inline, for the same
+    // reason as the player rows: the column has to compress on a desktop where
+    // the screen fits the card, and an inline value would beat the breakpoints.
     <div
+      className="ds-split"
       style={{
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        padding: "16px 18px",
         borderRadius: "var(--radius-pill-sm)",
         background,
         fontFamily: "var(--font-core)",

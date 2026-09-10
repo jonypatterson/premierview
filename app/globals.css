@@ -318,6 +318,11 @@ body {
 /* The hero chip's padding, out of line for the same reason as the rows. */
 .ds-hero { padding: 26px 22px 22px; }
 
+/* The split rows, and the column they stack in. Both are here rather than
+   inline so the four of them can close up on a desktop. */
+.a-splits { display: flex; flex-direction: column; gap: 10px; }
+.ds-split { padding: 16px 18px; }
+
 .site-footer { margin-top: 40px; }
 
 /* Player rows. Sizing is here rather than inline so it can compress on a
@@ -482,6 +487,14 @@ body {
     min-height: clamp(84px, 11vh, 170px);
     font-size: var(--size-body-sm);
   }
+
+  /* Four rows where there were three. Compressed they occupy roughly what the
+     three did, so the screen still fits the card: the column is what sets its
+     grid row's height on both desktop layouts, and a 1366x768 laptop had no
+     spare pixels to give it. The figure steps down with the padding — at
+     --size-figure-md it is what makes a row taller than its own label. */
+  .a-splits { gap: 7px; --size-figure-md: 24px; }
+  .ds-split { padding: 9px 18px; }
 
   .mw-tablepage > div { max-width: 640px; margin-left: auto; margin-right: auto; }
   .mw-tablepage.mw-pad { padding-top: 0; }

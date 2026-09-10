@@ -59,6 +59,30 @@ export const ACCENT = [
   "var(--accent-4)",
 ] as const;
 
+/** The same four as literal values, for anywhere a club's own chalk is compared. */
+const CHALKS = ["#FFB0D6", "#F6D34A", "#A8BE6E", "#A9C9F0"] as const;
+
+/**
+ * The club's chalk, made safe to fill a card with.
+ *
+ * A kit with no usable hue snaps to cream — and cream is the app surface, so a
+ * cream card would be an invisible rectangle. Those clubs take the yellow
+ * accent instead.
+ */
+export function cardChalk(clubChalk: string): string {
+  return clubChalk === "#FBF4E4" ? CHALKS[1] : clubChalk;
+}
+
+/**
+ * The next two chalks after the one already taken, following the rotation the
+ * system sets. Neither can be the taken one, so a card carrying the club's
+ * colour never sits beside a tile wearing the same chalk.
+ */
+export function companionChalks(taken: string): [string, string] {
+  const i = Math.max(0, CHALKS.indexOf(taken as (typeof CHALKS)[number]));
+  return [CHALKS[(i + 1) % CHALKS.length], CHALKS[(i + 2) % CHALKS.length]];
+}
+
 export const UP = "var(--delta-up)";
 export const DOWN = "var(--delta-down)";
 export const FLAT = "var(--delta-flat)";
