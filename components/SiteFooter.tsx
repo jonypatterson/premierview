@@ -9,8 +9,8 @@
 export default function SiteFooter() {
   return (
     <footer
+      className="site-footer"
       style={{
-        marginTop: 40,
         textAlign: "center",
         fontFamily: "var(--font-mono)",
         fontSize: "var(--size-mono-sm)",

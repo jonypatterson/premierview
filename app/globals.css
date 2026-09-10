@@ -248,7 +248,14 @@ body {
   inset: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
+  /* No visible scrollbar anywhere. Above 760px the screens are sized to fit
+     the card, so this is a safety valve for viewports too short to hold them
+     rather than something a reader is meant to use — and clipping would be
+     worse than a scroll they cannot see. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+.mw-screen::-webkit-scrollbar { display: none; }
 
 .mw-pad { padding: 56px 20px 132px; }
 
@@ -272,6 +279,39 @@ body {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
+
+/* The hero chip's padding, out of line for the same reason as the rows. */
+.ds-hero { padding: 26px 22px 22px; }
+
+.site-footer { margin-top: 40px; }
+
+/* Player rows. Sizing is here rather than inline so it can compress on a
+   desktop, where the screen has to fit the card without scrolling. */
+.ds-player {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border-hairline);
+}
+.ds-player-mark {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  color: var(--ink-900);
+  font-family: var(--font-core);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: -0.5px;
+}
+.ds-player-bars {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 11px;
+}
+.ds-player-bars > div { height: 10px; }
 
 /* Club tiles.
  *
@@ -364,12 +404,16 @@ body {
     min-height: min(840px, calc(100dvh - 80px));
   }
 
-  .mw-pad { padding: 44px 40px 132px; }
+  /* Bottom clearance drops from 132px to 96px. It exists so the floating tab
+     bar never covers a row, and the bar sits 26px up and is 48px tall — 96px
+     clears it with room to spare, and the 36px saved is 36px the screen no
+     longer has to scroll. */
+  .mw-pad { padding: 40px 40px 96px; }
 
   .mw-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 36px 40px;
+    gap: 24px 40px;
     align-items: start;
   }
   .mw-span { grid-column: 1 / -1; }
@@ -429,7 +473,29 @@ body {
       "splits record"
       "form goals"
       "chart chart";
+    /* The rows above take what they need; the chart row takes the rest. It
+       used to be a fixed clamp, which is what pushed the screen past the
+       card and made it scroll. */
+    grid-template-rows: auto auto auto minmax(0, 1fr);
   }
+
+  /* The chart block fills its row, and the plot fills what the legend and the
+     matchweek labels leave.
+     align-self matters: .mw-grid sets align-items:start, so without this the
+     chart sizes to its content and overflows its row instead of being bound
+     by it — and an svg with no definite height falls back to its viewBox
+     ratio, which at this width is half the card. */
+  .mw-season .mw-span {
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+    min-height: 0;
+  }
+  /* A floor low enough that the block never outgrows its grid row — at 110px
+     the plot plus its legend and axis labels overran the row on a 900px-tall
+     screen and printed over the footer. */
+  .mw-chartrow { flex: 1; min-height: 64px; }
+  .mw-season { --chart-h: 100%; }
   .a-shero { grid-area: shero; }
   .a-insight { grid-area: insight; }
   .a-splits { grid-area: splits; }
@@ -440,8 +506,8 @@ body {
 }
 
 @media (min-width: 1180px) {
-  .mw-pad { padding: 64px 64px 148px; }
-  .mw-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 44px 48px; }
+  .mw-pad { padding: 44px 64px 96px; }
+  .mw-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px 48px; }
   .mw-clubgrid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
   /* The name carries the tile at this size, so it steps up with it. */
   .club-tile { font-size: var(--size-name); }
@@ -451,10 +517,7 @@ body {
       "shero insight splits"
       "record form goals"
       "chart chart chart";
-    /* The chart takes up the slack at the foot of the overview. It grows with
-       the viewport rather than stopping at a fixed cap, which is most of what
-       made a tall monitor look top-heavy. */
-    --chart-h: clamp(200px, calc(100dvh - 560px), 440px);
+    grid-template-rows: auto auto minmax(0, 1fr);
   }
 
   /* On a tall display the grid sat at the top of a much taller card and left
@@ -463,7 +526,11 @@ body {
      Scoped by :has() to the screens that actually hold a grid — the table page
      is a sticky header over a row list and must stay a normal block. */
   .mw-screen.mw-pad:has(> .mw-grid) { display: flex; flex-direction: column; }
-  .mw-screen.mw-pad > .mw-grid { flex: 1; align-content: space-between; }
+  /* min-height:0 is what lets the grid shrink to the height flex assigns it.
+     Without it a flex item floors at its content height, so the chart's 1fr
+     row measured the content instead of the space left over and the screen
+     scrolled further, not less. */
+  .mw-screen.mw-pad > .mw-grid { flex: 1; min-height: 0; align-content: space-between; }
 
   /* Players stays two columns: .mw-grid's three would add a third track that
      its areas never fill, leaving the screen with a dead column.
@@ -480,6 +547,28 @@ body {
       "scored scored"
       "assisted assisted";
   }
+
+  /* Twelve rows across two lists make this the tallest of the three screens.
+     Compressed, they fit the card instead of overflowing it. */
+  .ds-player { padding: 6px 0; }
+  .ds-player-mark { width: 30px; height: 30px; font-size: 11.5px; }
+  .ds-player-bars { margin-top: 5px; }
+  .ds-player-bars > div { height: 8px; }
+
+  /* This screen's three rows are stacked sections rather than a mix of card
+     heights, so they sit closer than the season grid's. */
+  /* The figure is what sets a player row's height — at --size-figure-md it
+     stands taller than the 30px mark beside it. Scoped down here only. */
+  .mw-players { gap: 18px 48px; --size-figure-md: 24px; }
+
+  /* The screens are sized to the card here, so the footer takes the least
+     space that still separates it from the content above. */
+  .site-footer { margin-top: 20px; }
+
+  /* The players hero carries a name, not a 58px numeral, so it does not need
+     the display size the season hero does. */
+  .mw-players .ds-hero { padding: 20px 22px 18px; }
+  .a-hero { --size-hero: 44px; }
 
   /* Column-major: the list reads 1-2-3 down the left, then 4-5-6 down the
      right. `--rows` is set per list to half its length, so a short list splits

@@ -147,7 +147,10 @@ export function seasonView(d: PlayedTeamPage, mode: CompareMode) {
       {
         tag: "GF",
         label: "goals scored",
-        color: ACCENT[0],
+        // Green scored, pink conceded — the reading everyone brings to a
+        // scoreline. Both are still just identifying their own row, so this
+        // stays a metric colour rather than a judgement.
+        color: ACCENT[2],
         total: String(s.goals_for),
         prevTotal: String(pgf ?? 0),
         delta: s.goals_for === (pgf ?? 0) ? "level" : signed(s.goals_for - (pgf ?? 0)),
@@ -158,7 +161,7 @@ export function seasonView(d: PlayedTeamPage, mode: CompareMode) {
       {
         tag: "GA",
         label: "goals conceded",
-        color: ACCENT[2],
+        color: ACCENT[0],
         total: String(s.goals_against),
         prevTotal: String(pga ?? 0),
         delta: s.goals_against === (pga ?? 0) ? "level" : signed(s.goals_against - (pga ?? 0)),
