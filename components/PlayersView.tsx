@@ -65,20 +65,22 @@ export default function PlayersView({
           <div style={{ margin: "4px 0 8px" }}>
             <Eyebrow tone="faint">{vm.rowLegend}</Eyebrow>
           </div>
-          {vm.scorers.map((p) => (
-            <PlayerRow
-              key={p.name}
-              initials={p.initials}
-              name={p.name}
-              meta={p.meta}
-              value={p.value}
-              delta={p.delta}
-              deltaColor={p.deltaCol}
-              widthNow={p.pct}
-              widthPrevious={p.prevPct}
-              color={p.bar}
-            />
-          ))}
+          <div className="player-cols">
+            {vm.scorers.map((p) => (
+              <PlayerRow
+                key={p.name}
+                initials={p.initials}
+                name={p.name}
+                meta={p.meta}
+                value={p.value}
+                delta={p.delta}
+                deltaColor={p.deltaCol}
+                widthNow={p.pct}
+                widthPrevious={p.prevPct}
+                color={p.bar}
+              />
+            ))}
+          </div>
           {vm.noScorers ? (
             <div
               style={{
@@ -99,20 +101,22 @@ export default function PlayersView({
           <div style={{ margin: "4px 0 8px" }}>
             <Eyebrow tone="faint">{vm.rowLegend}</Eyebrow>
           </div>
-          {vm.assisters.map((p) => (
-            <PlayerRow
-              key={p.name}
-              initials={p.initials}
-              name={p.name}
-              meta={p.meta}
-              value={p.value}
-              delta={p.delta}
-              deltaColor={p.deltaCol}
-              widthNow={p.pct}
-              widthPrevious={p.prevPct}
-              color={p.bar}
-            />
-          ))}
+          <div className="player-cols">
+            {vm.assisters.map((p) => (
+              <PlayerRow
+                key={p.name}
+                initials={p.initials}
+                name={p.name}
+                meta={p.meta}
+                value={p.value}
+                delta={p.delta}
+                deltaColor={p.deltaCol}
+                widthNow={p.pct}
+                widthPrevious={p.prevPct}
+                color={p.bar}
+              />
+            ))}
+          </div>
           {vm.noAssisters ? (
             <div
               style={{

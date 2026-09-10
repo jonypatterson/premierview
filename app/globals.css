@@ -380,9 +380,26 @@ body {
   .mw-screen.mw-pad > .mw-grid { flex: 1; align-content: space-between; }
 
   /* Players stays two columns: .mw-grid's three would add a third track that
-     its "hero tiles" / "scored assisted" areas never fill, leaving the screen
-     with a dead column. */
-  .mw-players { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+     its areas never fill, leaving the screen with a dead column.
+
+     At this width the two lists stop sitting side by side and become
+     full-width sections stacked one above the other, each splitting its six
+     players across two columns. Side by side they were a narrow pair under a
+     much shorter first row, which left an obvious gap between the tiles and
+     the names; stacked, the same content reaches down the card. */
+  .mw-players {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "hero tiles"
+      "scored scored"
+      "assisted assisted";
+  }
+
+  .player-cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 48px;
+  }
 
   .a-hero { --size-hero: 58px; }
   .tb-d { display: block; }

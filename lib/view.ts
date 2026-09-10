@@ -194,7 +194,9 @@ export function playersView(d: PlayedTeamPage) {
     const rows = d.players
       .filter((p) => (p[key] ?? 0) > 0 || (p[prevKey] ?? 0) > 0)
       .sort((a, b) => (b[key] ?? 0) - (a[key] ?? 0) || (b[prevKey] ?? 0) - (a[prevKey] ?? 0))
-      .slice(0, 5);
+      // Six, not the artboard's five: above 1180px each list is a full-width
+      // section of two columns, and six divides into it evenly.
+      .slice(0, 6);
     const top = Math.max(1, ...rows.map((p) => Math.max(p[key] ?? 0, p[prevKey] ?? 0)));
     return rows.map((p) => {
       const now = p[key];
