@@ -31,6 +31,12 @@ export default function TabBar({ tab, onSeason, onPlayers, onTable, onPicker }: 
         display: "flex",
         justifyContent: "center",
         pointerEvents: "none",
+        // Above the league table's sticky header (3) and its row list (1).
+        // The screen and this bar are both positioned with z-index auto, which
+        // creates no stacking context, so those values compete directly with
+        // this one — without it the table painted over the bar and swallowed
+        // every click on it.
+        zIndex: 10,
       }}
     >
       <nav
