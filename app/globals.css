@@ -254,9 +254,19 @@ body {
 
 .mw-grid { display: flex; flex-direction: column; gap: 28px; }
 
-/* Base columns for the picker. It has to sit above the breakpoints below —
-   same specificity, so the last rule wins, and declaring it after them left
-   the grid at its phone width on every screen. */
+/* The picker. These base rules have to sit above the breakpoints below —
+   same specificity, so the last rule wins, and declaring them after left the
+   screen at its phone layout everywhere. */
+.mw-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 56px 20px 40px;
+}
+
+.mw-picker-head { animation: rise .34s ease both; }
+.mw-picker-lead { max-width: 320px; }
+
 .mw-clubgrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -324,6 +334,23 @@ body {
     align-items: start;
   }
   .mw-span { grid-column: 1 / -1; }
+
+  /* The picker is a short screen inside a card that fills the viewport, so
+     stacked at the top it left a large dead area beneath — nearly 460px at
+     1920x1200. Centring it uses that space on both sides instead.
+     `safe` falls back to start-alignment when the content is taller than the
+     card, so the heading can never be pushed above the scroll origin; the
+     plain `center` before it covers browsers without `safe`. */
+  .mw-picker {
+    padding: 40px 40px 48px;
+    gap: 40px;
+    justify-content: center;
+    justify-content: safe center;
+  }
+
+  /* 320px is a phone measure; on a wide card it left the head as a narrow
+     column against a full-width grid. */
+  .mw-picker-lead { max-width: 460px; }
 
   /* Fewer columns than the artboard's five and seven: those were sized for a
      three-letter code, and a club name needs room to sit on one line. */
