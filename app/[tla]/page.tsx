@@ -21,7 +21,7 @@ import Frame from "@/components/Frame";
 import TeamApp from "@/components/TeamApp";
 import { FALLBACK_CLUBS } from "@/lib/clubs";
 import { errorMessage } from "@/lib/format";
-import { OG_IMAGE, SITE, SITE_URL } from "@/lib/site";
+import { SITE, SITE_URL } from "@/lib/site";
 import { getClubs, getLeagueTable, getTeamPage } from "@/lib/queries";
 import type { LeagueTable, TeamPage } from "@/lib/types";
 
@@ -62,7 +62,9 @@ export async function generateMetadata({ params }: { params: Promise<{ tla: stri
       url: `${SITE_URL}/${tla}`,
       title,
       description: `${name} this season against last, matchweek by matchweek.`,
-      images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: SITE }],
+      // No `images` here on purpose: opengraph-image.tsx supplies this route's
+      // card, and naming one would replace it with the static file every club
+      // used to share.
     },
   };
 }

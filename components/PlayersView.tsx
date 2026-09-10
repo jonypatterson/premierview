@@ -81,10 +81,7 @@ export default function PlayersView({
                 name={p.name}
                 meta={p.meta}
                 value={p.value}
-                delta={p.delta}
-                deltaColor={p.deltaCol}
                 widthNow={p.pct}
-                widthPrevious={p.prevPct}
                 color={p.bar}
               />
             ))}
@@ -117,10 +114,7 @@ export default function PlayersView({
                 name={p.name}
                 meta={p.meta}
                 value={p.value}
-                delta={p.delta}
-                deltaColor={p.deltaCol}
                 widthNow={p.pct}
-                widthPrevious={p.prevPct}
                 color={p.bar}
               />
             ))}

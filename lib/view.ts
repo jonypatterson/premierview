@@ -188,7 +188,22 @@ export function playersView(d: PlayedTeamPage) {
   const s = d.summary;
   const prevShort = short(d.seasons.previous);
 
-  // Bars are scaled against the larger of the two seasons, so both compare.
+  /**
+   * Last season's player figures are whole-season totals — `player_match_stats`
+   * and `player_gameweek_stats` are empty, so there is no way to ask what a
+   * player had scored by matchweek 3 of last season.
+   *
+   * That makes any delta against them a lie at this end of the season: two
+   * goals in three matches against seven in thirty-eight came out as "-5" in
+   * red, which reads as a collapse when it is a player on pace to beat it. So
+   * no delta, no "was" — "was" means "at this stage" everywhere else in the
+   * app — and no second bar, because a three-match bar beside a full-season
+   * one says the same wrong thing in pictures.
+   *
+   * Last season stays on the row as context, stated with its scope. When the
+   * sync backfills per-match player stats this can become a real same-stage
+   * comparison, and the delta and the second bar can come back.
+   */
   const rank = (
     key: "goals" | "assists",
     prevKey: "prev_goals" | "prev_assists",
@@ -200,22 +215,19 @@ export function playersView(d: PlayedTeamPage) {
       // Six, not the artboard's five: above 1180px each list is a full-width
       // section of two columns, and six divides into it evenly.
       .slice(0, 6);
-    const top = Math.max(1, ...rows.map((p) => Math.max(p[key] ?? 0, p[prevKey] ?? 0)));
+    // Scaled against this season only, so the bars rank these players against
+    // each other rather than against a season none of them has played yet.
+    const top = Math.max(1, ...rows.map((p) => p[key] ?? 0));
     return rows.map((p) => {
-      const now = p[key];
+      const now = p[key] ?? 0;
       const was = p[prevKey];
-      const diff = now == null || was == null ? null : now - was;
       return {
         name: p.player_name,
         initials: initials(p.player_name),
         bar: colour,
-        value: now == null ? "—" : String(now),
-        meta: was == null ? "not reported" : `was ${was}`,
-        delta: diff == null ? "" : diff === 0 ? "level" : signed(diff),
-        deltaCol: diff == null || diff === 0 ? FLAT : diff > 0 ? UP : DOWN,
-        // 46% each, so the pair of bars can never exceed the row.
-        pct: `${Math.round(((now ?? 0) / top) * 46)}%`,
-        prevPct: `${Math.round(((was ?? 0) / top) * 46)}%`,
+        value: String(now),
+        meta: was == null ? "not reported" : `${was} in ${prevShort}`,
+        pct: `${Math.round((now / top) * 100)}%`,
       };
     });
   };
@@ -246,14 +258,15 @@ export function playersView(d: PlayedTeamPage) {
         topScorerLabel: "Top scorer",
         topScorerName: topScorer.player_name,
         topScorerGoals: `${topScorer.goals} ${topScorer.goals === 1 ? "goal" : "goals"} in ${matches}`,
-        topScorerDelta: `was ${topScorer.prev_goals ?? 0}`,
-        topScorerNote: `in ${prevShort}`,
+        // Not "was": a whole-season total, so it is labelled as one.
+        topScorerDelta: `${topScorer.prev_goals ?? 0} goals`,
+        topScorerNote: `all of ${prevShort}`,
       }
     : {
         topScorerLabel: "Top scorer",
         topScorerName: "None yet",
         topScorerGoals: `no goals in ${matches}`,
-        topScorerDelta: prevTopScorer ? `was ${prevTopScorer.prev_goals}` : "",
+        topScorerDelta: prevTopScorer ? `${prevTopScorer.prev_goals} goals` : "",
         topScorerNote: prevTopScorer
           ? `${prevTopScorer.player_name} led ${prevShort}`
           : `no goals in ${prevShort} either`,
@@ -262,19 +275,19 @@ export function playersView(d: PlayedTeamPage) {
   return {
     ...head,
     headerMeta: `${short(d.seasons.current)} · matchweek ${s.matchweek}`,
-    rowLegend: `upper bar this season, lower ${prevShort}`,
+    rowLegend: `bar is this season · ${prevShort} shown in full for context`,
     playerSummary: [
       {
         code: "Scorers used",
         fill: ACCENT[2],
         value: scored ? String(scorersUsed) : "—",
-        caption: scored ? `was ${prevScorersUsed}` : "no goals yet",
+        caption: scored ? `${prevScorersUsed} across ${prevShort}` : "no goals yet",
       },
       {
         code: "Assisted",
         fill: ACCENT[3],
         value: scored ? String(assistTotal) : "—",
-        caption: scored ? `was ${prevAssistTotal}` : "no goals yet",
+        caption: scored ? `${prevAssistTotal} across ${prevShort}` : "no goals yet",
       },
     ],
     scorers,

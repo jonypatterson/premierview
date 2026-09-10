@@ -13,7 +13,10 @@ import { NextResponse, type NextRequest } from "next/server";
  */
 export function middleware(req: NextRequest) {
   const segment = req.nextUrl.pathname.slice(1);
-  if (segment && !/^[A-Za-z]{3}$/.test(segment)) {
+  // Single-segment paths only. [tla] catches those and nothing deeper, so a
+  // nested path is a route in its own right — /ARS/opengraph-image renders the
+  // club's share card — and testing it against a three-letter code 404s it.
+  if (segment && !segment.includes("/") && !/^[A-Za-z]{3}$/.test(segment)) {
     // Rewritten to a two-segment path, which no route matches — so Next serves
     // app/not-found.tsx with a genuine 404 rather than a blank body.
     return NextResponse.rewrite(new URL("/_/not-a-club", req.url));
