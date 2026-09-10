@@ -254,6 +254,15 @@ body {
 
 .mw-grid { display: flex; flex-direction: column; gap: 28px; }
 
+/* Base columns for the picker. It has to sit above the breakpoints below —
+   same specificity, so the last rule wins, and declaring it after them left
+   the grid at its phone width on every screen. */
+.mw-clubgrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
 /* Columns only exist above 760px; on a phone every screen is one column. */
 .a-shero, .a-insight, .a-splits, .a-form, .a-record, .a-goals,
 .a-hero, .a-tiles, .a-scored, .a-assisted, .mw-span { min-width: 0; }
@@ -316,8 +325,9 @@ body {
   }
   .mw-span { grid-column: 1 / -1; }
 
-  .mw-clubgrid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
-  .mw-clubgrid button { padding: 16px 12px; }
+  /* Fewer columns than the artboard's five and seven: those were sized for a
+     three-letter code, and a club name needs room to sit on one line. */
+  .mw-clubgrid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
 
   .mw-tablepage > div { max-width: 640px; margin-left: auto; margin-right: auto; }
   .mw-tablepage.mw-pad { padding-top: 0; }
@@ -357,8 +367,7 @@ body {
 @media (min-width: 1180px) {
   .mw-pad { padding: 64px 64px 148px; }
   .mw-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 44px 48px; }
-  .mw-clubgrid { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 16px; }
-  .mw-clubgrid button { padding: 18px 14px; }
+  .mw-clubgrid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
 
   .mw-season {
     grid-template-areas:
@@ -450,24 +459,42 @@ body {
 .ds-btn-quiet:hover:not(:disabled) { background: var(--surface-quiet-hover); }
 .ds-btn-accent { background: var(--accent-1); color: var(--text-body); }
 
-/* Club tiles on the picker: selected is a fill change and a scale to 1.00. */
+/* Club tiles on the picker.
+ *
+ * The name is the content, not a caption under a mark. The mark is gone: it
+ * was a chalk square inside the tile's own square — a box within a box, which
+ * the system forbids — and snapping twenty kits onto five chalks put eight
+ * clubs on the same pink and eight more on the same blue, so its colour
+ * identified nothing while looking as though it should.
+ *
+ * Colour is now spent where it means something: the one tile you are already
+ * on takes the accent, which is the same rule the league table follows.
+ * Selection is a fill change and a scale to 1.00, never an outline.
+ */
 .club-tile {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 12px 10px;
+  justify-content: center;
+  text-align: center;
+  min-height: 76px;
+  padding: 14px 12px;
   border: 0;
   border-radius: var(--radius-tile);
   cursor: pointer;
   font-family: var(--font-core);
+  font-size: var(--size-body);
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--text-body);
+  text-wrap: balance;
   transition: var(--transition-state);
   background: var(--surface-quiet);
   transform: scale(var(--scale-unselected));
 }
 .club-tile:hover { background: var(--surface-quiet-hover); }
 .club-tile-current {
-  background: var(--surface-quiet-hover);
+  background: var(--accent-1);
+  font-weight: 600;
   transform: scale(var(--scale-selected));
 }
 
