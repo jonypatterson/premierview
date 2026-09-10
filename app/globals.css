@@ -390,6 +390,34 @@ body {
   .tb-frozen { padding-top: 64px; }
 }
 
+/* Skeleton placeholder.
+ *
+ * The one looping animation in the app. The system says "no loading skeleton
+ * animation, and nothing loops" — this is a deliberate exception: the static
+ * text screen it replaces read as a dead end rather than as loading. The tones
+ * are still ink at an opacity, so it stays in the paper family rather than
+ * introducing a grey. Reduced motion is handled by the global rule below.
+ */
+.sk {
+  /* The quiet surface shimmering to its own hover tone — both are existing
+     tokens, so the placeholder is a real surface from the system rather than
+     an invented grey. */
+  background: linear-gradient(
+    90deg,
+    var(--surface-quiet) 25%,
+    var(--surface-quiet-hover) 50%,
+    var(--surface-quiet) 75%
+  );
+  background-size: 400px 100%;
+  animation: sk 1.4s linear infinite;
+  border-radius: var(--radius-chip);
+}
+
+@keyframes sk {
+  from { background-position: -200px 0; }
+  to { background-position: 200px 0; }
+}
+
 /* Button tones. The bundle held hover in React state; as CSS it keeps the
    components server-rendered. "Nothing changes opacity on hover." */
 .ds-btn { transition: var(--transition-state); }
