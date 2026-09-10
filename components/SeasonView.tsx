@@ -172,7 +172,9 @@ export default function SeasonView({
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: 9 }}>
+          {/* Takes the height the rows above leave, so the screen fits the
+              card rather than the chart forcing it to scroll. */}
+          <div className="mw-chartrow" style={{ display: "flex", gap: 9 }}>
             <div
               style={{
                 position: "relative",

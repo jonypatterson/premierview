@@ -203,9 +203,9 @@ export function HeroStat({
 }) {
   return (
     <div
+      className="ds-hero"
       style={{
         borderRadius: "var(--radius-hero)",
-        padding: "26px 22px 22px",
         position: "relative",
         overflow: "hidden",
         background,
@@ -498,16 +498,14 @@ export function PlayerRow({
   style?: CSSProperties;
 }) {
   return (
-    <div
-      style={{
-        padding: "14px 0",
-        borderBottom: "1px solid var(--border-hairline)",
-        fontFamily: "var(--font-core)",
-        ...style,
-      }}
-    >
+    // Sizing lives in globals.css (.ds-player*) rather than inline, so the
+    // rows can compress on a desktop where the screen has to fit the card.
+    // Inline values would beat the breakpoints.
+    <div className="ds-player" style={{ fontFamily: "var(--font-core)", ...style }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <Avatar initials={initials} shape="round" size={40} background={color} color="var(--ink-900)" />
+        <span className="ds-player-mark" style={{ background: color }}>
+          {initials}
+        </span>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: "var(--size-body)", fontWeight: 500, color: "var(--text-body)" }}>
             {name}
@@ -542,18 +540,10 @@ export function PlayerRow({
           </div>
         </div>
       </div>
-      <div style={{ display: "flex", gap: 5, marginTop: 11, alignItems: "center" }}>
+      <div className="ds-player-bars">
+        <div style={{ borderRadius: "var(--radius-full)", background: color, width: widthNow }} />
         <div
           style={{
-            height: 10,
-            borderRadius: "var(--radius-full)",
-            background: color,
-            width: widthNow,
-          }}
-        />
-        <div
-          style={{
-            height: 10,
             borderRadius: "var(--radius-full)",
             background: "var(--track-bar-past)",
             width: widthPrevious,

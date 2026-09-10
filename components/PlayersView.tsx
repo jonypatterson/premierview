@@ -70,7 +70,7 @@ export default function PlayersView({
 
         <div className="a-scored" style={{ animation: "rise .34s ease .12s both" }}>
           <Eyebrow>Scored</Eyebrow>
-          <div style={{ margin: "4px 0 8px" }}>
+          <div style={{ margin: "2px 0 5px" }}>
             <Eyebrow tone="faint">{vm.rowLegend}</Eyebrow>
           </div>
           <div className="player-cols" style={cols(vm.scorers.length)}>
@@ -106,7 +106,7 @@ export default function PlayersView({
 
         <div className="a-assisted" style={{ animation: "rise .34s ease .16s both" }}>
           <Eyebrow>Assisted</Eyebrow>
-          <div style={{ margin: "4px 0 8px" }}>
+          <div style={{ margin: "2px 0 5px" }}>
             <Eyebrow tone="faint">{vm.rowLegend}</Eyebrow>
           </div>
           <div className="player-cols" style={cols(vm.assisters.length)}>
