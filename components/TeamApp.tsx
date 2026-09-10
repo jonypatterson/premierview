@@ -8,8 +8,8 @@ import ProblemState from "./ProblemState";
 import SeasonView from "./SeasonView";
 import TabBar, { type Tab } from "./TabBar";
 import TableView from "./TableView";
+import { rememberClub } from "@/lib/club-memory";
 import { COMPARE_MODE } from "@/lib/config";
-import { STORAGE_KEY } from "@/lib/format";
 import { MARK_INK, snap } from "@/lib/palette";
 import { playersView, seasonView } from "@/lib/view";
 import type { Club, LeagueTable, PlayedTeamPage, TeamPage } from "@/lib/types";
@@ -29,12 +29,10 @@ export default function TeamApp({ tla, data, error, clubs, table }: Props) {
   const [picker, setPicker] = useState(false);
 
   // Visiting /MUN directly is also a choice — remember it, so / lands here next.
+  // This is also what backfills the cookie for visitors who only have the
+  // older localStorage entry.
   useEffect(() => {
-    try {
-      window.localStorage.setItem(STORAGE_KEY, tla);
-    } catch {
-      /* private mode */
-    }
+    rememberClub(tla);
   }, [tla]);
 
   const club = clubs.find((c) => c.code === tla);

@@ -5,7 +5,7 @@ import { useTransition } from "react";
 import { Avatar } from "./ds";
 import LogoLockup from "./LogoLockup";
 import SiteFooter from "./SiteFooter";
-import { STORAGE_KEY } from "@/lib/format";
+import { rememberClub } from "@/lib/club-memory";
 import { MARK_INK, snap } from "@/lib/palette";
 import { FALLBACK_CLUBS } from "@/lib/clubs";
 import type { Club } from "@/lib/types";
@@ -30,11 +30,7 @@ export default function ClubPicker({ clubs, currentTla }: Props) {
   const list = clubs.length ? clubs : FALLBACK_CLUBS;
 
   const pick = (code: string) => {
-    try {
-      window.localStorage.setItem(STORAGE_KEY, code);
-    } catch {
-      /* private mode — the route still works, it just won't be remembered */
-    }
+    rememberClub(code);
     startTransition(() => router.push(`/${code}`));
   };
 
