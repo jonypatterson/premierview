@@ -273,6 +273,45 @@ body {
   gap: 10px;
 }
 
+/* Club tiles.
+ *
+ * The name is the content, not a caption under a mark. The mark is gone: it
+ * was a chalk square inside the tile's own square — a box within a box, which
+ * the system forbids — and snapping twenty kits onto five chalks put eight
+ * clubs on the same pink and eight more on the same blue, so its colour
+ * identified nothing while looking as though it should.
+ *
+ * Colour is now spent where it means something: the one tile you are already
+ * on takes the accent, which is the same rule the league table follows.
+ * Selection is a fill change and a scale to 1.00, never an outline.
+ */
+.club-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 76px;
+  padding: 14px 12px;
+  border: 0;
+  border-radius: var(--radius-tile);
+  cursor: pointer;
+  font-family: var(--font-core);
+  font-size: var(--size-body);
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--text-body);
+  text-wrap: balance;
+  transition: var(--transition-state);
+  background: var(--surface-quiet);
+  transform: scale(var(--scale-unselected));
+}
+.club-tile:hover { background: var(--surface-quiet-hover); }
+.club-tile-current {
+  background: var(--accent-1);
+  font-weight: 600;
+  transform: scale(var(--scale-selected));
+}
+
 /* Columns only exist above 760px; on a phone every screen is one column. */
 .a-shero, .a-insight, .a-splits, .a-form, .a-record, .a-goals,
 .a-hero, .a-tiles, .a-scored, .a-assisted, .mw-span { min-width: 0; }
@@ -335,17 +374,15 @@ body {
   }
   .mw-span { grid-column: 1 / -1; }
 
-  /* The picker is a short screen inside a card that fills the viewport, so
-     stacked at the top it left a large dead area beneath — nearly 460px at
-     1920x1200. Centring it uses that space on both sides instead.
-     `safe` falls back to start-alignment when the content is taller than the
-     card, so the heading can never be pushed above the scroll origin; the
-     plain `center` before it covers browsers without `safe`. */
+  /* The heading stays at the top — it titles the screen, so centring the whole
+     block put it adrift in the middle of the card. The room a tall card leaves
+     goes into the tiles instead: they grow with the viewport rather than the
+     gaps between them growing, because spacing rows further apart is what
+     stops a grid reading as one group, and a bigger tile is also a bigger
+     target. */
   .mw-picker {
     padding: 40px 40px 48px;
     gap: 40px;
-    justify-content: center;
-    justify-content: safe center;
   }
 
   /* 320px is a phone measure; on a wide card it left the head as a narrow
@@ -355,6 +392,17 @@ body {
   /* Fewer columns than the artboard's five and seven: those were sized for a
      three-letter code, and a club name needs room to sit on one line. */
   .mw-clubgrid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+
+  /* Height tracks the viewport, with a floor and a ceiling: four rows sharing
+     the whole of a 1440px-tall card would make each tile 250px, which is a
+     slab rather than a button.
+     11vh, not more — at 12vh a 900px-tall laptop tips into scrolling, and
+     that is the commonest desktop size there is. The ceiling only binds above
+     about 1550px of viewport, so raising it costs nothing below that. */
+  .club-tile {
+    min-height: clamp(84px, 11vh, 170px);
+    font-size: var(--size-body-sm);
+  }
 
   .mw-tablepage > div { max-width: 640px; margin-left: auto; margin-right: auto; }
   .mw-tablepage.mw-pad { padding-top: 0; }
@@ -395,6 +443,8 @@ body {
   .mw-pad { padding: 64px 64px 148px; }
   .mw-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 44px 48px; }
   .mw-clubgrid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
+  /* The name carries the tile at this size, so it steps up with it. */
+  .club-tile { font-size: var(--size-name); }
 
   .mw-season {
     grid-template-areas:
@@ -485,45 +535,6 @@ body {
 .ds-btn-quiet { background: var(--surface-quiet); color: var(--text-body); }
 .ds-btn-quiet:hover:not(:disabled) { background: var(--surface-quiet-hover); }
 .ds-btn-accent { background: var(--accent-1); color: var(--text-body); }
-
-/* Club tiles on the picker.
- *
- * The name is the content, not a caption under a mark. The mark is gone: it
- * was a chalk square inside the tile's own square — a box within a box, which
- * the system forbids — and snapping twenty kits onto five chalks put eight
- * clubs on the same pink and eight more on the same blue, so its colour
- * identified nothing while looking as though it should.
- *
- * Colour is now spent where it means something: the one tile you are already
- * on takes the accent, which is the same rule the league table follows.
- * Selection is a fill change and a scale to 1.00, never an outline.
- */
-.club-tile {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  min-height: 76px;
-  padding: 14px 12px;
-  border: 0;
-  border-radius: var(--radius-tile);
-  cursor: pointer;
-  font-family: var(--font-core);
-  font-size: var(--size-body);
-  font-weight: 500;
-  line-height: 1.2;
-  color: var(--text-body);
-  text-wrap: balance;
-  transition: var(--transition-state);
-  background: var(--surface-quiet);
-  transform: scale(var(--scale-unselected));
-}
-.club-tile:hover { background: var(--surface-quiet-hover); }
-.club-tile-current {
-  background: var(--accent-1);
-  font-weight: 600;
-  transform: scale(var(--scale-selected));
-}
 
 /* Focus is not styled in the source; the system's own note says to add one. */
 :where(button, a, [tabindex]):focus-visible {
