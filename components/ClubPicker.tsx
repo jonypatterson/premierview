@@ -46,11 +46,11 @@ export default function ClubPicker({ clubs, currentTla, onClose }: Props) {
   };
 
   return (
-    <div
-      className="mw-pad mw-screen"
-      style={{ display: "flex", flexDirection: "column", gap: 32, padding: "56px 20px 40px" }}
-    >
-      <div style={{ animation: "rise .34s ease both" }}>
+    /* Layout lives in globals.css. Setting it inline put it out of reach of
+       the breakpoints, which is why this screen never picked up the desktop
+       treatment the others have. */
+    <div className="mw-screen mw-picker">
+      <div className="mw-picker-head">
         <LogoLockup size={44} />
         <div
           style={{
@@ -64,13 +64,13 @@ export default function ClubPicker({ clubs, currentTla, onClose }: Props) {
           Pick your club
         </div>
         <div
+          className="mw-picker-lead"
           style={{
             fontSize: "var(--size-lead)",
             fontWeight: 500,
             lineHeight: "var(--leading-lead)",
             color: "var(--text-muted)",
             marginTop: 12,
-            maxWidth: 320,
             textWrap: "pretty",
           }}
         >
