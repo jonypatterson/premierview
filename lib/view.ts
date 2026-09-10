@@ -3,7 +3,7 @@
 // renderVals() in `Season Comparison - Matchday.dc.html`.
 
 import { initials, ord, places, short, signed } from "./format";
-import { ACCENT, DOWN, FLAT, UP } from "./palette";
+import { ACCENT, companionChalks, DOWN, FLAT, UP } from "./palette";
 import type { CompareMode, LeagueTable, PlayedTeamPage } from "./types";
 
 /** Chart geometry is authored against a 320x160 box and stretched to fit. */
@@ -54,6 +54,7 @@ export function seasonView(d: PlayedTeamPage, mode: CompareMode) {
   const [mx, my] = xy(cur[lastIdx] ?? 1, lastIdx);
 
   const games = s.won + s.drawn + s.lost;
+  const prevGames = (prevWon ?? 0) + (prevDrawn ?? 0) + (prevLost ?? 0);
   const pts = s.won * 3 + s.drawn;
   const prevPts = (prevWon ?? 0) * 3 + (prevDrawn ?? 0);
   const ptsDelta = pts - prevPts;
@@ -123,9 +124,20 @@ export function seasonView(d: PlayedTeamPage, mode: CompareMode) {
         fill: "var(--accent-4)",
       },
       {
-        // The projection replaces points per game, which was the same number
-        // in a duller unit — 3.0 a game *is* 114 over a season, and the season
-        // total is the one anybody quotes.
+        // The rate, against the rate at the same stage last season. It says
+        // something the season total cannot at matchweek 3, when three points
+        // is either a bad start or a perfect one depending on the fixtures
+        // played.
+        label: "points per game",
+        value: (pts / Math.max(1, games)).toFixed(1),
+        previous: (prevPts / Math.max(1, prevGames)).toFixed(1),
+        fill: "var(--accent-1)",
+      },
+      {
+        // The same rate carried out to 38 matches. It sits beside points per
+        // game rather than instead of it: one is where the season is, the
+        // other is where it ends up if nothing changes, and the second is the
+        // number anybody actually quotes.
         //
         // It compares against last season's *finished* total, not the figure
         // at this stage, because a projection is itself a full-season number.
@@ -136,7 +148,7 @@ export function seasonView(d: PlayedTeamPage, mode: CompareMode) {
         value: String(Math.round((pts / Math.max(1, games)) * 38)),
         previous: String((s.prev_final_won ?? 0) * 3 + (s.prev_final_drawn ?? 0)),
         previousLabel: "finished",
-        fill: "var(--accent-1)",
+        fill: "var(--accent-2)",
       },
     ],
 
@@ -193,9 +205,17 @@ export function seasonView(d: PlayedTeamPage, mode: CompareMode) {
   };
 }
 
-export function playersView(d: PlayedTeamPage) {
+/**
+ * @param clubChalk The club's own chalk, already made safe to fill a card with.
+ *   The top-scorer hero wears it, so the screen's largest surface identifies
+ *   the club rather than repeating the palette rotation every other club gets.
+ */
+export function playersView(d: PlayedTeamPage, clubChalk: string) {
   const s = d.summary;
   const prevShort = short(d.seasons.previous);
+  // The two tiles beside the hero take the next chalks along, so neither ever
+  // repeats the colour the hero is already carrying.
+  const [tileA, tileB] = companionChalks(clubChalk);
 
   /**
    * Last season's player figures are whole-season totals — `player_match_stats`
@@ -285,16 +305,17 @@ export function playersView(d: PlayedTeamPage) {
     ...head,
     headerMeta: `${short(d.seasons.current)} · matchweek ${s.matchweek}`,
     rowLegend: `bar is this season · ${prevShort} shown in full for context`,
+    heroFill: clubChalk,
     playerSummary: [
       {
         code: "Scorers used",
-        fill: ACCENT[2],
+        fill: tileA,
         value: scored ? String(scorersUsed) : "—",
         caption: scored ? `${prevScorersUsed} across ${prevShort}` : "no goals yet",
       },
       {
         code: "Assisted",
-        fill: ACCENT[3],
+        fill: tileB,
         value: scored ? String(assistTotal) : "—",
         caption: scored ? `${prevAssistTotal} across ${prevShort}` : "no goals yet",
       },

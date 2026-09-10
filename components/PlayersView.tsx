@@ -55,7 +55,7 @@ export default function PlayersView({
             label={vm.topScorerGoals}
             delta={vm.topScorerDelta}
             deltaCaption={vm.topScorerNote}
-            background="var(--accent-2)"
+            background={vm.heroFill}
           />
         </div>
 

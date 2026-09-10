@@ -71,10 +71,8 @@ export default function SeasonView({
           </InsightCard>
         </div>
 
-        <div
-          className="a-splits"
-          style={{ display: "flex", flexDirection: "column", gap: 10, animation: "rise .34s ease .1s both" }}
-        >
+        {/* Layout is in globals.css so the gap can close on a desktop. */}
+        <div className="a-splits" style={{ animation: "rise .34s ease .1s both" }}>
           {vm.splits.map((s) => (
             <SplitRow
               key={s.label}
