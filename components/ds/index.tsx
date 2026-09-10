@@ -568,12 +568,18 @@ export function SplitRow({
   label,
   value,
   previous,
+  previousLabel = "was",
   background = "var(--accent-3)",
   style,
 }: {
   label: string;
   value: ReactNode;
   previous?: ReactNode;
+  /**
+   * "was" means "at this stage" throughout the app. A row comparing against a
+   * finished season has to say so instead.
+   */
+  previousLabel?: string;
   background?: string;
   style?: CSSProperties;
 }) {
@@ -610,7 +616,7 @@ export function SplitRow({
               color: "var(--ink-60)",
             }}
           >
-            was {previous}
+            {`${previousLabel} ${previous}`}
           </span>
         ) : null}
       </span>
