@@ -4,9 +4,8 @@ export const SITE_URL = "https://www.betterthanthelast.one";
 export const DESCRIPTION =
   "Your club's Premier League season so far, against the same point last season.";
 
-/**
- * Served from /public rather than the app/opengraph-image file convention: a
- * route that sets its own `openGraph` block replaces the inherited one, and the
- * club pages — the ones people actually share — lost the image that way.
- */
-export const OG_IMAGE = "/og.png";
+// The share cards are no longer here. Both are rendered by the
+// app/opengraph-image file convention — one at the root for the site, one under
+// [tla] for each club — so neither can fall behind the design the way a PNG
+// checked into /public did. There is no shared constant to point at, because
+// each route supplies its own and none of them names a URL.

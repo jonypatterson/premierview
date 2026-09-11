@@ -9,6 +9,7 @@ const config: NextConfig = {
   // tracing cannot see them on its own — without this they are missing from
   // the deployed bundle and the card 500s in production but not locally.
   outputFileTracingIncludes: {
+    "/opengraph-image": ["./assets/fonts/**"],
     "/[tla]/opengraph-image": ["./assets/fonts/**"],
   },
 
