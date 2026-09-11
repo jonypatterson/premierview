@@ -28,7 +28,12 @@ export const config = {
   // An explicit list, not "anything with a dot in it": the served files are a
   // known, short set, and exempting every dotted path would hand /.env and
   // friends the same soft 200 this exists to remove.
+  // `opengraph-image` is the site's share card — a real single-segment route,
+  // and one that is not three letters, so without this it is rewritten to the
+  // 404 and every link to the domain previews nothing. The club card at
+  // /ARS/opengraph-image is nested and was never at risk. The old og.png that
+  // used to be listed here has gone: both cards are rendered now.
   matcher: [
-    "/((?!_next/|robots\\.txt|sitemap\\.xml|favicon\\.ico|og\\.png|icon\\.svg|apple-icon\\.png).*)",
+    "/((?!_next/|robots\\.txt|sitemap\\.xml|favicon\\.ico|opengraph-image|icon\\.svg|apple-icon\\.png).*)",
   ],
 };

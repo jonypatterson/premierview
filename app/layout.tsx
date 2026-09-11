@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { DM_Mono, Outfit } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
-import { DESCRIPTION, OG_IMAGE, SITE, SITE_URL } from "@/lib/site";
+import { DESCRIPTION, SITE, SITE_URL } from "@/lib/site";
 
 /**
  * Google Analytics 4, or nothing at all.
@@ -70,7 +70,10 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     url: SITE_URL,
     locale: "en_GB",
-    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: SITE }],
+    // No `images` here on purpose, in both directions. app/opengraph-image.tsx
+    // supplies this one, and naming a URL here would override it; the club
+    // routes set their own openGraph block, which replaces this one entirely,
+    // and their own file-convention card fills it back in.
   },
   // Card type only: X and the rest fall back to the og: tags, so the per-club
   // title doesn't have to be repeated in two vocabularies.
